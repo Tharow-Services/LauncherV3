@@ -19,10 +19,8 @@
 package net.technicpack.launcher.ui;
 
 import net.technicpack.launcher.LauncherMain;
-import net.technicpack.launchercore.exception.MicrosoftAuthException;
 import net.technicpack.launchercore.exception.ResponseException;
 import net.technicpack.launchercore.exception.SessionException;
-import net.technicpack.minecraftcore.microsoft.auth.MicrosoftUser;
 import net.technicpack.ui.controls.list.popupformatters.RoundedBorderFormatter;
 import net.technicpack.ui.controls.lang.LanguageCellRenderer;
 import net.technicpack.ui.controls.lang.LanguageCellUI;
@@ -64,7 +62,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
     private TechnicSettings settings;
 
     private RoundedButton addMojang;
-    private RoundedButton addMicrosoft;
+    private RoundedButton addRegistration;
     private RoundedButton login;
     private JTextField username;
     private JLabel selectLabel;
@@ -208,15 +206,15 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         selectLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         add(selectLabel, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10,20,0,20), 0,0));
 
-//        addAccounts = new JLabel(resources.getString("login.instructions"));
-//        addAccounts.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-//        addAccounts.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-//        add(addAccounts, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-//
-//        visitBrowser = new JLabel(resources.getString("login.checkbrowser"));
-//        visitBrowser.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-//        visitBrowser.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-//        add(visitBrowser,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+        //addAccounts = new JLabel(resources.getString("login.instructions"));
+        //addAccounts.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        //addAccounts.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        //add(addAccounts, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+
+        //visitBrowser = new JLabel(resources.getString("login.checkbrowser"));
+        //visitBrowser.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        //visitBrowser.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        //add(visitBrowser,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
         // Setup account select box
         nameSelect = new JComboBox<>();
@@ -257,7 +255,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         add(login, new GridBagConstraints(0, 6, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
 
         // Add mojang account button
-        addMojang = new RoundedButton(resources.getString("login.addmojang"));
+        addMojang = new RoundedButton("Add Account");
         addMojang.setBorder(BorderFactory.createEmptyBorder(5,17,10,17));
         addMojang.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
         addMojang.setContentAreaFilled(false);
@@ -266,18 +264,18 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         addMojang.addActionListener(e -> addMojangAccount());
         add(addMojang, new GridBagConstraints(0, 7, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(50,20,0,20),0,0));
 
-        // Microsoft login button
-        addMicrosoft = new RoundedButton(resources.getString("login.addmicrosoft"));
-        addMicrosoft.setBorder(BorderFactory.createEmptyBorder(5,17,10,17));
-        addMicrosoft.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
-        addMicrosoft.setContentAreaFilled(false);
-        addMicrosoft.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
-        addMicrosoft.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        addMicrosoft.addActionListener(e -> addMicrosoftAccount());
-        add(addMicrosoft, new GridBagConstraints(0, 8, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
+        // Register button
+        addRegistration = new RoundedButton("Register");
+        addRegistration.setBorder(BorderFactory.createEmptyBorder(5,17,10,17));
+        addRegistration.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
+        addRegistration.setContentAreaFilled(false);
+        addRegistration.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
+        addRegistration.setHoverForeground(LauncherFrame.COLOR_BLUE);
+        addRegistration.addActionListener(e -> visitRegister());
+        add(addRegistration, new GridBagConstraints(0, 8, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
 
         // Mojang username label
-        usernameLabel = new JLabel(resources.getString("login.username"));
+        usernameLabel = new JLabel("Tharow Email");
         usernameLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         usernameLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         add(usernameLabel, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10,20,0,20), 0,0));
@@ -293,7 +291,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         add(username, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(3,20,0,20),4,17));
 
         // Mojang password label
-        passwordLabel = new JLabel(resources.getString("login.password"));
+        passwordLabel = new JLabel("Tharow Password");
         passwordLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         passwordLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         add(passwordLabel, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(12,20,0,20),0,0));
@@ -402,6 +400,10 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         DesktopUtils.browseUrl("https://www.technicpack.net/terms");
     }
 
+    protected void visitRegister() {
+        DesktopUtils.browseUrl("https://ts-mc-reg.azurewebsites.net/");
+    }
+
     protected void refreshSelectedUsers() {
         Collection<IUserType> users = userModel.getUsers();
         IUserType lastUser = userModel.getLastUser();
@@ -451,9 +453,6 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         login.setVisible(true);
     }
 
-    protected void addMicrosoftAccount() {
-        newMicrosoftLogin();
-    }
 
     protected void clearCurrentUser() {
         password.setText("");
@@ -506,7 +505,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
 
     private void setAddAccountVisibility(boolean visible) {
         addMojang.setVisible(visible);
-        addMicrosoft.setVisible(visible);
+        addRegistration.setVisible(visible);
     }
 
     private void login(IUserType user) {
@@ -541,43 +540,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         }
     }
 
-    private void newMicrosoftLogin() {
-        setAccountSelectVisibility(false);
-        setAddAccountVisibility(false);
-        // TODO: Setup info message + cancel flow
 
-        try {
-            MicrosoftUser microsoftUser = userModel.getMicrosoftAuthenticator().loginNewUser();
-            userModel.addUser(microsoftUser);
-            userModel.setCurrentUser(microsoftUser);
-            setCurrentUser(microsoftUser);
-        } catch (MicrosoftAuthException e) {
-            switch (e.getType()) {
-                case UNDERAGE:
-                    showMessageDialog(this,
-                            "Your Xbox account is underage and will need to be added to a Family to play this game.",
-                            "Underage Error", ERROR_MESSAGE);
-                    break;
-                case NO_XBOX_ACCOUNT:
-                    showMessageDialog(this,
-                            "You don't have an Xbox account associated with this Microsoft account.\n" +
-                            "Please login at minecraft.net and set up an Xbox account, then try to login here again.",
-                            "No Xbox Account", ERROR_MESSAGE);
-                    DesktopUtils.browseUrl("https://www.minecraft.net/login");
-                    break;
-                case NO_MINECRAFT:
-                    showMessageDialog(this,
-                            "This account has not purchased Minecraft Java Edition.", "No Minecraft", ERROR_MESSAGE);
-                    break;
-                default:
-                    e.printStackTrace();
-                    showMessageDialog(this, e.getMessage(), "Add Microsoft Account Failed", ERROR_MESSAGE);
-            }
-        } finally {
-            setAccountSelectVisibility(!userModel.getUsers().isEmpty());
-            setAddAccountVisibility(true);
-        }
-    }
     private void newMojangLogin(String name) {
         try {
             MojangUser newUser;

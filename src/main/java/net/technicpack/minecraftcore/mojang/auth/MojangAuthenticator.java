@@ -38,7 +38,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MojangAuthenticator {
-    private static final String AUTH_SERVER = "https://authserver.mojang.com/";
+    private static final String AUTH_SERVER = "https://ts-mc-auth.azurewebsites.net/inc/authserver/";
     private final String clientToken;
 
     public MojangAuthenticator(String clientToken) {
@@ -51,7 +51,7 @@ public class MojangAuthenticator {
 
         AuthResponse response;
         try {
-            String returned = postJson(AUTH_SERVER + "authenticate", data);
+            String returned = postJson(AUTH_SERVER + "authenticate/", data);
             response = MojangUtils.getGson().fromJson(returned, AuthResponse.class);
             if (response == null) {
                 throw new ResponseException("Auth Error", "Invalid credentials. Invalid username or password.");

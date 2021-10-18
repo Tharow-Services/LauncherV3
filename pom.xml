@@ -7,29 +7,29 @@
     <groupId>net.technicpack</groupId>
     <artifactId>launcher</artifactId>
     <version>${revision}</version>
-    <url>https://www.technicpack.net</url>
-    <inceptionYear>2014</inceptionYear>
-    <description>Minecraft launcher for installing and updating Modpacks from the Technic Platform.</description>
+    <url>https://www.tharow.net</url>
+    <inceptionYear>2019</inceptionYear>
+    <description>Minecraft launcher for installing and updating Modpacks from the Tharow Platform.</description>
 
     <!-- Build properties -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>${project.groupId}.${project.artifactId}.LauncherMain</mainClass>
-        <buildNumber>0</buildNumber>
+        <buildNumber>2</buildNumber>
         <revision>4.0-${buildNumber}</revision>
     </properties>
 
     <!-- Company information -->
     <organization>
-        <url>https://www.technicpack.net</url>
-        <name>Syndicate, LLC</name>
+        <url>https://www.tharow.net</url>
+        <name>Tharow Services</name>
     </organization>
 
     <!-- Source code access -->
     <scm>
-        <developerConnection>scm:git:git@github.com:TechnicPack/LauncherV3.git</developerConnection>
-        <connection>scm:git:git://github.com/TechnicPack/LauncherV3.git</connection>
-        <url>https://github.com/TechnicPack/LauncherV3/tree/dev</url>
+        <developerConnection>scm:git:git@github.com:Tharow-Services/LauncherV3.git</developerConnection>
+        <connection>scm:git:git://github.com/Tharow-Services/LauncherV3.git</connection>
+        <url>https://github.com/Tharow-Services/LauncherV3/tree/dev</url>
     </scm>
 
     <!-- Build server -->
@@ -265,7 +265,7 @@
                 </property>
             </activation>
             <properties>
-                <buildNumber>0</buildNumber>
+                <buildNumber>2</buildNumber>
             </properties>
         </profile>
         <profile>
@@ -330,82 +330,6 @@
                                 <phase>package</phase>
                                 <goals>
                                     <goal>launch4j</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <!-- Package for OS X -->
-        <profile>
-            <id>package-osx</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <!-- chmod executable ... while japp plugin produces the correct
-                                permissions, jar/unjar operation resets 'x' flag, so the app becomes non-executable.
-                                Must fix that manually -->
-                            <execution>
-                                <id>chmod-modeler</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>/bin/chmod</executable>
-                                    <arguments>
-                                        <argument>755</argument>
-                                        <argument>${basedir}/src/main/app/Contents/MacOS/JavaAppLauncher</argument>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>sign</id>
-            <activation>
-                <property>
-                    <name>env.CERT_KEYSTORE</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jarsigner-plugin</artifactId>
-                        <version>3.0.0</version>
-                        <executions>
-                            <execution>
-                                <id>sign</id>
-                                <configuration>
-                                    <storetype>pkcs12</storetype>
-                                    <keystore>${env.CERT_KEYSTORE}</keystore>
-                                    <alias>${env.CERT_ALIAS}</alias>
-                                    <storepass>${env.CERT_STOREPASS}</storepass>
-                                    <keypass>${env.CERT_KEYPASS}</keypass>
-                                    <verbose>true</verbose>
-                                </configuration>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>verify</id>
-                                <goals>
-                                    <goal>verify</goal>
                                 </goals>
                             </execution>
                         </executions>
