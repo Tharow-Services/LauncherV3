@@ -19,7 +19,7 @@
 
 package net.tharow.tantalum.ui.controls.borders;
 
-import net.tharow.tantalum.contrib.romainguy.FastBlurFilter;
+import net.tharow.tantalum.launchercore.util.FastBlurFilter;
 
 import javax.swing.border.AbstractBorder;
 import java.awt.*;

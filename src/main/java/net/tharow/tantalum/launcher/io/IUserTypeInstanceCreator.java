@@ -3,7 +3,7 @@ package net.tharow.tantalum.launcher.io;
 import com.google.gson.*;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.tharow.auth.MojangUser;
+import net.tharow.tantalum.launchercore.auth.TantalumUser;
 
 import java.lang.reflect.Type;
 
@@ -17,18 +17,18 @@ public class IUserTypeInstanceCreator implements JsonDeserializer<IUserType>, Js
         JsonObject rootObject = json.getAsJsonObject();
         JsonElement userType = rootObject.get("userType");
         String userString = userType == null ? null: userType.getAsString();
-        if (userString == null || userString.equals(MojangUser.MOJANG_USER_TYPE)) {
+        if (userString == null || userString.equals(TantalumUser.MOJANG_USER_TYPE)) {
             System.out.println("Deserializing mojang user");
-            return MojangUtils.getGson().fromJson(rootObject, MojangUser.class);
+            return MojangUtils.getGson().fromJson(rootObject, TantalumUser.class);
         }
         return null;
     }
 
     @Override
     public JsonElement serialize(IUserType src, Type typeOfSrc, JsonSerializationContext context) {
-        if (src instanceof MojangUser) {
+        if (src instanceof TantalumUser) {
             JsonElement userElement = MojangUtils.getGson().toJsonTree(src);
-            userElement.getAsJsonObject().addProperty("userType", MojangUser.MOJANG_USER_TYPE);
+            userElement.getAsJsonObject().addProperty("userType", TantalumUser.MOJANG_USER_TYPE);
             return userElement;        }
         return null;
     }

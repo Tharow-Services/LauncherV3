@@ -27,8 +27,8 @@ import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
 import net.tharow.tantalum.launchercore.install.verifiers.ValidZipFileVerifier;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.tharow.version.MojangVersion;
-import net.tharow.tantalum.minecraftcore.tharow.version.io.GameDownloads;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.GameDownloads;
 import net.tharow.tantalum.utilslib.Utils;
 
 import java.io.File;

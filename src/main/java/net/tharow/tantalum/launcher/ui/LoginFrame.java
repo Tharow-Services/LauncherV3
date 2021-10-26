@@ -35,7 +35,7 @@ import net.tharow.tantalum.ui.controls.login.*;
 import net.tharow.tantalum.ui.listitems.LanguageItem;
 import net.tharow.tantalum.launchercore.auth.IAuthListener;
 import net.tharow.tantalum.launchercore.auth.IUserType;
-import net.tharow.tantalum.minecraftcore.tharow.auth.MojangUser;
+import net.tharow.tantalum.launchercore.auth.TantalumUser;
 import net.tharow.tantalum.launchercore.auth.UserModel;
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
@@ -392,7 +392,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
     }
 
     protected void toggleRemember() {
-        if (!rememberAccount.isSelected() && nameSelect.isVisible() && nameSelect.getSelectedItem() instanceof MojangUser) {
+        if (!rememberAccount.isSelected() && nameSelect.isVisible() && nameSelect.getSelectedItem() instanceof TantalumUser) {
             forgetUser((IUserType)nameSelect.getSelectedItem());
         }
     }
@@ -544,7 +544,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
 
     private void newMojangLogin(String name) {
         try {
-            MojangUser newUser;
+            TantalumUser newUser;
             newUser = userModel.getMojangAuthenticator().loginNewUser(name, new String(this.password.getPassword()));
             userModel.addUser(newUser);
             userModel.setCurrentUser(newUser);

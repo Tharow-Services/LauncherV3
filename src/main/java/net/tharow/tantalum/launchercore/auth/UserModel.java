@@ -22,7 +22,6 @@ package net.tharow.tantalum.launchercore.auth;
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.launchercore.exception.ResponseException;
 import net.tharow.tantalum.launchercore.exception.SessionException;
-import net.tharow.tantalum.minecraftcore.tharow.auth.MojangAuthenticator;
 
 import javax.swing.JOptionPane;
 import java.util.Collection;
@@ -33,12 +32,12 @@ public class UserModel {
     private IUserType mCurrentUser = null;
     private List<IAuthListener> mAuthListeners = new LinkedList<>();
     private IUserStore mUserStore;
-    private MojangAuthenticator mojangAuthenticator;
+    private TantalumAuthenticator tantalumAuthenticator;
 
-    public UserModel(IUserStore userStore, MojangAuthenticator mojangAuthenticator) {
+    public UserModel(IUserStore userStore, TantalumAuthenticator tantalumAuthenticator) {
         this.mCurrentUser = null;
         this.mUserStore = userStore;
-        this.mojangAuthenticator = mojangAuthenticator;
+        this.tantalumAuthenticator = tantalumAuthenticator;
     }
 
     public IUserType getCurrentUser() {
@@ -79,7 +78,7 @@ public class UserModel {
             setCurrentUser(null);
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Login Error", JOptionPane.ERROR_MESSAGE);
         } catch (AuthenticationException ex) {
-            setCurrentUser(mojangAuthenticator.createOfflineUser(user.getDisplayName()));
+            setCurrentUser(tantalumAuthenticator.createOfflineUser(user.getDisplayName()));
         }
     }
 
@@ -107,7 +106,7 @@ public class UserModel {
         mUserStore.setLastUser(user.getUsername());
     }
 
-    public MojangAuthenticator getMojangAuthenticator() {
-        return mojangAuthenticator;
+    public TantalumAuthenticator getMojangAuthenticator() {
+        return tantalumAuthenticator;
     }
 }

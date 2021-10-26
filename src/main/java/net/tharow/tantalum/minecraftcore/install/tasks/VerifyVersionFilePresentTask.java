@@ -23,8 +23,8 @@ import net.tharow.tantalum.launchercore.exception.PackNotAvailableOfflineExcepti
 import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
 import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
-import net.tharow.tantalum.minecraftcore.tharow.version.MojangVersion;
-import net.tharow.tantalum.minecraftcore.tharow.version.MojangVersionBuilder;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersionBuilder;
 
 import java.io.IOException;
 

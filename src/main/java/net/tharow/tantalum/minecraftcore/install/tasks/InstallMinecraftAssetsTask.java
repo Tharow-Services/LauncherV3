@@ -30,7 +30,7 @@ import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
 import net.tharow.tantalum.launchercore.install.verifiers.FileSizeVerifier;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.tharow.version.MojangVersion;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;

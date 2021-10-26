@@ -65,7 +65,7 @@ import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.LogoReso
 import net.tharow.tantalum.launchercore.modpacks.sources.IAuthoritativePackSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.IInstalledPackRepository;
 import net.tharow.tantalum.minecraftcore.launch.MinecraftLauncher;
-import net.tharow.tantalum.minecraftcore.tharow.auth.MojangAuthenticator;
+import net.tharow.tantalum.launchercore.auth.TantalumAuthenticator;
 import net.tharow.tantalum.platform.IPlatformApi;
 import net.tharow.tantalum.platform.IPlatformSearchApi;
 import net.tharow.tantalum.platform.PlatformPackInfoRepository;
@@ -380,8 +380,8 @@ public class LauncherMain {
         javaVersions.selectVersion(settings.getJavaVersion(), settings.getJavaBitness());
 
         TechnicUserStore users = TechnicUserStore.load(new File(directories.getLauncherDirectory(),"users.json"));
-        MojangAuthenticator mojangAuthenticator = new MojangAuthenticator(users.getClientToken());
-        UserModel userModel = new UserModel(users, mojangAuthenticator);
+        TantalumAuthenticator tantalumAuthenticator = new TantalumAuthenticator(users.getClientToken());
+        UserModel userModel = new UserModel(users, tantalumAuthenticator);
 
         IModpackResourceType iconType = new IconResourceType();
         IModpackResourceType logoType = new LogoResourceType();

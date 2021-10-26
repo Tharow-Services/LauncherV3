@@ -22,7 +22,7 @@ import com.google.gson.JsonSyntaxException;
 import net.tharow.tantalum.launchercore.auth.IUserStore;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.tharow.auth.MojangUser;
+import net.tharow.tantalum.launchercore.auth.TantalumUser;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
 
@@ -86,8 +86,8 @@ public class TechnicUserStore implements IUserStore {
     public void addUser(IUserType user) {
         if (savedUsers.containsKey(user.getUsername())) {
             IUserType oldUser = savedUsers.get(user.getUsername());
-            if (oldUser instanceof MojangUser && user instanceof MojangUser) {
-                ((MojangUser) user).mergeUserProperties((MojangUser) oldUser);
+            if (oldUser instanceof TantalumUser && user instanceof TantalumUser) {
+                ((TantalumUser) user).mergeUserProperties((TantalumUser) oldUser);
             }
         }
         savedUsers.put(user.getUsername(), user);

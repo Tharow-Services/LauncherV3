@@ -28,8 +28,8 @@ import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
 import net.tharow.tantalum.launchercore.install.verifiers.ValidJsonFileVerifier;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.tharow.version.MojangVersion;
-import net.tharow.tantalum.minecraftcore.tharow.version.io.AssetIndex;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.AssetIndex;
 
 import java.io.File;
 import java.io.IOException;

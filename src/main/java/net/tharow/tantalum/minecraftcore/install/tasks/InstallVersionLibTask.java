@@ -10,8 +10,8 @@ import net.tharow.tantalum.launchercore.install.verifiers.MD5FileVerifier;
 import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
 import net.tharow.tantalum.launchercore.install.verifiers.ValidZipFileVerifier;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
-import net.tharow.tantalum.minecraftcore.tharow.version.ExtractRulesFileFilter;
-import net.tharow.tantalum.minecraftcore.tharow.version.io.Library;
+import net.tharow.tantalum.minecraftcore.mojang.version.ExtractRulesFileFilter;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.Library;
 import net.tharow.tantalum.utilslib.*;
 
 

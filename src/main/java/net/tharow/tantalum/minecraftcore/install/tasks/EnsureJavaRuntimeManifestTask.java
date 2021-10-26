@@ -28,11 +28,11 @@ import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
 import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.tharow.java.JavaRuntime;
-import net.tharow.tantalum.minecraftcore.tharow.java.JavaRuntimes;
-import net.tharow.tantalum.minecraftcore.tharow.version.MojangVersion;
-import net.tharow.tantalum.minecraftcore.tharow.version.io.Download;
-import net.tharow.tantalum.minecraftcore.tharow.version.io.JavaVersion;
+import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntime;
+import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntimes;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.Download;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.JavaVersion;
 
 import java.io.File;
 import java.io.IOException;

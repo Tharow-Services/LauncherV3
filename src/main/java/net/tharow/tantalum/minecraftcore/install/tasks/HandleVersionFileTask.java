@@ -26,11 +26,11 @@ import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.tharow.version.MojangVersion;
-import net.tharow.tantalum.minecraftcore.tharow.version.MojangVersionBuilder;
-import net.tharow.tantalum.minecraftcore.tharow.version.builder.FileVersionBuilder;
-import net.tharow.tantalum.minecraftcore.tharow.version.builder.retrievers.ZipFileRetriever;
-import net.tharow.tantalum.minecraftcore.tharow.version.io.Library;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersionBuilder;
+import net.tharow.tantalum.minecraftcore.mojang.version.builder.FileVersionBuilder;
+import net.tharow.tantalum.minecraftcore.mojang.version.builder.retrievers.ZipFileRetriever;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.Library;
 
 import java.io.File;
 import java.io.IOException;
