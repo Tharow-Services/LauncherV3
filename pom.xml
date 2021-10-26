@@ -4,19 +4,19 @@
 
     <!-- Project information -->
     <name>Technic Launcher</name>
-    <groupId>net.technicpack</groupId>
+    <groupId>net.tharow.tantalum</groupId>
     <artifactId>launcher</artifactId>
     <version>${revision}</version>
-    <url>https://www.tharow.net</url>
-    <inceptionYear>2019</inceptionYear>
-    <description>Minecraft launcher for installing and updating Modpacks from the Tharow Platform.</description>
+    <url>https://www.tantalum.tharow.net</url>
+    <inceptionYear>2021</inceptionYear>
+    <description>Minecraft launcher for installing and updating Modpacks from the Technic Platform.</description>
 
     <!-- Build properties -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>${project.groupId}.${project.artifactId}.LauncherMain</mainClass>
-        <buildNumber>2</buildNumber>
-        <revision>4.0-${buildNumber}</revision>
+        <buildNumber>3</buildNumber>
+        <revision>5.1-${buildNumber}</revision>
     </properties>
 
     <!-- Company information -->
@@ -25,19 +25,19 @@
         <name>Tharow Services</name>
     </organization>
 
-    <!-- Source code access -->
+    <!-- Source code access
     <scm>
-        <developerConnection>scm:git:git@github.com:Tharow-Services/LauncherV3.git</developerConnection>
-        <connection>scm:git:git://github.com/Tharow-Services/LauncherV3.git</connection>
-        <url>https://github.com/Tharow-Services/LauncherV3/tree/dev</url>
+        <developerConnection>scm:git:git@github.com:TechnicPack/LauncherV3.git</developerConnection>
+        <connection>scm:git:git://github.com/TechnicPack/LauncherV3.git</connection>
+        <url>https://github.com/TechnicPack/LauncherV3/tree/dev</url>
     </scm>
-
-    <!-- Build server -->
+    -->
+    <!-- Build server
     <ciManagement>
         <system>jenkins</system>
         <url>http://jenkins.technicpack.net/job/LauncherV3/</url>
     </ciManagement>
-
+    -->
     <!-- Project dependencies -->
     <dependencies>
         <!-- Included in final JAR -->
@@ -316,10 +316,10 @@
                                     </jre>
                                     <icon>${basedir}/src/main/resources/exe/icon.ico</icon>
                                     <versionInfo>
-                                        <fileVersion>4.0.0.${buildNumber}</fileVersion>
-                                        <txtFileVersion>4.0.0.${buildNumber}</txtFileVersion>
-                                        <productVersion>4.0.0.${buildNumber}</productVersion>
-                                        <txtProductVersion>4.0.0.${buildNumber}</txtProductVersion>
+                                        <fileVersion>5.1.0.${buildNumber}</fileVersion>
+                                        <txtFileVersion>5.1.0.${buildNumber}</txtFileVersion>
+                                        <productVersion>5.1.0.${buildNumber}</productVersion>
+                                        <txtProductVersion>5.1.0.${buildNumber}</txtProductVersion>
                                         <fileDescription>${project.name}</fileDescription>
                                         <productName>${project.name}</productName>
                                         <copyright>${project.organization.name}, ${project.organization.url}</copyright>
