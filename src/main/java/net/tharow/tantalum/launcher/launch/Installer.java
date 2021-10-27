@@ -19,10 +19,10 @@
 package net.tharow.tantalum.launcher.launch;
 
 import net.tharow.tantalum.launcher.settings.StartupParameters;
-import net.tharow.tantalum.launcher.settings.TechnicSettings;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.launcher.ui.components.FixRunDataDialog;
-import net.tharow.tantalum.launchercore.TechnicConstants;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.BuildInaccessibleException;
 import net.tharow.tantalum.launchercore.exception.CacheDeleteException;
 import net.tharow.tantalum.launchercore.exception.DownloadException;
@@ -71,7 +71,7 @@ import java.util.zip.ZipException;
 public class Installer {
     protected final ModpackInstaller<MojangVersion> installer;
     protected final MinecraftLauncher launcher;
-    protected final TechnicSettings settings;
+    protected final TantalumSettings settings;
     protected final PackResourceMapper packIconMapper;
     protected final StartupParameters startupParameters;
     protected final LauncherDirectories directories;
@@ -81,7 +81,7 @@ public class Installer {
     private Thread runningThread;
     private LauncherUnhider launcherUnhider;
 
-    public Installer(StartupParameters startupParameters, LauncherDirectories directories, ModpackInstaller installer, MinecraftLauncher launcher, TechnicSettings settings, PackResourceMapper packIconMapper) {
+    public Installer(StartupParameters startupParameters, LauncherDirectories directories, ModpackInstaller installer, MinecraftLauncher launcher, TantalumSettings settings, PackResourceMapper packIconMapper) {
         this.installer = installer;
         this.launcher = launcher;
         this.settings = settings;
@@ -348,7 +348,7 @@ public class Installer {
         }
 
         if (!fmlLibsZip.isEmpty()) {
-            verifyingFiles.addTask(new EnsureFileTask(new File(directories.getCacheDirectory(), fmlLibsZip), new ValidZipFileVerifier(), modpackFmlLibDir, TechnicConstants.technicFmlLibRepo + fmlLibsZip, installingLibs, installingLibs));
+            verifyingFiles.addTask(new EnsureFileTask(new File(directories.getCacheDirectory(), fmlLibsZip), new ValidZipFileVerifier(), modpackFmlLibDir, TantalumConstants.technicFmlLibRepo + fmlLibsZip, installingLibs, installingLibs));
         }
 
         if (!fmlLibs.isEmpty()) {
@@ -362,7 +362,7 @@ public class Installer {
                 File target = new File(modpackFmlLibDir, name);
 
                 if (!target.exists() || (verifier != null && !verifier.isFileValid(target)) ) {
-                    verifyingFiles.addTask(new EnsureFileTask(cached, verifier, null, TechnicConstants.technicFmlLibRepo + name, installingLibs, installingLibs));
+                    verifyingFiles.addTask(new EnsureFileTask(cached, verifier, null, TantalumConstants.technicFmlLibRepo + name, installingLibs, installingLibs));
                     installingLibs.addTask(new CopyFileTask(cached, target));
                 }
             });
@@ -428,7 +428,7 @@ public class Installer {
     private MojangVersionBuilder createVersionBuilder(ModpackModel modpack, InstallTasksQueue tasksQueue) {
 
         ZipFileRetriever zipVersionRetriever = new ZipFileRetriever(new File(modpack.getBinDir(), "modpack.jar"));
-        HttpFileRetriever fallbackVersionRetriever = new HttpFileRetriever(TechnicConstants.technicVersions, tasksQueue.getDownloadListener());
+        HttpFileRetriever fallbackVersionRetriever = new HttpFileRetriever(TantalumConstants.technicVersions, tasksQueue.getDownloadListener());
 
         ArrayList<MojangVersionRetriever> fallbackRetrievers = new ArrayList<MojangVersionRetriever>(1);
         fallbackRetrievers.add(fallbackVersionRetriever);

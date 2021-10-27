@@ -35,28 +35,28 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class TechnicUserStore implements IUserStore {
+public class TantalumUserStore implements IUserStore {
     private String clientToken = UUID.randomUUID().toString();
     private Map<String, IUserType> savedUsers = new HashMap<>();
     private String lastUser;
     private transient File usersFile;
 
-    public TechnicUserStore() {
+    public TantalumUserStore() {
     }
 
-    public TechnicUserStore(File userFile) {
+    public TantalumUserStore(File userFile) {
         this.usersFile = userFile;
     }
 
-    public static TechnicUserStore load(File userFile) {
+    public static TantalumUserStore load(File userFile) {
         if (!userFile.exists()) {
             Utils.getLogger().log(Level.WARNING, "Unable to load users from " + userFile + " because it does not exist.");
-            return new TechnicUserStore(userFile);
+            return new TantalumUserStore(userFile);
         }
 
         try {
             String json = FileUtils.readFileToString(userFile, StandardCharsets.UTF_8);
-            TechnicUserStore newModel = MojangUtils.getGson().fromJson(json, TechnicUserStore.class);
+            TantalumUserStore newModel = MojangUtils.getGson().fromJson(json, TantalumUserStore.class);
 
             if (newModel != null) {
                 newModel.setUserFile(userFile);
@@ -66,7 +66,7 @@ public class TechnicUserStore implements IUserStore {
             Utils.getLogger().log(Level.WARNING, "Unable to load users from " + userFile);
         }
 
-        return new TechnicUserStore(userFile);
+        return new TantalumUserStore(userFile);
     }
 
     public void setUserFile(File userFile) {

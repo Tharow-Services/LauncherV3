@@ -22,9 +22,6 @@ import com.beust.jcommander.JCommander;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.autoupdate.Relauncher;
 import net.tharow.tantalum.autoupdate.http.HttpUpdateStream;
-import net.tharow.tantalum.discord.CacheDiscordApi;
-import net.tharow.tantalum.discord.HttpDiscordApi;
-import net.tharow.tantalum.discord.IDiscordApi;
 import net.tharow.tantalum.launcher.autoupdate.CommandLineBuildNumber;
 import net.tharow.tantalum.launcher.autoupdate.TechnicRelauncher;
 import net.tharow.tantalum.launcher.autoupdate.VersionFileBuildNumber;
@@ -32,7 +29,7 @@ import net.tharow.tantalum.launcher.io.*;
 import net.tharow.tantalum.launcher.launch.Installer;
 import net.tharow.tantalum.launcher.settings.SettingsFactory;
 import net.tharow.tantalum.launcher.settings.StartupParameters;
-import net.tharow.tantalum.launcher.settings.TechnicSettings;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.settings.migration.IMigrator;
 import net.tharow.tantalum.launcher.settings.migration.InitialV3Migrator;
 import net.tharow.tantalum.launcher.ui.InstallerFrame;
@@ -40,7 +37,7 @@ import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.launcher.ui.LoginFrame;
 import net.tharow.tantalum.launcher.ui.components.discover.DiscoverInfoPanel;
 import net.tharow.tantalum.launcher.ui.components.modpacks.ModpackSelector;
-import net.tharow.tantalum.launchercore.TechnicConstants;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.auth.UserModel;
 import net.tharow.tantalum.launchercore.exception.DownloadException;
@@ -154,7 +151,7 @@ public class LauncherMain {
             ex.printStackTrace();
         }
 
-        TechnicSettings settings = null;
+        TantalumSettings settings = null;
 
         try {
             settings = SettingsFactory.buildSettingsObject(Relauncher.getRunningPath(LauncherMain.class), params.isMover());
@@ -179,16 +176,18 @@ public class LauncherMain {
         // Sanity check
         checkIfRunningInsideOneDrive(directories.getLauncherDirectory());
 
-        if (params.getBuildNumber() != null && !params.getBuildNumber().isEmpty())
+        if (params.getBuildNumber() != null && !params.getBuildNumber().isEmpty()) {
             buildNumber = new CommandLineBuildNumber(params);
-        else
+        } else {
             buildNumber = new VersionFileBuildNumber(resources);
+        }
 
-        TechnicConstants.setBuildNumber(buildNumber);
+        TantalumConstants.setBuildNumber(buildNumber);
 
         setupLogging(directories, resources);
 
-        String launcherBuild = buildNumber.getBuildNumber();
+        //Currently Unused
+        // String launcherBuild = buildNumber.getBuildNumber();
         int build = -1;
 
         try {
@@ -197,7 +196,7 @@ public class LauncherMain {
             //This is probably a debug build or something, build number is invalid
         }
 
-        // These 2 need to happen *before* the launcher or the updater run so we have valuable debug information and so
+        // These 2 need to happen *before* the launcher or the updater run, so we have valuable debug information, and so
         // we can properly use websites that use Let's Encrypt (and other current certs not supported by old Java versions)
         runStartupDebug();
         injectNewRootCerts();
@@ -242,7 +241,17 @@ public class LauncherMain {
         final Logger logger = Utils.getLogger();
         File logDirectory = new File(directories.getLauncherDirectory(), "logs");
         if (!logDirectory.exists()) {
-            logDirectory.mkdir();
+            try{
+                if(logDirectory.mkdir()){
+                    System.out.println("Logging dir made");
+                } else {
+                    System.out.println("Logging dir Couldn't be made");
+                }
+
+            } catch (SecurityException e){
+                throw new SecurityException("Security manager is Active and prevented log dir from being made" + e);
+            }
+
         }
         File logs = new File(logDirectory, "techniclauncher_%D.log");
         RotatingFileHandler fileHandler = new RotatingFileHandler(logs.getPath());
@@ -281,11 +290,12 @@ public class LauncherMain {
                 String ips = inetAddresses.stream().map(InetAddress::getHostAddress).collect(Collectors.joining(", "));
                 Utils.getLogger().info(domain + " resolves to [" + ips + "]");
             } catch (UnknownHostException ex) {
-                Utils.getLogger().log(Level.SEVERE, "Failed to resolve " + domain + ": " + ex.toString());
+                Utils.getLogger().log(Level.SEVERE, "Failed to resolve " + domain + ": " + ex);
             }
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     private static void injectNewRootCerts() {
         // Adapted from Forge installer
         final String javaVersion = System.getProperty("java.version");
@@ -300,7 +310,9 @@ public class LauncherMain {
                 return;
             }
         } catch (final NumberFormatException e) {
-            Utils.getLogger().log(Level.WARNING, "Couldn't parse Java version, can't inject new root certs", e);
+            Utils.getLogger().log(Level.WARNING,
+                    "Couldn't parse Java version, can't inject new root certs",
+                    e);
             return;
         }
 
@@ -350,7 +362,7 @@ public class LauncherMain {
         }
     }
 
-    private static void startLauncher(final TechnicSettings settings, StartupParameters startupParameters, final LauncherDirectories directories, ResourceLoader resources) {
+    private static void startLauncher(final TantalumSettings settings, StartupParameters startupParameters, final LauncherDirectories directories, ResourceLoader resources) {
         UIManager.put( "ComboBox.disabledBackground", LauncherFrame.COLOR_FORMELEMENT_INTERNAL );
         UIManager.put( "ComboBox.disabledForeground", LauncherFrame.COLOR_GREY_TEXT );
         System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
@@ -361,7 +373,11 @@ public class LauncherMain {
             while (files.hasNext()) {
                 File logFile = files.next();
                 if (logFile.exists() && (new DateTime(logFile.lastModified())).isBefore(DateTime.now().minusWeeks(1))) {
-                    logFile.delete();
+                    if(logFile.delete()){
+                        //Utils.getLogger().log(Level.INFO, "logfiles older then a week were deleted");
+                    } else {
+                        //Utils.getLogger().log(Level.WARNING, "logfiles older then a week couldn't be deleted");
+                    }
                 }
             }
         }).start();
@@ -379,7 +395,7 @@ public class LauncherMain {
         javaVersionFile.enumerateVersions(javaVersions);
         javaVersions.selectVersion(settings.getJavaVersion(), settings.getJavaBitness());
 
-        TechnicUserStore users = TechnicUserStore.load(new File(directories.getLauncherDirectory(),"users.json"));
+        TantalumUserStore users = TantalumUserStore.load(new File(directories.getLauncherDirectory(),"users.json"));
         TantalumAuthenticator tantalumAuthenticator = new TantalumAuthenticator(users.getClientToken());
         UserModel userModel = new UserModel(users, tantalumAuthenticator);
 
@@ -394,7 +410,7 @@ public class LauncherMain {
 
         ImageRepository<IUserType> skinRepo = new ImageRepository<>(new TechnicFaceMapper(directories, resources), new MinotarFaceImageStore("https://minotar.net/"));
 
-        ImageRepository<AuthorshipInfo> avatarRepo = new ImageRepository<>(new TechnicAvatarMapper(directories, resources), new WebAvatarImageStore());
+        ImageRepository<AuthorshipInfo> avatarRepo = new ImageRepository<>(new TantalumAvatarMapper(directories, resources), new WebAvatarImageStore());
 
         HttpSolderApi httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
@@ -406,7 +422,8 @@ public class LauncherMain {
         IInstalledPackRepository packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks"));
         IAuthoritativePackSource packInfoRepository = new PlatformPackInfoRepository(platform, solder);
 
-        ArrayList<IMigrator> migrators = new ArrayList<IMigrator>(1);
+
+        ArrayList<IMigrator> migrators = new ArrayList<>(1);
         migrators.add(new InitialV3Migrator(platform));
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
@@ -420,13 +437,11 @@ public class LauncherMain {
         DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, startupParameters.getDiscoverUrl(), platform, directories, selector);
 
         MinecraftLauncher launcher = new MinecraftLauncher(platform, directories, userModel, javaVersions, buildNumber);
+        //noinspection rawtypes
         ModpackInstaller modpackInstaller = new ModpackInstaller(platform, settings.getClientId());
         Installer installer = new Installer(startupParameters, directories, modpackInstaller, launcher, settings, iconMapper);
 
-        IDiscordApi discordApi = new HttpDiscordApi("https://discord.com/api/");
-        discordApi = new CacheDiscordApi(discordApi, 600, 60);
-
-        final LauncherFrame frame = new LauncherFrame(resources, skinRepo, userModel, settings, selector, iconRepo, logoRepo, backgroundRepo, installer, avatarRepo, platform, directories, packStore, startupParameters, discoverInfoPanel, javaVersions, javaVersionFile, buildNumber, discordApi);
+        final LauncherFrame frame = new LauncherFrame(resources, skinRepo, userModel, settings, selector, iconRepo, logoRepo, backgroundRepo, installer, avatarRepo, platform, directories, packStore, startupParameters, discoverInfoPanel, javaVersions, javaVersionFile, buildNumber);
         userModel.addAuthListener(frame);
 
         ActionListener listener = e -> {

@@ -36,7 +36,7 @@ import net.tharow.tantalum.ui.controls.list.SimpleButtonComboUI;
 import net.tharow.tantalum.ui.controls.list.popupformatters.RoundedBorderFormatter;
 import net.tharow.tantalum.ui.lang.IRelocalizableResource;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
-import net.tharow.tantalum.launcher.settings.TechnicSettings;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.ui.controls.LauncherDialog;
 import net.tharow.tantalum.ui.controls.RoundedButton;
@@ -74,7 +74,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     private static final int DIALOG_WIDTH = 830;
     private static final int DIALOG_HEIGHT = 564;
 
-    private TechnicSettings settings;
+    private TantalumSettings settings;
 
     private boolean hasShownStreamInfo = false;
     private ResourceLoader resources;
@@ -154,7 +154,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     JTextField wrapperCommand;
     JCheckBox useMojangJava;
 
-    public OptionsDialog(final Frame owner, final TechnicSettings settings, final ResourceLoader resourceLoader, final StartupParameters params, final JavaVersionRepository javaVersions, final FileJavaSource fileJavaSource, final IBuildNumber buildNumber) {
+    public OptionsDialog(final Frame owner, final TantalumSettings settings, final ResourceLoader resourceLoader, final StartupParameters params, final JavaVersionRepository javaVersions, final FileJavaSource fileJavaSource, final IBuildNumber buildNumber) {
         super(owner);
 
         this.settings = settings;

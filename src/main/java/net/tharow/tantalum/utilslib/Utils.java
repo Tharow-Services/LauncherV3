@@ -20,7 +20,7 @@ package net.tharow.tantalum.utilslib;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.tharow.tantalum.launchercore.TechnicConstants;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
 import net.tharow.tantalum.launchercore.mirror.download.Download;
@@ -67,8 +67,8 @@ public class Utils {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setDoInput(true);
         conn.setDoOutput(false);
-        System.setProperty("http.agent", TechnicConstants.getUserAgent());
-        conn.setRequestProperty("User-Agent", TechnicConstants.getUserAgent());
+        System.setProperty("http.agent", TantalumConstants.getUserAgent());
+        conn.setRequestProperty("User-Agent", TantalumConstants.getUserAgent());
         conn.setUseCaches(false);
         return conn;
     }
@@ -218,8 +218,8 @@ public class Utils {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoInput(true);
             conn.setDoOutput(false);
-            System.setProperty("http.agent", TechnicConstants.getUserAgent());
-            conn.setRequestProperty("User-Agent", TechnicConstants.getUserAgent());
+            System.setProperty("http.agent", TantalumConstants.getUserAgent());
+            conn.setRequestProperty("User-Agent", TantalumConstants.getUserAgent());
             HttpURLConnection.setFollowRedirects(true);
             conn.setUseCaches(false);
             conn.setInstanceFollowRedirects(true);

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Technic Launcher Core.
  * Copyright ©2015 Syndicate, LLC
  *
@@ -21,11 +21,14 @@ package net.tharow.tantalum.launchercore;
 
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 
-public class TechnicConstants {
+public class TantalumConstants {
     public static final String technicURL = "https://mirror.technicpack.net/Technic/";
     public static final String technicVersions = technicURL + "version/";
     public static final String technicFmlLibRepo = technicURL + "lib/fml/";
     public static final String technicForgeRepo = technicURL + "lib/";
+    public static final String authserverURL = "https://tharow-auth.azurewebsties.net/authserver/";
+    public static final String authAuthenticationURL = authserverURL + "authenticate.php";
+    public static final String authRefreshURL = authserverURL + "refresh.php";
 
     private static IBuildNumber buildNumber;
     private static String userAgent;
@@ -35,7 +38,7 @@ public class TechnicConstants {
     }
 
     public static void setBuildNumber(IBuildNumber buildNumber) {
-        TechnicConstants.buildNumber = buildNumber;
+        TantalumConstants.buildNumber = buildNumber;
 
         userAgent = "Mozilla/5.0 (Java) TechnicLauncher/4." + buildNumber.getBuildNumber();
     }

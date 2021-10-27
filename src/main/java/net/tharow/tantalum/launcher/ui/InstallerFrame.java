@@ -25,7 +25,7 @@ import net.tharow.tantalum.launcher.autoupdate.TechnicRelauncher;
 import net.tharow.tantalum.launcher.autoupdate.VersionFileBuildNumber;
 import net.tharow.tantalum.launcher.io.TechnicLauncherDirectories;
 import net.tharow.tantalum.launcher.settings.StartupParameters;
-import net.tharow.tantalum.launcher.settings.TechnicSettings;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.ui.controls.list.popupformatters.RoundedBorderFormatter;
 import net.tharow.tantalum.ui.controls.DraggableFrame;
 import net.tharow.tantalum.ui.controls.RoundedButton;
@@ -72,14 +72,14 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
     private JComboBox standardLanguages;
     private JComboBox portableLanguages;
 
-    private TechnicSettings settings;
+    private TantalumSettings settings;
 
     private JPanel glassPane;
 
     public InstallerFrame(ResourceLoader resources, StartupParameters params) {
         this.resources = resources;
         this.params = params;
-        this.settings = new TechnicSettings();
+        this.settings = new TantalumSettings();
         this.settings.setFilePath(new File(OperatingSystem.getOperatingSystem().getUserDirectoryForApp("technic"), "settings.json"));
         this.settings.getTechnicRoot();
 
@@ -90,7 +90,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
         relocalize(resources);
     }
 
-    public InstallerFrame(ResourceLoader resources, StartupParameters params, TechnicSettings settings, Window mainFrame) {
+    public InstallerFrame(ResourceLoader resources, StartupParameters params, TantalumSettings settings, Window mainFrame) {
         this.settings = settings;
         this.resources = resources;
         this.params = params;

@@ -21,7 +21,7 @@ package net.tharow.tantalum.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import net.tharow.tantalum.launchercore.TechnicConstants;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class RestObject {
     public static <T extends RestObject> T getRestObject(Class<T> restObject, String url) throws RestfulAPIException {
         try {
             URLConnection conn = new URL(url).openConnection();
-            conn.setRequestProperty("User-Agent", TechnicConstants.getUserAgent());
+            conn.setRequestProperty("User-Agent", TantalumConstants.getUserAgent());
             conn.setConnectTimeout(15000);
             conn.setReadTimeout(15000);
 

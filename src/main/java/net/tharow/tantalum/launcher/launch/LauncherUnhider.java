@@ -18,7 +18,7 @@
 
 package net.tharow.tantalum.launcher.launch;
 
-import net.tharow.tantalum.launcher.settings.TechnicSettings;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.launchercore.launch.ProcessExitListener;
 import net.tharow.tantalum.launchercore.util.LaunchAction;
@@ -27,11 +27,11 @@ import java.awt.*;
 
 public class LauncherUnhider implements ProcessExitListener {
 
-    private final TechnicSettings settings;
+    private final TantalumSettings settings;
     private final LauncherFrame frame;
     private boolean hasExited = false;
 
-    public LauncherUnhider(TechnicSettings settings, LauncherFrame frame) {
+    public LauncherUnhider(TantalumSettings settings, LauncherFrame frame) {
         this.settings = settings;
         this.frame = frame;
     }

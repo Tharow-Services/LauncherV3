@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class SettingsFactory {
-    public static TechnicSettings buildSettingsObject(String runningDir, boolean isMover) {
+    public static TantalumSettings buildSettingsObject(String runningDir, boolean isMover) {
 
         System.out.println("Settings for exe: "+runningDir);
 
@@ -45,7 +45,7 @@ public class SettingsFactory {
         else
             System.out.println("Portable settings dir: "+portableSettingsDir.getAbsolutePath());
 
-        TechnicSettings portableSettings = tryGetSettings(portableSettingsDir);
+        TantalumSettings portableSettings = tryGetSettings(portableSettingsDir);
 
         if (portableSettings != null && portableSettings.isPortable()) {
             System.out.println("Portable settings file found.");
@@ -54,12 +54,12 @@ public class SettingsFactory {
 
         File installedSettingsDir = OperatingSystem.getOperatingSystem().getUserDirectoryForApp("technic");
 
-        TechnicSettings settings = tryGetSettings(installedSettingsDir);
+        TantalumSettings settings = tryGetSettings(installedSettingsDir);
 
         return settings;
     }
 
-    public static void migrateSettings(TechnicSettings settings, IInstalledPackRepository packStore, LauncherDirectories directories, IUserStore users, List<IMigrator> migrators) {
+    public static void migrateSettings(TantalumSettings settings, IInstalledPackRepository packStore, LauncherDirectories directories, IUserStore users, List<IMigrator> migrators) {
         for(IMigrator migrator : migrators) {
             String version = settings.getLauncherSettingsVersion();
             boolean bothNull = version == null && migrator.getMigrationVersion() == null;
@@ -72,7 +72,7 @@ public class SettingsFactory {
         settings.save();
     }
 
-    private static TechnicSettings tryGetSettings(File rootDir) {
+    private static TantalumSettings tryGetSettings(File rootDir) {
         if (!rootDir.exists())
             return null;
 
@@ -82,7 +82,7 @@ public class SettingsFactory {
 
         try {
             String json = FileUtils.readFileToString(settingsFile, StandardCharsets.UTF_8);
-            TechnicSettings settings = Utils.getGson().fromJson(json, TechnicSettings.class);
+            TantalumSettings settings = Utils.getGson().fromJson(json, TantalumSettings.class);
 
             if (settings != null)
                 settings.setFilePath(settingsFile);
@@ -103,6 +103,6 @@ public class SettingsFactory {
         if (isMover)
             return runningFolder;
         else
-            return new File(runningFolder,"technic");
+            return new File(runningFolder,"tantalum");
     }
 }

@@ -27,7 +27,7 @@ import net.tharow.tantalum.ui.controls.lang.LanguageCellUI;
 import net.tharow.tantalum.ui.controls.list.SimpleButtonComboUI;
 import net.tharow.tantalum.ui.lang.IRelocalizableResource;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
-import net.tharow.tantalum.launcher.settings.TechnicSettings;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.ui.controls.DraggableFrame;
 import net.tharow.tantalum.ui.controls.RoundedButton;
 import net.tharow.tantalum.ui.controls.borders.RoundBorder;
@@ -60,7 +60,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
     private ResourceLoader resources;
     private ImageRepository<IUserType> skinRepository;
     private UserModel userModel;
-    private TechnicSettings settings;
+    private TantalumSettings settings;
 
     private RoundedButton addMojang;
     private RoundedButton addRegistration;
@@ -79,7 +79,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
     private static final int FRAME_WIDTH = 347;
     private static final int FRAME_HEIGHT = 399;
 
-    public LoginFrame(ResourceLoader resources, TechnicSettings settings, UserModel userModel, ImageRepository<IUserType> skinRepository) {
+    public LoginFrame(ResourceLoader resources, TantalumSettings settings, UserModel userModel, ImageRepository<IUserType> skinRepository) {
         this.skinRepository = skinRepository;
         this.userModel = userModel;
         this.settings = settings;
@@ -552,7 +552,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         } catch(ResponseException e) {
             showMessageDialog(this, e.getMessage(), e.getError(), ERROR_MESSAGE);
         } catch (AuthenticationException e) {
-            //TODO: What else is uncaught here?
+            // What else is uncaught here? Nothing As Far As I Can Tell
             showMessageDialog(this, e.getMessage(), "Authentication error", ERROR_MESSAGE);
             e.printStackTrace();
         }

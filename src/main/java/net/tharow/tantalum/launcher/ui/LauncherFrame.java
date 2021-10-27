@@ -19,7 +19,6 @@
 package net.tharow.tantalum.launcher.ui;
 
 import net.tharow.tantalum.autoupdate.IBuildNumber;
-import net.tharow.tantalum.discord.IDiscordApi;
 import net.tharow.tantalum.launcher.LauncherMain;
 import net.tharow.tantalum.launcher.settings.StartupParameters;
 import net.tharow.tantalum.launcher.ui.components.ModpackOptionsDialog;
@@ -36,14 +35,13 @@ import net.tharow.tantalum.ui.controls.TintablePanel;
 import net.tharow.tantalum.ui.lang.IRelocalizableResource;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.launcher.launch.Installer;
-import net.tharow.tantalum.launcher.settings.TechnicSettings;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.components.OptionsDialog;
 import net.tharow.tantalum.launcher.ui.components.discover.DiscoverInfoPanel;
 import net.tharow.tantalum.launcher.ui.components.modpacks.ModpackInfoPanel;
 import net.tharow.tantalum.launcher.ui.components.modpacks.ModpackSelector;
 import net.tharow.tantalum.launcher.ui.components.news.NewsInfoPanel;
 import net.tharow.tantalum.launcher.ui.components.news.NewsSelector;
-import net.tharow.tantalum.launcher.ui.controls.*;
 import net.tharow.tantalum.ui.controls.feeds.CountCircle;
 import net.tharow.tantalum.ui.controls.installation.ProgressBar;
 import net.tharow.tantalum.launchercore.auth.IAuthListener;
@@ -106,7 +104,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
     private ResourceLoader resources;
     private final UserModel userModel;
     private final ImageRepository<IUserType> skinRepository;
-    private final TechnicSettings settings;
+    private final TantalumSettings settings;
     private final ImageRepository<ModpackModel> iconRepo;
     private final ImageRepository<ModpackModel> logoRepo;
     private final ImageRepository<ModpackModel> backgroundRepo;
@@ -119,7 +117,6 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
     private final JavaVersionRepository javaVersions;
     private final FileJavaSource fileJavaSource;
     private final IBuildNumber buildNumber;
-    private final IDiscordApi discordApi;
 
     private ModpackOptionsDialog modpackOptionsDialog = null;
 
@@ -145,7 +142,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
     ModpackInfoPanel modpackPanel;
     DiscoverInfoPanel discoverInfoPanel;
 
-    public LauncherFrame(final ResourceLoader resources, final ImageRepository<IUserType> skinRepository, final UserModel userModel, final TechnicSettings settings, final ModpackSelector modpackSelector, final ImageRepository<ModpackModel> iconRepo, final ImageRepository<ModpackModel> logoRepo, final ImageRepository<ModpackModel> backgroundRepo, final Installer installer, final ImageRepository<AuthorshipInfo> avatarRepo, final IPlatformApi platformApi, final LauncherDirectories directories, final IInstalledPackRepository packRepository, final StartupParameters params, final DiscoverInfoPanel discoverInfoPanel, final JavaVersionRepository javaVersions, final FileJavaSource fileJavaSource, final IBuildNumber buildNumber, final IDiscordApi discordApi) {
+    public LauncherFrame(final ResourceLoader resources, final ImageRepository<IUserType> skinRepository, final UserModel userModel, final TantalumSettings settings, final ModpackSelector modpackSelector, final ImageRepository<ModpackModel> iconRepo, final ImageRepository<ModpackModel> logoRepo, final ImageRepository<ModpackModel> backgroundRepo, final Installer installer, final ImageRepository<AuthorshipInfo> avatarRepo, final IPlatformApi platformApi, final LauncherDirectories directories, final IInstalledPackRepository packRepository, final StartupParameters params, final DiscoverInfoPanel discoverInfoPanel, final JavaVersionRepository javaVersions, final FileJavaSource fileJavaSource, final IBuildNumber buildNumber) {
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("Technic Launcher");
@@ -167,7 +164,6 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         this.fileJavaSource = fileJavaSource;
         this.javaVersions = javaVersions;
         this.buildNumber = buildNumber;
-        this.discordApi = discordApi;
 
         //Handles rebuilding the frame, so use it to build the frame in the first place
         relocalize(resources);
@@ -478,7 +474,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         getRootPane().getContentPane().add(centralPanel, BorderLayout.CENTER);
         centralPanel.setLayout(new BorderLayout());
 
-        modpackPanel = new ModpackInfoPanel(resources, iconRepo, logoRepo, backgroundRepo, avatarRepo, discordApi, new ActionListener() {
+        modpackPanel = new ModpackInfoPanel(resources, iconRepo, logoRepo, backgroundRepo, avatarRepo, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 openModpackOptions((ModpackModel)e.getSource());

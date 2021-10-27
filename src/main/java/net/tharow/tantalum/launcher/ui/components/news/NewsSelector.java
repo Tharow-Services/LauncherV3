@@ -19,7 +19,7 @@
 package net.tharow.tantalum.launcher.ui.components.news;
 
 import net.tharow.tantalum.ui.lang.ResourceLoader;
-import net.tharow.tantalum.launcher.settings.TechnicSettings;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.ui.controls.list.SimpleScrollbarUI;
 import net.tharow.tantalum.ui.controls.feeds.CountCircle;
@@ -46,14 +46,14 @@ public class NewsSelector extends JPanel {
     private NewsWidget selectedItem;
     private JPanel widgetHost;
     private CountCircle circle;
-    private TechnicSettings settings;
+    private TantalumSettings settings;
     private int newLatestNewsArticle;
 
     private NewsInfoPanel panel;
 
     private ImageRepository<AuthorshipInfo> avatarRepo;
 
-    public NewsSelector(ResourceLoader resources, NewsInfoPanel panel, IPlatformApi platformApi, ImageRepository<AuthorshipInfo> avatarRepo, CountCircle count, TechnicSettings settings) {
+    public NewsSelector(ResourceLoader resources, NewsInfoPanel panel, IPlatformApi platformApi, ImageRepository<AuthorshipInfo> avatarRepo, CountCircle count, TantalumSettings settings) {
         this.resources = resources;
         this.platformApi = platformApi;
         this.avatarRepo = avatarRepo;

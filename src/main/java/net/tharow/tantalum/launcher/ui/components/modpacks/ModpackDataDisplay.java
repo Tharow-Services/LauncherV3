@@ -18,9 +18,6 @@
 
 package net.tharow.tantalum.launcher.ui.components.modpacks;
 
-import net.tharow.tantalum.discord.IDiscordApi;
-import net.tharow.tantalum.discord.IDiscordCallback;
-import net.tharow.tantalum.discord.io.Server;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.ui.controls.list.SimpleScrollbarUI;
@@ -40,10 +37,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class ModpackDataDisplay extends JPanel implements IImageJobListener<ModpackModel>, IDiscordCallback {
+public class ModpackDataDisplay extends JPanel implements IImageJobListener<ModpackModel> {
     private ResourceLoader resources;
     private ImageRepository<ModpackModel> logoRepo;
-    private IDiscordApi discordApi;
 
     private JPanel statBoxes;
 
@@ -64,10 +60,9 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
 
     private ModpackModel currentModpack;
 
-    public ModpackDataDisplay(ResourceLoader resources, ImageRepository<ModpackModel> logoRepo, IDiscordApi api) {
+    public ModpackDataDisplay(ResourceLoader resources, ImageRepository<ModpackModel> logoRepo) {
         this.resources = resources;
         this.logoRepo = logoRepo;
-        this.discordApi = api;
 
         initComponents();
     }
@@ -113,10 +108,6 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
                 repaint();
             }
         });
-
-        discordPanel.setVisible(false);
-        if (modpack.getDiscordId() != null && !modpack.getDiscordId().isEmpty())
-            discordApi.retrieveServer(modpack, modpack.getDiscordId(), this);
     }
 
     private void initComponents() {
@@ -326,36 +317,6 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
     public void jobComplete(ImageJob<ModpackModel> job) {
         if (job.getJobData() == currentModpack) {
             packImage.setIcon(new ImageIcon(ImageUtils.scaleImage(job.getImage(), 370, 220)));
-        }
-    }
-
-    @Override
-    public void serverGetCallback(ModpackModel pack, final Server server) {
-        if (this.currentModpack == pack) {
-            if (server != null && server.getInviteLink() != null && !server.getInviteLink().isEmpty()) {
-                this.discordPanel.setVisible(true);
-                this.countLabel.setText(resources.getString("launcher.discord.count", Integer.toString(server.getPresenceCount())));
-
-                if (pack.isOfficial())
-                    this.discordLabel.setText(resources.getString("launcher.discord.official"));
-                else
-                    this.discordLabel.setText(resources.getString("launcher.discord.join"));
-
-                for (JButton discordButton : discordButtons) {
-                    int actionListenerCount = discordButton.getActionListeners().length;
-                    for (int i = 0; i < actionListenerCount; i++) {
-                        discordButton.removeActionListener(discordButton.getActionListeners()[0]);
-                    }
-                    discordButton.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            DesktopUtils.browseUrl(server.getInviteLink());
-                        }
-                    });
-                }
-            } else {
-                this.discordPanel.setVisible(false);
-            }
         }
     }
 }

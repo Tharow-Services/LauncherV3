@@ -18,7 +18,7 @@
 
 package net.tharow.tantalum.launcher.settings.migration;
 
-import net.tharow.tantalum.launcher.settings.TechnicSettings;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launchercore.auth.IUserStore;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.launchercore.modpacks.InstalledPack;
@@ -49,7 +49,7 @@ public class InitialV3Migrator implements IMigrator {
     }
 
     @Override
-    public void migrate(TechnicSettings settings, IInstalledPackRepository packStore, LauncherDirectories directories, IUserStore users) {
+    public void migrate(TantalumSettings settings, IInstalledPackRepository packStore, LauncherDirectories directories, IUserStore users) {
         //A fresh install/upgrade from v2 shouldn't show the latest news as being new
         int maxNewsId = 0;
 

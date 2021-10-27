@@ -26,11 +26,11 @@ import net.tharow.tantalum.platform.io.AuthorshipInfo;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public class TechnicAvatarMapper implements IImageMapper<AuthorshipInfo> {
+public class TantalumAvatarMapper implements IImageMapper<AuthorshipInfo> {
     private LauncherDirectories directories;
     private BufferedImage defaultImage;
 
-    public TechnicAvatarMapper(LauncherDirectories directories, ResourceLoader resources) {
+    public TantalumAvatarMapper(LauncherDirectories directories, ResourceLoader resources) {
         this.directories = directories;
         defaultImage = resources.getImage("icon.png");
     }

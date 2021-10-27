@@ -19,7 +19,7 @@
 
 package net.tharow.tantalum.minecraftcore.mojang.version.io;
 
-import net.tharow.tantalum.launchercore.TechnicConstants;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.utilslib.OperatingSystem;
 import net.tharow.tantalum.utilslib.Utils;
@@ -196,7 +196,7 @@ public class Library {
                 // Check if this URL is in Minecraft Forge's Maven repo and add ours as a primary mirror
                 Matcher m = FORGE_MAVEN_ROOT.matcher(artifactUrl);
                 if (m.matches())
-                    possibleUrls.add(TechnicConstants.technicForgeRepo + m.group(1));
+                    possibleUrls.add(TantalumConstants.technicForgeRepo + m.group(1));
 
                 possibleUrls.add(artifactUrl);
             }

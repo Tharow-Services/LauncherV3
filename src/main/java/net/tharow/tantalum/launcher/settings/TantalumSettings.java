@@ -30,7 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class TechnicSettings implements ILaunchOptions {
+public class TantalumSettings implements ILaunchOptions {
     public static final String STABLE = "stable";
     public static final String BETA = "beta";
 
