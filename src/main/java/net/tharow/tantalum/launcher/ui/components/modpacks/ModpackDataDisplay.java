@@ -181,7 +181,7 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
 
         packInfoPanel.add(Box.createHorizontalGlue(), new GridBagConstraints(2, 2, 1, 1, 1.0, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
-        discordPanel = new JPanel();
+    /*    discordPanel = new JPanel();
         discordPanel.setOpaque(false);
         discordPanel.setLayout(new GridBagLayout());
 
@@ -215,7 +215,7 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
 
         packInfoPanel.add(discordPanel, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 4), 0, 0));
         discordPanel.setVisible(false);
-
+*/
         titleLabel = new JLabel(resources.getString("launcher.packstats.title", "Modpack"));
         titleLabel.setFont(resources.getFont(ResourceLoader.FONT_RALEWAY, 24, Font.BOLD));
         titleLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);

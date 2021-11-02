@@ -26,7 +26,7 @@ public class TantalumConstants {
     public static final String technicVersions = technicURL + "version/";
     public static final String technicFmlLibRepo = technicURL + "lib/fml/";
     public static final String technicForgeRepo = technicURL + "lib/";
-    public static final String authserverURL = "https://tharow-auth.azurewebsties.net/authserver/";
+    public static final String authserverURL = "https://tantalum-auth.azurewebsites.net/authserver/";
     public static final String authAuthenticationURL = authserverURL + "authenticate.php";
     public static final String authRefreshURL = authserverURL + "refresh.php";
 
