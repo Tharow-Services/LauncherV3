@@ -48,6 +48,8 @@ public final class StartupParameters {
     private boolean blockReboot = false;
     @Parameter(names = {"-buildNumber"}, description = "Force build number to this value for debugging.")
     private String buildNumber = "";
+    @Parameter(names = {"-offline"}, description = "Force offline mode")
+    private boolean offline = false;
 
     public StartupParameters(String[] args) {
         this.args = args;
@@ -56,6 +58,7 @@ public final class StartupParameters {
     public List<String> getParameters() {
         return parameters;
     }
+
     public String[] getArgs() { return args; }
 
     public boolean isConsole() {
@@ -73,6 +76,8 @@ public final class StartupParameters {
     public boolean isUpdate() { return update; }
 
     public boolean isBlockReboot() { return blockReboot; }
+
+    public boolean isOffline() {return offline;}
 
     public String getMoveTarget() { return moveTarget; }
 

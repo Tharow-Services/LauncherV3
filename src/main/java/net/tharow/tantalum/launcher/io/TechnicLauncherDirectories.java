@@ -22,8 +22,9 @@ import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 
 import java.io.File;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class TechnicLauncherDirectories implements LauncherDirectories {
-    private File workDir;
+    private final File workDir;
 
     public TechnicLauncherDirectories(File rootDir) {
         workDir = rootDir;
