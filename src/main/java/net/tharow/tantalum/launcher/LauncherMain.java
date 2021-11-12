@@ -160,7 +160,7 @@ public class LauncherMain {
         }
 
         if (settings == null) {
-            ResourceLoader installerResources = new ResourceLoader(null, "net","technicpack","launcher","resources");
+            ResourceLoader installerResources = new ResourceLoader(null, "net","tharow","tantalum","launcher","resources");
             installerResources.setSupportedLanguages(supportedLanguages);
             installerResources.setLocale(ResourceLoader.DEFAULT_LOCALE);
             InstallerFrame dialog = new InstallerFrame(installerResources, params);
@@ -169,7 +169,7 @@ public class LauncherMain {
         }
 
         LauncherDirectories directories = new TechnicLauncherDirectories(settings.getTechnicRoot());
-        ResourceLoader resources = new ResourceLoader(directories, "net","technicpack","launcher","resources");
+        ResourceLoader resources = new ResourceLoader(directories, "net","tharow","tantalum","launcher","resources");
         resources.setSupportedLanguages(supportedLanguages);
         resources.setLocale(settings.getLanguageCode());
 
@@ -187,7 +187,7 @@ public class LauncherMain {
         setupLogging(directories, resources);
 
         //Currently Unused
-        // String launcherBuild = buildNumber.getBuildNumber();
+        //String launcherBuild = buildNumber.getBuildNumber();
         int build = -1;
 
         try {
@@ -200,9 +200,8 @@ public class LauncherMain {
         // we can properly use websites that use Let's Encrypt (and other current certs not supported by old Java versions)
         runStartupDebug();
         injectNewRootCerts();
-
-        Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream("https://api.technicpack.net/launcher/"), settings.getBuildStream()+"4", build, directories, resources, params);
-
+        //startLauncher(settings, params, directories, resources);
+        Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream("https://tantalum-auth.azurewebsites.net/launcher/"), settings.getBuildStream()+"4", build, directories, resources, params);
         try {
             if (launcher.runAutoUpdater())
                 startLauncher(settings, params, directories, resources);
@@ -213,6 +212,8 @@ public class LauncherMain {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
     }
 
     private static void checkIfRunningInsideOneDrive(File launcherRoot) {
@@ -372,13 +373,9 @@ public class LauncherMain {
             Iterator<File> files = FileUtils.iterateFiles(new File(directories.getLauncherDirectory(), "logs"), new String[] {"log"}, false);
             while (files.hasNext()) {
                 File logFile = files.next();
-                if (logFile.exists() && (new DateTime(logFile.lastModified())).isBefore(DateTime.now().minusWeeks(1))) {
-                    if(logFile.delete()){
-                        //Utils.getLogger().log(Level.INFO, "logfiles older then a week were deleted");
-                    } else {
-                        //Utils.getLogger().log(Level.WARNING, "logfiles older then a week couldn't be deleted");
-                    }
-                }
+                if (logFile.exists() && (new DateTime(logFile.lastModified())).isBefore(DateTime.now().minusWeeks(1)))
+                    //noinspection ResultOfMethodCallIgnored
+                    logFile.delete();
             }
         }).start();
 
@@ -414,8 +411,9 @@ public class LauncherMain {
 
         HttpSolderApi httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
-        HttpPlatformApi httpPlatform = new HttpPlatformApi("https://api.technicpack.net/", buildNumber.getBuildNumber());
 
+        HttpPlatformApi httpPlatform = new HttpPlatformApi("https://api.technicpack.net/", buildNumber.getBuildNumber());
+        Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
         IPlatformApi platform = new ModpackCachePlatformApi(httpPlatform, 60 * 60, directories);
         IPlatformSearchApi platformSearch = new HttpPlatformSearchApi("https://api.technicpack.net/", buildNumber.getBuildNumber());
 
