@@ -109,9 +109,9 @@ public class MinecraftLauncher {
         if (exitListener != null) mcProcess.setExitListener(exitListener);
 
         platformApi.incrementPackRuns(pack.getName());
-        if (!Utils.sendTracking("runModpack", pack.getName(), pack.getInstalledVersion().getVersion(), options.getOptions().getClientId())) {
-            Utils.getLogger().info("Failed to record event");
-        }
+        //if (!Utils.sendTracking("runModpack", pack.getName(), pack.getInstalledVersion().getVersion(), options.getOptions().getClientId())) {
+        //    Utils.getLogger().info("Failed to record event");
+        //}
 
         return mcProcess;
     }

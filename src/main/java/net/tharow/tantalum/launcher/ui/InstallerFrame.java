@@ -199,7 +199,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
                 settings.save();
 
                 VersionFileBuildNumber buildNumber = new VersionFileBuildNumber(resources);
-                Utils.sendTracking("installLauncher", "standard", buildNumber.getBuildNumber(), settings.getClientId());
+                //Utils.sendTracking("installLauncher", "standard", buildNumber.getBuildNumber(), settings.getClientId());
 
                 Relauncher relauncher = new TechnicRelauncher(null, settings.getBuildStream(), 0, new TechnicLauncherDirectories(settings.getTechnicRoot()), resources, params);
                 try {
@@ -285,7 +285,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
                 settings.save();
 
                 VersionFileBuildNumber buildNumber = new VersionFileBuildNumber(resources);
-                Utils.sendTracking("installLauncher", "portable", buildNumber.getBuildNumber(), settings.getClientId());
+                //Utils.sendTracking("installLauncher", "portable", buildNumber.getBuildNumber(), settings.getClientId());
 
                 relauncher.launch(threadTargetPath, params.getArgs());
                 System.exit(0);

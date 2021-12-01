@@ -116,7 +116,7 @@ public class Utils {
         }
     }
 
-    public static boolean sendTracking(String category, String action, String label, String clientId) {
+    /*public static void sendTracking(String category, String action, String label, String clientId) {
         String url = "https://www.google-analytics.com/collect";
         try {
             URL urlObj = new URL(url);
@@ -149,7 +149,7 @@ public class Utils {
         } catch (IOException e) {
             return false;
         }
-    }
+    }*/
 
     /**
      *

@@ -459,6 +459,6 @@ public class LauncherMain {
 
         userModel.startupAuth();
 
-        Utils.sendTracking("runLauncher", "run", buildNumber.getBuildNumber(), settings.getClientId());
+        //Utils.sendTracking("runLauncher", "run", buildNumber.getBuildNumber(), settings.getClientId());
     }
 }

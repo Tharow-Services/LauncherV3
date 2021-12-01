@@ -143,7 +143,7 @@
             <!-- Filtered resources -->
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
-                <targetPath>net/technicpack/launcher/resources</targetPath>
+                <targetPath>net//tharow/tantalum/launcher/resources</targetPath>
                 <filtering>false</filtering>
                 <includes>
                     <include>**/*</include>
@@ -155,7 +155,7 @@
             </resource>
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
-                <targetPath>net/technicpack/launcher/resources</targetPath>
+                <targetPath>net/tharow/tantalum/launcher/resources</targetPath>
                 <filtering>true</filtering>
                 <includes>
                     <include>version</include>

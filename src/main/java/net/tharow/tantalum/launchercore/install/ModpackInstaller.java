@@ -46,7 +46,7 @@ public class ModpackInstaller<VersionData> {
 
         if (installedVersion == null) {
             platformApi.incrementPackInstalls(modpack.getName());
-            Utils.sendTracking("installModpack", modpack.getName(), modpack.getBuild(), clientId);
+            //Utils.sendTracking("installModpack", modpack.getName(), modpack.getBuild(), clientId);
         }
 
         return tasksQueue.getMetadata();
