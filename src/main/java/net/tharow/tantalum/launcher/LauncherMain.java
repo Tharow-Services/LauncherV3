@@ -160,7 +160,7 @@ public class LauncherMain {
         }
 
         if (settings == null) {
-            ResourceLoader installerResources = new ResourceLoader(null, "net","technicpack","launcher","resources");
+            ResourceLoader installerResources = new ResourceLoader(null, "net","tharow","tantalum","launcher","resources");
             installerResources.setSupportedLanguages(supportedLanguages);
             installerResources.setLocale(ResourceLoader.DEFAULT_LOCALE);
             InstallerFrame dialog = new InstallerFrame(installerResources, params);
@@ -169,7 +169,7 @@ public class LauncherMain {
         }
 
         LauncherDirectories directories = new TechnicLauncherDirectories(settings.getTechnicRoot());
-        ResourceLoader resources = new ResourceLoader(directories, "net","technicpack","launcher","resources");
+        ResourceLoader resources = new ResourceLoader(directories, "net","tharow","tantalum","launcher","resources");
         resources.setSupportedLanguages(supportedLanguages);
         resources.setLocale(settings.getLanguageCode());
 
