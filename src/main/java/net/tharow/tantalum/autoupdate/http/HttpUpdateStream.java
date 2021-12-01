@@ -33,6 +33,6 @@ public class HttpUpdateStream implements IUpdateStream {
 
     @Override
     public StreamVersion getStreamVersion(String stream) throws RestfulAPIException {
-        return RestObject.getRestObject(StreamVersion.class, baseUrl + "version/" + stream);
+        return RestObject.getRestObject(StreamVersion.class, baseUrl + "version.php?stream=" + stream);
     }
 }

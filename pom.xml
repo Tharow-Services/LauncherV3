@@ -44,8 +44,9 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.10.12</version>
+            <version>2.10.13</version>
         </dependency>
+
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
@@ -54,7 +55,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.8</version>
+            <version>2.8.9</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -85,7 +86,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.15</version>
+            <version>20041127.091804</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -234,7 +235,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
@@ -252,7 +253,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
     <!-- Build profiles -->
@@ -265,7 +266,7 @@
                 </property>
             </activation>
             <properties>
-                <buildNumber>2</buildNumber>
+                <buildNumber>4</buildNumber>
             </properties>
         </profile>
         <profile>
@@ -280,7 +281,7 @@
             </properties>
         </profile>
         <!-- Package for Windows -->
-        <profile>
+        <!--<profile>
             <id>package-win</id>
             <activation>
                 <os>
@@ -289,7 +290,7 @@
             </activation>
             <build>
                 <plugins>
-                    <plugin>
+                    <!-<plugin>
                         <groupId>com.akathist.maven.plugins.launch4j</groupId>
                         <artifactId>launch4j-maven-plugin</artifactId>
                         <version>2.1.2</version>
@@ -336,7 +337,7 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
+        </profile>-->
     </profiles>
 
 </project>

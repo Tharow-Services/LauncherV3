@@ -36,7 +36,7 @@ public class HttpPlatformApi implements IPlatformApi {
     }
 
     public String getPlatformUri(String packSlug) {
-        return platformUrl + "modpack/" + packSlug + "?build="+launcherBuild;
+        return platformUrl + "modpack.php?slug=" + packSlug;// + "?build="+launcherBuild;
     }
 
     @Override
@@ -52,19 +52,19 @@ public class HttpPlatformApi implements IPlatformApi {
 
     @Override
     public void incrementPackRuns(String packSlug) {
-        String url = platformUrl + "modpack/" + packSlug + "/stat/run?build="+launcherBuild;
+        String url = platformUrl + "modpack.php?slug=" + packSlug + "&stat=run";//?build="+launcherBuild;
         Utils.pingHttpURL(url);
     }
 
     @Override
     public void incrementPackInstalls(String packSlug) {
-        String url = platformUrl + "modpack/" + packSlug + "/stat/install?build="+launcherBuild;
+        String url = platformUrl + "modpack.php?slug=" + packSlug + "&stat=install";
         Utils.pingHttpURL(url);
     }
 
     @Override
     public NewsData getNews() throws RestfulAPIException {
-        String url = platformUrl + "news?build="+launcherBuild;
+        String url = platformUrl + "news.php?build="+launcherBuild;
         return RestObject.getRestObject(NewsData.class, url);
     }
 }
