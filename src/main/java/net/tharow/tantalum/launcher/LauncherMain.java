@@ -195,13 +195,13 @@ public class LauncherMain {
         } catch (NumberFormatException ex) {
             //This is probably a debug build or something, build number is invalid
         }
-
+        Utils.getLogger().info("Current Build Number is " + build);
         // These 2 need to happen *before* the launcher or the updater run, so we have valuable debug information, and so
         // we can properly use websites that use Let's Encrypt (and other current certs not supported by old Java versions)
         runStartupDebug();
         injectNewRootCerts();
         //startLauncher(settings, params, directories, resources);
-        Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream("https://tantalum-auth.azurewebsites.net/launcher/"), settings.getBuildStream()+"4", build, directories, resources, params);
+        Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream("https://tantalum-auth.azurewebsites.net/platform/"), settings.getBuildStream()+"4", build, directories, resources, params);
         try {
             if (launcher.runAutoUpdater())
                 startLauncher(settings, params, directories, resources);
@@ -412,10 +412,10 @@ public class LauncherMain {
         HttpSolderApi httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
 
-        HttpPlatformApi httpPlatform = new HttpPlatformApi("https://api.technicpack.net/", buildNumber.getBuildNumber());
+        HttpPlatformApi httpPlatform = new HttpPlatformApi("https://tantalum-auth.azurewebsites.net/platform/", buildNumber.getBuildNumber());
         Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
         IPlatformApi platform = new ModpackCachePlatformApi(httpPlatform, 60 * 60, directories);
-        IPlatformSearchApi platformSearch = new HttpPlatformSearchApi("https://api.technicpack.net/", buildNumber.getBuildNumber());
+        IPlatformSearchApi platformSearch = new HttpPlatformSearchApi("https://tantalum-auth.azurewebsites.net/platform/", buildNumber.getBuildNumber());
 
         IInstalledPackRepository packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks"));
         IAuthoritativePackSource packInfoRepository = new PlatformPackInfoRepository(platform, solder);
@@ -426,7 +426,7 @@ public class LauncherMain {
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
         PackLoader packList = new PackLoader(directories, packStore, packInfoRepository);
-        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource("https://solder.technicpack.net/api/", solder), solder, platform, platformSearch, iconRepo);
+        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource("https://example.com/", solder), solder, platform, platformSearch, iconRepo);
         selector.setBorder(BorderFactory.createEmptyBorder());
         userModel.addAuthListener(selector);
 

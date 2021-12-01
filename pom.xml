@@ -44,8 +44,9 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.10.12</version>
+            <version>2.10.13</version>
         </dependency>
+
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
@@ -54,7 +55,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.8</version>
+            <version>2.8.9</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -234,42 +235,23 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <id>osx.app</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${basedir}/src/main/assembly/app.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <!-- Build profiles -->
     <profiles>
         <profile>
-            <id>static_build_number</id>
+            <id>DropBox Deploy</id>
             <activation>
                 <property>
                     <name>!env.BUILD_NUMBER</name>
                 </property>
             </activation>
             <properties>
-                <buildNumber>2</buildNumber>
+                <buildNumber>4</buildNumber>
             </properties>
         </profile>
         <profile>
-            <id>dynamic_build_number</id>
+            <id>Build Number As Revision</id>
             <activation>
                 <property>
                     <name>env.BUILD_NUMBER</name>
