@@ -356,7 +356,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         ActionListener tabListener = e -> selectTab(e.getActionCommand());
 
         discoverTab = new HeaderTab(resources.getString("launcher.title.discover"), resources);
-        header.add(discoverTab);
+        //header.add(discoverTab);
         discoverTab.setActionCommand(TAB_DISCOVER);
         discoverTab.addActionListener(tabListener);
 
@@ -371,7 +371,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         newsTab.setLayout(null);
         newsTab.addActionListener(tabListener);
         newsTab.setActionCommand(TAB_NEWS);
-        header.add(newsTab);
+        //header.add(newsTab);
 
         CountCircle newsCircle = new CountCircle();
         newsCircle.setBackground(COLOR_RED);

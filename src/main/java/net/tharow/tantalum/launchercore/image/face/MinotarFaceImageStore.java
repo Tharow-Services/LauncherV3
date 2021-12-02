@@ -41,16 +41,14 @@ public class MinotarFaceImageStore implements IImageStore<IUserType> {
 
     @Override
     public void downloadImage(IUserType user, File location) {
-        //TODO Setup api to use tantalum for avatar or gravatar
-        Utils.getLogger().log(Level.INFO, "User Face Image Isn't Currently Implemented");
-        /*
+        //Utils.getLogger().log(Level.INFO, "User Face Image Isn't Currently Implemented");
         try {
-            Utils.downloadFile(mBaseUrl + "helm/" + user.getId() + "/100", user.getDisplayName(), location.getAbsolutePath());
+            Utils.downloadFile(mBaseUrl + "avatar.php?u=" + user.getUsername(), user.getDisplayName(), location.getAbsolutePath());
         } catch (InterruptedException ex) {
             //User cancelled
         } catch (IOException e) {
             Utils.getLogger().log(Level.INFO, "Error downloading user face image: " + user.getDisplayName(), e);
-        }*/
+        }
     }
 
     @Override

@@ -405,7 +405,7 @@ public class LauncherMain {
         ImageRepository<ModpackModel> logoRepo = new ImageRepository<>(new PackResourceMapper(directories, resources.getImage("modpack/ModImageFiller.png"), logoType), new PackImageStore(logoType));
         ImageRepository<ModpackModel> backgroundRepo = new ImageRepository<>(new PackResourceMapper(directories, null, backgroundType), new PackImageStore(backgroundType));
 
-        ImageRepository<IUserType> skinRepo = new ImageRepository<>(new TechnicFaceMapper(directories, resources), new MinotarFaceImageStore("https://minotar.net/"));
+        ImageRepository<IUserType> skinRepo = new ImageRepository<>(new TechnicFaceMapper(directories, resources), new MinotarFaceImageStore("https://tantalum-auth.azurewebsites.net/platform/"));
 
         ImageRepository<AuthorshipInfo> avatarRepo = new ImageRepository<>(new TantalumAvatarMapper(directories, resources), new WebAvatarImageStore());
 
@@ -444,7 +444,7 @@ public class LauncherMain {
 
         ActionListener listener = e -> {
             splash.dispose();
-            if (settings.getLaunchToModpacks())
+            if (true)//settings.getLaunchToModpacks())
                 frame.selectTab("modpacks");
         };
 

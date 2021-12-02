@@ -57,7 +57,7 @@ public class DiscoverInfoPanel extends TiledBackground {
         this.resources = loader;
 
         if (discoverUrl == null)
-            discoverUrl = "https://api.technicpack.net/discover/";
+            discoverUrl = "https://tantalum-auth.azurewebsites.net/discover/";
 
         final String runnableAccessDiscover = discoverUrl;
 
