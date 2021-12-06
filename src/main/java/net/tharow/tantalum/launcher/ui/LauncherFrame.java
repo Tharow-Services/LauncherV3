@@ -58,6 +58,7 @@ import net.tharow.tantalum.utilslib.DesktopUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Locale;
 
 public class LauncherFrame extends DraggableFrame implements IRelocalizableResource, IAuthListener {
 
@@ -145,7 +146,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
     public LauncherFrame(final ResourceLoader resources, final ImageRepository<IUserType> skinRepository, final UserModel userModel, final TantalumSettings settings, final ModpackSelector modpackSelector, final ImageRepository<ModpackModel> iconRepo, final ImageRepository<ModpackModel> logoRepo, final ImageRepository<ModpackModel> backgroundRepo, final Installer installer, final ImageRepository<AuthorshipInfo> avatarRepo, final IPlatformApi platformApi, final LauncherDirectories directories, final IInstalledPackRepository packRepository, final StartupParameters params, final DiscoverInfoPanel discoverInfoPanel, final JavaVersionRepository javaVersions, final FileJavaSource fileJavaSource, final IBuildNumber buildNumber) {
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Technic Launcher");
+        setTitle("Tantalum Launcher");
 
         this.userModel = userModel;
         this.skinRepository = skinRepository;
@@ -184,14 +185,26 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         modpacksTab.setIsActive(false);
         newsTab.setIsActive(false);
 
-        if (tabName.equalsIgnoreCase(TAB_DISCOVER))
+        switch (tabName.toLowerCase(Locale.ROOT)){
+            case TAB_DISCOVER:
+                discoverTab.setIsActive(true);
+                break;
+            case TAB_MODPACKS:
+                modpacksTab.setIsActive(true);
+                break;
+            case TAB_NEWS:
+                newsTab.setIsActive(true);
+                newsSelector.ping();
+        }
+
+        /*if (tabName.equalsIgnoreCase(TAB_DISCOVER))
             discoverTab.setIsActive(true);
         else if (tabName.equalsIgnoreCase(TAB_MODPACKS))
             modpacksTab.setIsActive(true);
         else if (tabName.equalsIgnoreCase(TAB_NEWS)) {
             newsTab.setIsActive(true);
             newsSelector.ping();
-        }
+        }*/
 
         infoLayout.show(infoSwap, tabName);
 
@@ -348,7 +361,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         headerLabel.setContentAreaFilled(false);
         headerLabel.setFocusPainted(false);
         headerLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        headerLabel.addActionListener(e -> DesktopUtils.browseUrl("https://www.tharow.net/"));
+        headerLabel.addActionListener(e -> DesktopUtils.browseUrl("https://tantalum.tharow.net/"));
         header.add(headerLabel);
 
         header.add(Box.createRigidArea(new Dimension(6, 0)));
@@ -356,7 +369,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         ActionListener tabListener = e -> selectTab(e.getActionCommand());
 
         discoverTab = new HeaderTab(resources.getString("launcher.title.discover"), resources);
-        //header.add(discoverTab);
+        header.add(discoverTab);
         discoverTab.setActionCommand(TAB_DISCOVER);
         discoverTab.addActionListener(tabListener);
 
@@ -371,7 +384,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         newsTab.setLayout(null);
         newsTab.addActionListener(tabListener);
         newsTab.setActionCommand(TAB_NEWS);
-        //header.add(newsTab);
+        header.add(newsTab);
 
         CountCircle newsCircle = new CountCircle();
         newsCircle.setBackground(COLOR_RED);
@@ -530,8 +543,8 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         buildCtrl.setHorizontalAlignment(SwingConstants.RIGHT);
         buildCtrl.setFocusable(false);
         buildCtrl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        buildCtrl.addActionListener(e -> DesktopUtils.browseUrl("https://www.akliz.net/technic"));
-        //footer.add(buildCtrl);
+        buildCtrl.addActionListener(e -> DesktopUtils.browseUrl("https://www.tharow.net/"));
+        footer.add(buildCtrl);
 
         getRootPane().getContentPane().add(footer, BorderLayout.PAGE_END);
 

@@ -276,7 +276,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         add(addRegistration, new GridBagConstraints(0, 8, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
 
         // Mojang username label
-        usernameLabel = new JLabel("Tharow Email");
+        usernameLabel = new JLabel("Tantalum Username");
         usernameLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         usernameLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         add(usernameLabel, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10,20,0,20), 0,0));
@@ -292,7 +292,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         add(username, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(3,20,0,20),4,17));
 
         // Mojang password label
-        passwordLabel = new JLabel("Tharow Password");
+        passwordLabel = new JLabel("Tantalum Password");
         passwordLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         passwordLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         add(passwordLabel, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(12,20,0,20),0,0));
@@ -398,11 +398,11 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
     }
 
     protected void visitTerms() {
-        DesktopUtils.browseUrl("https://www.technicpack.net/terms");
+        DesktopUtils.browseUrl("https://www.tantalum.tharow.net/terms.html");
     }
 
     protected void visitRegister() {
-        DesktopUtils.browseUrl("https://ts-mc-reg.azurewebsites.net/");
+        DesktopUtils.browseUrl("https://www.tantalum.tharow.net/register.html");
     }
 
     protected void refreshSelectedUsers() {

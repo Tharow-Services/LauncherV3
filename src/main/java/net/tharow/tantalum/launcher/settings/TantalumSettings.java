@@ -39,7 +39,7 @@ public class TantalumSettings implements ILaunchOptions {
     private int memory;
     private LaunchAction launchAction = LaunchAction.HIDE;
     private String buildStream = STABLE;
-    private boolean showConsole = true;
+    private boolean showConsole = false;
     private String languageCode = "default";
     private String clientId = UUID.randomUUID().toString();
     private String directory;

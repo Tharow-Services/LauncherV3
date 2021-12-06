@@ -426,7 +426,7 @@ public class LauncherMain {
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
         PackLoader packList = new PackLoader(directories, packStore, packInfoRepository);
-        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource("https://example.com/", solder), solder, platform, platformSearch, iconRepo);
+        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource("https://tantalum-solder.azurewebsites.net/api/", solder), solder, platform, platformSearch, iconRepo);
         selector.setBorder(BorderFactory.createEmptyBorder());
         userModel.addAuthListener(selector);
 
@@ -444,7 +444,7 @@ public class LauncherMain {
 
         ActionListener listener = e -> {
             splash.dispose();
-            if (true)//settings.getLaunchToModpacks())
+            if (settings.getLaunchToModpacks())
                 frame.selectTab("modpacks");
         };
 
