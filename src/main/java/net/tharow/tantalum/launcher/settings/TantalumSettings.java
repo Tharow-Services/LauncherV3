@@ -61,6 +61,14 @@ public class TantalumSettings implements ILaunchOptions {
     private int windowHeight = 0;
     private boolean enableStencilBuffer = true;
     private boolean useMojangJava = true;
+    private boolean useTorRelay = false;
+    private boolean useTorProxy = false;
+
+    public boolean getUseTorRelay(){ return this.useTorRelay;}
+    public void setUseTorRelay(boolean useRelay){this.useTorRelay = useRelay;}
+
+    public boolean getUseTorProxy(){ return this.useTorProxy;}
+    public void setUseTorProxy(boolean useProxy){this.useTorProxy = useProxy;}
 
     public File getFilePath() { return this.settingsFile; }
     public void setFilePath(File settingsFile) {
