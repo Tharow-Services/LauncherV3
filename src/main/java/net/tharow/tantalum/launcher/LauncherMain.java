@@ -480,16 +480,15 @@ public class LauncherMain {
 
         discoverInfoPanel.setLoadListener(listener);
         if(settings.getUseTorRelay()){
-            startTorRelay(directories);
             if(checkTorRelay()){
                 Utils.getLogger().info("Using Tor Relay");
-                System.setProperty("sun.net.spi.nameservice.nameservers", "localhost:3653");
-                System.setProperty("sun.net.spi.nameservice.domain", "localhost:3653");
+                System.setProperty("sun.net.spi.nameservice.nameservers", settings.getNameServers());
+                System.setProperty("sun.net.spi.nameservice.domain", settings.getNameServiceDomains());
                 if(settings.getUseTorProxy()){
                     Utils.getLogger().info("Using Tor Proxy");
-                    System.setProperty("socksProxyHost", "localhost");
-                    System.setProperty("socksProxyPort", "3652");
-                    System.setProperty("socksProxyVersion", "5");
+                    System.setProperty("socksProxyHost", settings.getProxyHost());
+                    System.setProperty("socksProxyPort", String.valueOf(settings.getProxyPort()));
+                    //System.setProperty("socksProxyVersion", settings.getJavaVersion());
                 }
             }
         }

@@ -99,6 +99,93 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
+    private DocumentListener proxyHostListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeProxyHost();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeProxyHost();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeProxyHost();
+        }
+    };
+
+    private DocumentListener proxyPortListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeProxyPort();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeProxyPort();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeProxyPort();
+        }
+    };
+
+    private DocumentListener nameServerListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeNameServers();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeNameServers();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeNameServers();
+        }
+    };
+
+
+    private DocumentListener nameServiceDomainsListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeNameServiceDomains();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeNameServiceDomains();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeNameServiceDomains();
+        }
+    };
+
+
+    private DocumentListener torControlPortListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeTorControlPort();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeTorControlPort();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeTorControlPort();
+        }
+    };
+
     private DocumentListener dimensionListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -153,6 +240,16 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     JTextField heightInput;
     JTextField wrapperCommand;
     JCheckBox useMojangJava;
+    JCheckBox useTorRelay;
+    JCheckBox useTorProxy;
+    JTextField proxyHost;
+    JTextField proxyPort;
+    JCheckBox proxyVersion;
+    JTextField torControlPort;
+    JTextField nameServers;
+    JTextField nameServiceDomains;
+
+
 
     public OptionsDialog(final Frame owner, final TantalumSettings settings, final ResourceLoader resourceLoader, final StartupParameters params, final JavaVersionRepository javaVersions, final FileJavaSource fileJavaSource, final IBuildNumber buildNumber) {
         super(owner);
@@ -169,6 +266,47 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     protected void closeDialog() {
         resources.unregisterResource(this);
         dispose();
+    }
+
+    protected void changeUseTorRelay() {
+        settings.setUseTorRelay(useTorRelay.isSelected());
+        settings.save();
+    }
+
+    protected void changeUseTorProxy() {
+        settings.setUseTorProxy(useTorProxy.isSelected());
+        settings.save();
+    }
+
+    protected void changeProxyHost(){
+        //System.setProperty("proxyHost",proxyHost.getText().trim());
+        settings.setProxyHost(proxyHost.getText().trim());
+        settings.save();
+    }
+
+    protected void changeProxyPort(){
+        settings.setProxyPort(Integer.parseInt(proxyPort.getText().trim()));
+        settings.save();
+    }
+
+    protected void changeTorControlPort(){
+        settings.setTorControlPort(Integer.parseInt(torControlPort.getText().trim()));
+        settings.save();
+    }
+
+    protected void changeProxyVersion(){
+        settings.setProxyVersion(proxyVersion.isSelected());
+        settings.save();
+    }
+
+    protected void changeNameServers(){
+        settings.setNameServers(nameServers.getText().trim());
+        settings.save();
+    }
+
+    protected void changeNameServiceDomains(){
+        settings.setNameServiceDomains(nameServiceDomains.getText().trim());
+        settings.save();
     }
 
     protected void changeJavaArgs() {
@@ -342,12 +480,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         final InstallerFrame frame = new InstallerFrame(resources, params, settings, getOwner());
         frame.setVisible(true);
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                frame.requestFocus();
-            }
-        });
+        EventQueue.invokeLater(frame::requestFocus);
 
         this.dispose();
     }
@@ -362,6 +495,26 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         javaArgs.setText(settings.getJavaArgs());
         javaArgs.getDocument().addDocumentListener(javaArgsListener);
 
+        proxyHost.getDocument().removeDocumentListener(proxyHostListener);
+        proxyHost.setText(settings.getProxyHost());
+        proxyHost.getDocument().addDocumentListener(proxyHostListener);
+
+        proxyPort.getDocument().removeDocumentListener(proxyPortListener);
+        proxyPort.setText(String.valueOf(settings.getProxyPort()));
+        proxyPort.getDocument().addDocumentListener(proxyPortListener);
+
+        nameServers.getDocument().removeDocumentListener(nameServerListener);
+        nameServers.setText(settings.getNameServers());
+        nameServers.getDocument().addDocumentListener(nameServerListener);
+
+        nameServiceDomains.getDocument().removeDocumentListener(nameServiceDomainsListener);
+        nameServiceDomains.setText(settings.getNameServiceDomains());
+        nameServiceDomains.getDocument().addDocumentListener(nameServiceDomainsListener);
+        /*
+        torControlPort.getDocument().removeDocumentListener(torControlPortListener);
+        torControlPort.setText(String.valueOf(settings.getTorControlPort()));
+        torControlPort.getDocument().addDocumentListener(torControlPortListener);
+        */
         wrapperCommand.getDocument().removeDocumentListener(wrapperCommandListener);
         wrapperCommand.setText(settings.getWrapperCommand());
         wrapperCommand.getDocument().addDocumentListener(wrapperCommandListener);
@@ -372,42 +525,37 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         for (ActionListener listener : showConsole.getActionListeners())
             showConsole.removeActionListener(listener);
         showConsole.setSelected(settings.getShowConsole());
-        showConsole.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeShowConsole();
-            }
-        });
+        showConsole.addActionListener(e -> changeShowConsole());
 
+        for (ActionListener listener : useTorRelay.getActionListeners())
+            useTorRelay.removeActionListener(listener);
+        useTorRelay.setSelected(settings.getUseTorRelay());
+        useTorRelay.addActionListener(e -> changeUseTorRelay());
+
+        for (ActionListener listener : useTorProxy.getActionListeners())
+            useTorProxy.removeActionListener(listener);
+        useTorProxy.setSelected(settings.getUseTorProxy());
+        useTorProxy.addActionListener(e -> changeUseTorProxy());
+/*
+        for (ActionListener listener : proxyVersion.getActionListeners())
+            proxyVersion.removeActionListener(listener);
+        proxyVersion.setSelected(settings.getProxyVersion());
+        proxyVersion.addActionListener(e -> changeProxyVersion());
+*/
         for (ActionListener listener : askFirstBox.getActionListeners())
             askFirstBox.removeActionListener(listener);
         askFirstBox.setSelected(!settings.shouldAutoAcceptModpackRequirements());
-        askFirstBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeAskFirst();
-            }
-        });
+        askFirstBox.addActionListener(e -> changeAskFirst());
 
         for (ActionListener listener : useMojangJava.getActionListeners())
             useMojangJava.removeActionListener(listener);
         useMojangJava.setSelected(settings.shouldUseMojangJava());
-        useMojangJava.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeUseMojangJava();
-            }
-        });
+        useMojangJava.addActionListener(e -> changeUseMojangJava());
 
         for (ActionListener listener : launchToModpacks.getActionListeners())
             launchToModpacks.removeActionListener(listener);
         launchToModpacks.setSelected(settings.getLaunchToModpacks());
-        launchToModpacks.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeLaunchToModpacks();
-            }
-        });
+        launchToModpacks.addActionListener(e -> changeLaunchToModpacks());
 
         for (ActionListener listener : versionSelect.getActionListeners())
             versionSelect.removeActionListener(listener);
@@ -438,12 +586,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             }
         }
 
-        versionSelect.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeJavaVersion();
-            }
-        });
+        versionSelect.addActionListener(e -> changeJavaVersion());
 
         rebuildMemoryList();
 
@@ -454,12 +597,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         streamSelect.addItem(new StreamItem(resources.getString("launcheroptions.build.stable"), "stable"));
         streamSelect.addItem(new StreamItem(resources.getString("launcheroptions.build.beta"), "beta"));
         streamSelect.setSelectedIndex((settings.getBuildStream().equals("beta"))?1:0);
-        streamSelect.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeStream();
-            }
-        });
+        streamSelect.addActionListener(e -> changeStream());
 
         for (ActionListener listener : launchSelect.getActionListeners())
             launchSelect.removeActionListener(listener);
@@ -481,12 +619,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             default:
                 launchSelect.setSelectedIndex(0);
         }
-        launchSelect.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeLaunchAction();
-            }
-        });
+        launchSelect.addActionListener(e -> changeLaunchAction());
 
         for (ActionListener listener : langSelect.getActionListeners())
             langSelect.removeActionListener(listener);
@@ -512,12 +645,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
                 }
             }
         }
-        langSelect.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeLanguage();
-            }
-        });
+        langSelect.addActionListener(e -> changeLanguage());
 
         widthInput.getDocument().removeDocumentListener(dimensionListener);
         heightInput.getDocument().removeDocumentListener(dimensionListener);
@@ -680,12 +808,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         closeButton.setContentAreaFilled(false);
         closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         closeButton.setFocusPainted(false);
-        closeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                closeDialog();
-            }
-        });
+        closeButton.addActionListener(e -> closeDialog());
         header.add(closeButton);
 
         SimpleTabPane centerPanel = new SimpleTabPane();
@@ -699,8 +822,13 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
 
         JPanel general = new JPanel();
         general.setBackground(LauncherFrame.COLOR_CENTRAL_BACK_OPAQUE);
-
         setupGeneralPanel(general);
+
+
+        JPanel proxy = new JPanel();
+        proxy.setBackground(LauncherFrame.COLOR_CENTRAL_BACK_OPAQUE);
+        setupProxyPanel(proxy);
+
 
         JPanel javaOptions = new JPanel();
         javaOptions.setBackground(LauncherFrame.COLOR_CENTRAL_BACK_OPAQUE);
@@ -738,12 +866,9 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         textPane.setHighlighter(null);
         textPane.setAlignmentX(LEFT_ALIGNMENT);
         textPane.setContentType("text/html");
-        textPane.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
-                    DesktopUtils.browseUrl(e.getURL().toString());
-            }
+        textPane.addHyperlinkListener(e -> {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+                DesktopUtils.browseUrl(e.getURL().toString());
         });
         MutableAttributeSet attributes = new SimpleAttributeSet(textPane.getParagraphAttributes());
         StyleConstants.setLineSpacing(attributes, StyleConstants.getLineSpacing(attributes) * 1.3f);
@@ -756,8 +881,112 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         centerPanel.addTab(resources.getString("launcheroptions.tab.java").toUpperCase(), javaOptions);
         centerPanel.addTab(resources.getString("launcheroptions.tab.video").toUpperCase(), videoOptions);
         centerPanel.addTab(resources.getString("launcheroptions.tab.about").toUpperCase(), about);
+        centerPanel.addTab(resources.getString("launcheroptions.tab.proxy").toUpperCase(), proxy);
         centerPanel.setFocusable(false);
     }
+
+    private void setupProxyPanel(JPanel panel) {
+
+        panel.setLayout(new GridBagLayout());
+
+        JLabel proxyHostLabel = new JLabel(resources.getString("launcheroptions.proxy.host"));
+        proxyHostLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        proxyHostLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(proxyHostLabel, new GridBagConstraints(0, 3, 1, 1, 0, 0, 13, GridBagConstraints.NONE, new Insets(0, 40, 0, 0), 0, 0));
+
+        proxyHost = new JTextField("");
+        proxyHost.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        proxyHost.setForeground(LauncherFrame.COLOR_BLUE);
+        proxyHost.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        proxyHost.setHighlighter(null);
+        proxyHost.setEditable(true);
+        proxyHost.setCursor(null);
+        proxyHost.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(proxyHost, new GridBagConstraints(1, 3, 2, 1, 5, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+
+
+        JLabel proxyPortLabel = new JLabel(resources.getString("launcheroptions.proxy.port"));
+        proxyPortLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        proxyPortLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(proxyPortLabel, new GridBagConstraints(3, 3, 1, 1, 0, 0, 17, 1, new Insets(0, 40, 0, 0), 0, 0));
+
+        proxyPort = new JTextField("");
+        proxyPort.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        proxyPort.setForeground(LauncherFrame.COLOR_BLUE);
+        proxyPort.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        proxyPort.setHighlighter(null);
+        proxyPort.setEditable(true);
+        proxyPort.setCursor(null);
+        proxyPort.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(proxyPort, new GridBagConstraints(4, 3, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+
+        JLabel nameServersField = new JLabel(resources.getString("launcheroptions.proxy.nameServer"));
+        nameServersField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        nameServersField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(nameServersField, new GridBagConstraints(0, 4, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 40, 0, 0), 0, 0));
+
+        nameServers = new JTextField("");
+        nameServers.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        nameServers.setForeground(LauncherFrame.COLOR_BLUE);
+        nameServers.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        nameServers.setHighlighter(null);
+        nameServers.setEditable(true);
+        nameServers.setCursor(null);
+        nameServers.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(nameServers, new GridBagConstraints(1, 4, 2, 1, 1, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(8, 16, 8, 16), 0, 16));
+
+        JLabel nameServiceDomainsField = new JLabel(resources.getString("launcheroptions.proxy.nameServiceDomains"));
+        nameServiceDomainsField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        nameServiceDomainsField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(nameServiceDomainsField, new GridBagConstraints(0, 5, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 40, 0, 0), 0, 0));
+
+        nameServiceDomains = new JTextField("");
+        nameServiceDomains.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        nameServiceDomains.setForeground(LauncherFrame.COLOR_BLUE);
+        nameServiceDomains.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        nameServiceDomains.setHighlighter(null);
+        nameServiceDomains.setEditable(true);
+        nameServiceDomains.setCursor(null);
+        nameServiceDomains.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(nameServiceDomains, new GridBagConstraints(1, 5, 2, 1, 1, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(8, 16, 8, 16), 0, 16));
+
+        //Add show console field
+        JLabel useTorRelayField = new JLabel(resources.getString("launcheroptions.proxy.useTorRelay"));
+        useTorRelayField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        useTorRelayField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(useTorRelayField, new GridBagConstraints(0, 6, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(10, 40, 0, 0), 0, 0));
+
+        useTorRelay = new JCheckBox("", false);
+        useTorRelay.setOpaque(false);
+        useTorRelay.setHorizontalAlignment(SwingConstants.RIGHT);
+        useTorRelay.setBorder(BorderFactory.createEmptyBorder());
+        useTorRelay.setIconTextGap(0);
+        useTorRelay.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
+        useTorRelay.setIcon(resources.getIcon("checkbox_open.png"));
+        useTorRelay.setFocusPainted(false);
+
+        panel.add(useTorRelay, new GridBagConstraints(1, 6, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(16, 16, 0, 0), 0, 0));
+
+        //Add launch to modpacks
+        JLabel useTorProxyField = new JLabel(resources.getString("launcheroptions.proxy.useTorProxy"));
+        useTorProxyField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        useTorProxyField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(useTorProxyField, new GridBagConstraints(0,7,1,1,0,0,GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(10,40,0,0),0,0));
+
+        useTorProxy = new JCheckBox("", false);
+        useTorProxy.setOpaque(false);
+        useTorProxy.setHorizontalAlignment(SwingConstants.RIGHT);
+        useTorProxy.setBorder(BorderFactory.createEmptyBorder());
+        useTorProxy.setIconTextGap(0);
+        useTorProxy.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
+        useTorProxy.setIcon(resources.getIcon("checkbox_open.png"));
+        useTorProxy.setFocusPainted(false);
+
+        panel.add(useTorProxy, new GridBagConstraints(1, 7, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(16, 16 ,0, 0), 0,0));
+
+        panel.add(Box.createGlue(), new GridBagConstraints(0, 8, 5, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
+
+        }
 
     private void setupGeneralPanel(JPanel panel) {
 

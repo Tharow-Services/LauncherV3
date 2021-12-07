@@ -63,6 +63,30 @@ public class TantalumSettings implements ILaunchOptions {
     private boolean useMojangJava = true;
     private boolean useTorRelay = false;
     private boolean useTorProxy = false;
+    private String proxyHost = "localhost";
+    private int proxyPort = 3652;
+    private boolean proxyVersion = true;
+    private int torControlPort = 3651;
+    private String nameServers = "localhost:3653";
+    private String nameDomain = "localhost";
+
+    public String getProxyHost(){ return this.proxyHost;}
+    public void setProxyHost(String proxyHost){this.proxyHost = proxyHost;}
+
+    public int getProxyPort(){ return this.proxyPort;}
+    public void setProxyPort(int proxyPort){this.proxyPort = proxyPort;}
+
+    public boolean getProxyVersion(){ return this.proxyVersion;}
+    public void setProxyVersion(boolean proxyVersion){this.proxyVersion = proxyVersion;}
+
+    public int getTorControlPort(){ return this.torControlPort;}
+    public void setTorControlPort(int torControlPort){this.torControlPort = torControlPort;}
+
+    public String getNameServers(){ return this.nameServers;}
+    public void setNameServers(String nameServers){this.nameServers = nameServers;}
+
+    public String getNameServiceDomains(){ return this.nameDomain;}
+    public void setNameServiceDomains(String nameServiceDomains){this.nameDomain = nameServiceDomains;}
 
     public boolean getUseTorRelay(){ return this.useTorRelay;}
     public void setUseTorRelay(boolean useRelay){this.useTorRelay = useRelay;}
