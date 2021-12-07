@@ -28,6 +28,7 @@ import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.launch.java.source.FileJavaSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.IInstalledPackRepository;
+import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.ui.controls.DraggableFrame;
 import net.tharow.tantalum.ui.controls.RoundedButton;
 import net.tharow.tantalum.ui.controls.SplatPane;
@@ -54,11 +55,13 @@ import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.platform.IPlatformApi;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
 import net.tharow.tantalum.utilslib.DesktopUtils;
+import net.tharow.tantalum.utilslib.Utils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Locale;
+import java.util.logging.Level;
 
 public class LauncherFrame extends DraggableFrame implements IRelocalizableResource, IAuthListener {
 
@@ -136,7 +139,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
     private NewsSelector newsSelector;
     private TintablePanel centralPanel;
     private TintablePanel footer;
-
+    private Boolean LoadNews = false;
     private String currentTabName;
 
     NewsInfoPanel newsInfoPanel;
@@ -180,11 +183,24 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
     // Action responses
     /////////////////////////////////////////////////
 
+    private boolean TestNews() {
+        Thread thread = new Thread(() -> {
+            try {
+                platformApi.getNews();
+                LoadNews = false;
+            } catch (RestfulAPIException ex) {
+                Utils.getLogger().log(Level.WARNING, "Unable to load news", ex);
+                LoadNews = true;
+            }
+        });
+        thread.start();
+        return LoadNews;
+    }
+
     public void selectTab(String tabName) {
         discoverTab.setIsActive(false);
         modpacksTab.setIsActive(false);
         newsTab.setIsActive(false);
-
         switch (tabName.toLowerCase(Locale.ROOT)){
             case TAB_DISCOVER:
                 discoverTab.setIsActive(true);
@@ -380,11 +396,14 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         modpacksTab.setActionCommand(TAB_MODPACKS);
         header.add(modpacksTab);
 
+
         newsTab = new HeaderTab(resources.getString("launcher.title.news"), resources);
         newsTab.setLayout(null);
         newsTab.addActionListener(tabListener);
         newsTab.setActionCommand(TAB_NEWS);
-        header.add(newsTab);
+        if(TestNews()) {
+            header.add(newsTab);
+        }
 
         CountCircle newsCircle = new CountCircle();
         newsCircle.setBackground(COLOR_RED);

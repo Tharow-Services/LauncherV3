@@ -176,7 +176,7 @@ public class TantalumSettings implements ILaunchOptions {
     public String getJavaArgs() {
         if (javaArgs == null || javaArgs.isEmpty()) {
             // These are the default JVM args in the vanilla launcher
-            javaArgs = "-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M";
+            javaArgs = "-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -javaagent:" + this.getTechnicRoot().getAbsolutePath() + "\\assets\\launcher\\authlib-injector.jar=tantalum-auth.azurewebsites.net";
         }
         return javaArgs;
     }

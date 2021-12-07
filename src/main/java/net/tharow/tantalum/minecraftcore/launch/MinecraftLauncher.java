@@ -192,8 +192,8 @@ public class MinecraftLauncher {
         params.put("user_type", user.getMCUserType());
         params.put("user_properties", user.getUserProperties());
 
-        params.put("launcher_name", "technic");
-        params.put("launcher_version", "4." + buildNumber.getBuildNumber());
+        params.put("launcher_name", "tantalum   ");
+        params.put("launcher_version", "5.1-" + buildNumber.getBuildNumber());
 
         // Prepend custom JVM arguments
         String customJvmArgs = options.getOptions().getJavaArgs();

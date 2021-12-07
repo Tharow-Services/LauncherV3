@@ -49,6 +49,8 @@ import javax.swing.plaf.metal.MetalComboBoxUI;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -207,23 +209,18 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         selectLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         add(selectLabel, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10,20,0,20), 0,0));
 
-        //addAccounts = new JLabel(resources.getString("login.instructions"));
-        //addAccounts.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        //addAccounts.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        addAccounts = new JLabel(resources.getString("login.instructions"));
+        addAccounts.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        addAccounts.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         //add(addAccounts, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
-        //visitBrowser = new JLabel(resources.getString("login.checkbrowser"));
-        //visitBrowser.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        //visitBrowser.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        visitBrowser = new JLabel(resources.getString("login.checkbrowser"));
+        visitBrowser.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        visitBrowser.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         //add(visitBrowser,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
         // Setup account select box
         nameSelect = new JComboBox<>();
-
-        if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("mac")) {
-            nameSelect.setUI(new MetalComboBoxUI());
-        }
-
         nameSelect.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         nameSelect.setEditable(true);
         nameSelect.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 10));
@@ -256,7 +253,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         add(login, new GridBagConstraints(0, 6, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
 
         // Add mojang account button
-        addMojang = new RoundedButton("Add Account");
+        addMojang = new RoundedButton(resources.getString("login.addaccount"));
         addMojang.setBorder(BorderFactory.createEmptyBorder(5,17,10,17));
         addMojang.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
         addMojang.setContentAreaFilled(false);
@@ -272,11 +269,11 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         addRegistration.setContentAreaFilled(false);
         addRegistration.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         addRegistration.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        addRegistration.addActionListener(e -> visitRegister());
-        add(addRegistration, new GridBagConstraints(0, 8, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
+        addRegistration.addActionListener(e -> visitTerms());
+        //add(addRegistration, new GridBagConstraints(0, 8, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
 
         // Mojang username label
-        usernameLabel = new JLabel("Tantalum Username");
+        usernameLabel = new JLabel(resources.getString("login.username"));
         usernameLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         usernameLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         add(usernameLabel, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10,20,0,20), 0,0));
@@ -292,7 +289,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         add(username, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(3,20,0,20),4,17));
 
         // Mojang password label
-        passwordLabel = new JLabel("Tantalum Password");
+        passwordLabel = new JLabel(resources.getString("login.password"));
         passwordLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         passwordLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         add(passwordLabel, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(12,20,0,20),0,0));
@@ -330,7 +327,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         rememberAccount.setIcon(resources.getIcon("checkbox_open.png"));
         rememberAccount.addActionListener(e -> toggleRemember());
         rememberAccount.setFocusPainted(false);
-//        add(rememberAccount, new GridBagConstraints(1,6,2,1,1.0,0.0, GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(24,20,0,20),0,0));
+        //add(rememberAccount, new GridBagConstraints(1,6,2,1,1.0,0.0, GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(24,20,0,20),0,0));
 
         add(Box.createVerticalGlue(), new GridBagConstraints(0, 8, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0),0,0));
 
@@ -374,13 +371,13 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
 
         linkPane.add(Box.createHorizontalGlue());
 
-        JButton termsLink = new JButton(resources.getString("login.terms"));
+        JButton termsLink = new JButton(resources.getString("login.torconnect"));
         termsLink.setContentAreaFilled(false);
         termsLink.setBorder(BorderFactory.createEmptyBorder());
         termsLink.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         termsLink.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
         termsLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        termsLink.addActionListener(e -> visitTerms());
+        termsLink.addActionListener(e -> setupTorConnection());
         linkPane.add(termsLink);
         linkPane.add(Box.createHorizontalStrut(8));
 
@@ -401,8 +398,35 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         DesktopUtils.browseUrl("https://www.tantalum.tharow.net/terms.html");
     }
 
-    protected void visitRegister() {
-        DesktopUtils.browseUrl("https://www.tantalum.tharow.net/register.html");
+    protected boolean checkTorConnection() {
+        try {
+            if(InetAddress.getByName("stackoverflow.com") == InetAddress.getByName("hit-adult.opendns.com")){
+                if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this,
+                        "Tor Browser is either not running or incorrectly configured. \nTo Try Again To Start With Tor Press Ok",
+                        "Run with tor", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE)) {
+                    checkTorConnection();
+                }
+            } else {
+                return true;
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    protected void setupTorConnection() {
+        if(checkTorConnection()) {
+            System.setProperty("sun.net.spi.nameservice.nameservers", "localhost:1024");
+            System.setProperty("sun.net.spi.nameservice.domain", "localhost");
+            System.setProperty("socksProxyHost", "localhost");
+            System.setProperty("socksProxyPort", "9150");
+            System.setProperty("socksProxyVersion", "5");
+            JOptionPane.showConfirmDialog(this,
+                    "Tor Connection Has Been Configured",
+                    "Tor Configured", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     protected void refreshSelectedUsers() {
@@ -531,7 +555,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
             //Go ahead and just play offline automatically, like the minecraft client does.  If we're running loud (user
             //is actually at the login UI clicking the login button), give them a choice.
             if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
-                    "The auth servers at Tharow Services are inaccessible.  Would you like to play offline?",
+                    "The auth servers at The Tantalum Platform are inaccessible.  Would you like to play offline?",
                     "Offline Play", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)) {
 
                 // This is the last time we'll have access to the user's real username,

@@ -51,10 +51,10 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
     private StatBox runs;
     private StatBox downloads;
 
-    private JPanel discordPanel;
-    private JButton discordLabel;
-    private JButton countLabel;
-    private java.util.List<JButton> discordButtons = new ArrayList<JButton>(3);
+    //private JPanel discordPanel;
+    //private JButton discordLabel;
+    //private JButton countLabel;
+    //private java.util.List<JButton> discordButtons = new ArrayList<JButton>(3);
 
     private String packSiteUrl;
 
@@ -78,7 +78,7 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
         this.packSiteUrl = modpack.getWebSite();
 
         if (this.packSiteUrl == null)
-            this.packSiteUrl = "https://www.technicpack.net/";
+            this.packSiteUrl = "https://www.tantalum.tharow.net/discover.html";
 
         titleLabel.setText(resources.getString("launcher.packstats.title", modpack.getDisplayName()));
         description.setText(modpack.getDescription());
@@ -101,12 +101,9 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
         job.addJobListener(this);
         packImage.setIcon(new ImageIcon(ImageUtils.scaleImage(job.getImage(), 370, 220)));
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                description.scrollRectToVisible(new Rectangle(new Dimension(1, 1)));
-                repaint();
-            }
+        EventQueue.invokeLater(() -> {
+            description.scrollRectToVisible(new Rectangle(new Dimension(1, 1)));
+            repaint();
         });
     }
 
@@ -132,12 +129,7 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
         packImage.setBorder(BorderFactory.createEmptyBorder());
         packImage.setContentAreaFilled(false);
         packImage.setFocusPainted(false);
-        packImage.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DesktopUtils.browseUrl(packSiteUrl);
-            }
-        });
+        packImage.addActionListener(e -> DesktopUtils.browseUrl(packSiteUrl));
         imagePanel.add(packImage);
 
         JPanel packInfoPanel = new JPanel();
@@ -152,12 +144,7 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
         statBoxes.setOpaque(false);
         statBoxes.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 
-        ActionListener listener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DesktopUtils.browseUrl(packSiteUrl);
-            }
-        };
+        ActionListener listener = e -> DesktopUtils.browseUrl(packSiteUrl);
 
         ratings = new StatBox(resources, resources.getString("launcher.packstats.ratings"), null);
         ratings.setBackground(LauncherFrame.COLOR_LIKES_BACK);

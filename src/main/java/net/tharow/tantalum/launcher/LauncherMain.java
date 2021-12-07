@@ -216,6 +216,8 @@ public class LauncherMain {
 
     }
 
+
+
     private static void checkIfRunningInsideOneDrive(File launcherRoot) {
         if (OperatingSystem.getOperatingSystem() != OperatingSystem.WINDOWS) {
             return;
