@@ -18,9 +18,14 @@
 
 package net.tharow.tantalum.launcher.ui;
 
+import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.launcher.LauncherMain;
+import net.tharow.tantalum.launcher.settings.StartupParameters;
+import net.tharow.tantalum.launcher.ui.components.OptionsDialog;
 import net.tharow.tantalum.launchercore.exception.ResponseException;
 import net.tharow.tantalum.launchercore.exception.SessionException;
+import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
+import net.tharow.tantalum.launchercore.launch.java.source.FileJavaSource;
 import net.tharow.tantalum.ui.controls.list.popupformatters.RoundedBorderFormatter;
 import net.tharow.tantalum.ui.controls.lang.LanguageCellRenderer;
 import net.tharow.tantalum.ui.controls.lang.LanguageCellUI;
@@ -45,12 +50,9 @@ import net.tharow.tantalum.utilslib.Utils;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import javax.swing.plaf.metal.MetalComboBoxUI;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -77,14 +79,22 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
     private JCheckBox rememberAccount;
     private JPasswordField password;
     private JComboBox<LanguageItem> languages;
+    private final StartupParameters params;
+    private final JavaVersionRepository javaVersions;
+    private final IBuildNumber buildNumber;
+    private final FileJavaSource fileJavaSource;
 
     private static final int FRAME_WIDTH = 347;
     private static final int FRAME_HEIGHT = 399;
 
-    public LoginFrame(ResourceLoader resources, TantalumSettings settings, UserModel userModel, ImageRepository<IUserType> skinRepository) {
+    public LoginFrame(ResourceLoader resources, TantalumSettings settings, UserModel userModel, ImageRepository<IUserType> skinRepository, StartupParameters params, JavaVersionRepository javaVersions, IBuildNumber buildNumber, FileJavaSource fileJavaSource) {
         this.skinRepository = skinRepository;
         this.userModel = userModel;
         this.settings = settings;
+        this.params = params;
+        this.javaVersions = javaVersions;
+        this.buildNumber = buildNumber;
+        this.fileJavaSource = fileJavaSource;
 
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -371,13 +381,13 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
 
         linkPane.add(Box.createHorizontalGlue());
 
-        JButton termsLink = new JButton(resources.getString("login.torconnect"));
+        JButton termsLink = new JButton(resources.getString("login.options"));
         termsLink.setContentAreaFilled(false);
         termsLink.setBorder(BorderFactory.createEmptyBorder());
         termsLink.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         termsLink.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
         termsLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        termsLink.addActionListener(e -> setupTorConnection());
+        termsLink.addActionListener(e -> openLauncherOptions());
         linkPane.add(termsLink);
         linkPane.add(Box.createHorizontalStrut(8));
 
@@ -398,35 +408,11 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         DesktopUtils.browseUrl("https://www.tantalum.tharow.net/terms.html");
     }
 
-    protected boolean checkTorConnection() {
-        try {
-            if(InetAddress.getByName("stackoverflow.com") == InetAddress.getByName("hit-adult.opendns.com")){
-                if (JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this,
-                        "Tor Browser is either not running or incorrectly configured. \nTo Try Again To Start With Tor Press Ok",
-                        "Run with tor", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE)) {
-                    checkTorConnection();
-                }
-            } else {
-                return true;
-            }
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
 
-    protected void setupTorConnection() {
-        if(checkTorConnection()) {
-            System.setProperty("sun.net.spi.nameservice.nameservers", "localhost:1024");
-            System.setProperty("sun.net.spi.nameservice.domain", "localhost");
-            System.setProperty("socksProxyHost", "localhost");
-            System.setProperty("socksProxyPort", "9150");
-            System.setProperty("socksProxyVersion", "5");
-            JOptionPane.showConfirmDialog(this,
-                    "Tor Connection Has Been Configured",
-                    "Tor Configured", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-        }
+    protected void openLauncherOptions() {
+        OptionsDialog dialog = new OptionsDialog(this, settings, resources, params, javaVersions, fileJavaSource, buildNumber);
+        dialog.setVisible(true);
     }
 
     protected void refreshSelectedUsers() {

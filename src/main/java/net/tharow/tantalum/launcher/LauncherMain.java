@@ -74,6 +74,7 @@ import net.tharow.tantalum.solder.ISolderApi;
 import net.tharow.tantalum.solder.SolderPackSource;
 import net.tharow.tantalum.solder.cache.CachedSolderApi;
 import net.tharow.tantalum.solder.http.HttpSolderApi;
+import net.tharow.tantalum.torcontrol.Communicator;
 import net.tharow.tantalum.ui.components.Console;
 import net.tharow.tantalum.ui.components.ConsoleFrame;
 import net.tharow.tantalum.ui.components.ConsoleHandler;
@@ -216,7 +217,34 @@ public class LauncherMain {
 
     }
 
+    private static boolean checkTorRelay() {
+        Communicator torControl = new Communicator("localhost",3651);
+        if(torControl.authenticate("PASS")){
+            Utils.getLogger().info("Unable to connect to tor server");
+            torControl.quit();
+            return false;
+        } else {
+            Utils.getLogger().info("Tor Relay is currently running");
+            torControl.quit();
+            return true;
+        }
 
+
+    }
+
+    private static void startTorRelay(LauncherDirectories directories) {
+        //Make Tor Command
+        String torRelayPath = directories.getRuntimesDirectory().getAbsolutePath() + "\\tor-relay";
+        String torExecPath = torRelayPath + "\\Tor\\tor.exe";
+        String torTorrcPath = torRelayPath + "\\Data\\torrc";
+        String torCommand = torExecPath + " -f " + torTorrcPath;
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process process = runtime.exec(torCommand);
+        } catch (IOException e) {
+            Utils.getLogger().info("Unable to start tor relay");
+        }
+    }
 
     private static void checkIfRunningInsideOneDrive(File launcherRoot) {
         if (OperatingSystem.getOperatingSystem() != OperatingSystem.WINDOWS) {
@@ -451,8 +479,21 @@ public class LauncherMain {
         };
 
         discoverInfoPanel.setLoadListener(listener);
-
-        LoginFrame login = new LoginFrame(resources, settings, userModel, skinRepo);
+        if(settings.getUseTorRelay()){
+            startTorRelay(directories);
+            if(checkTorRelay()){
+                Utils.getLogger().info("Using Tor Relay");
+                System.setProperty("sun.net.spi.nameservice.nameservers", "localhost:3653");
+                System.setProperty("sun.net.spi.nameservice.domain", "localhost:3653");
+                if(settings.getUseTorProxy()){
+                    Utils.getLogger().info("Using Tor Proxy");
+                    System.setProperty("socksProxyHost", "localhost");
+                    System.setProperty("socksProxyPort", "3652");
+                    System.setProperty("socksProxyVersion", "5");
+                }
+            }
+        }
+        LoginFrame login = new LoginFrame(resources, settings, userModel, skinRepo, startupParameters, javaVersions, buildNumber, javaVersionFile);
         userModel.addAuthListener(login);
         userModel.addAuthListener(user -> {
             if (user == null)
