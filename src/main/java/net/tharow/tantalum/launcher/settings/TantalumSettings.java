@@ -78,7 +78,23 @@ public class TantalumSettings implements ILaunchOptions {
     private String getTorControlPassword = "ItsTorProxy";
     //TODO Make Almost all urls be configurable
     private String authlibServerURL = "https://tantalum-auth.azurewebsites.net"; //Authlib-Injector Server Address
-    private String defaultDiscoverURL = "";
+    private String defaultDiscoverURL = "https://example.net";
+    private String defaultSolderURL = "https://tantalum-solder.azurewebsites.net/api/";
+    private String defaultPlatformURL = "https://tantalum-auth.azurewebsites.net/platform/";
+
+    //Website Urls
+    public String getAuthlibServerURL(){return this.authlibServerURL;}
+    public void setAuthlibServerURL(String authlibServerURL){this.authlibServerURL = authlibServerURL;}
+
+    public String getDefaultDiscoverURL(){return this.defaultDiscoverURL;}
+    public void setDefaultDiscoverURL(String defaultDiscoverURL){this.defaultDiscoverURL = defaultDiscoverURL;}
+
+    public String getDefaultSolderURL(){return this.defaultSolderURL;}
+    public void setDefaultSolderURL(String defaultSolderURL){this.defaultSolderURL = defaultSolderURL;}
+
+    public String getDefaultPlatformURL(){return this.defaultPlatformURL;}
+    public void setDefaultPlatformURL(String defaultPlatformURL){this.defaultPlatformURL = defaultPlatformURL;}
+
     //Socks Proxy Configs
     public boolean getUseSocksProxy(){return this.useSocksProxy;}
     public void setUseSocksProxy(boolean useSocksProxy){this.useSocksProxy = useSocksProxy;}

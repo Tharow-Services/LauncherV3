@@ -85,6 +85,12 @@ import net.tharow.tantalum.utilslib.JavaUtils;
 import net.tharow.tantalum.utilslib.OperatingSystem;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.joda.time.DateTime;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -217,33 +223,37 @@ public class LauncherMain {
 
     }
 
-    private static boolean checkTorRelay() {
-        Communicator torControl = new Communicator("localhost",3651);
-        if(torControl.authenticate("PASS")){
-            Utils.getLogger().info("Unable to connect to tor server");
-            torControl.quit();
-            return false;
-        } else {
-            Utils.getLogger().info("Tor Relay is currently running");
-            torControl.quit();
-            return true;
+
+    public static void runProxySetup(TantalumSettings settings2) {
+        if(false){//settings2.getUseTorRelay()){
+
+        }
+        //Setup http Proxy
+        if(settings2.getUseHTTPProxy()){
+            Utils.getLogger().info("HTTP Proxy is currently configured as \n  HTTP Proxy Host: " + settings2.getHTTPProxyHost()+ "\n  HTTP Proxy Port: "+ settings2.getHTTPProxyPort() +"\n HTTP Proxy Non Proxies Hosts: " +settings2.getHTTPProxyBypassDomains());
+            System.setProperty("http.proxyHost",settings2.getHTTPProxyHost());
+            System.setProperty("http.proxyPort", String.valueOf(settings2.getHTTPProxyPort()));
+            System.setProperty("http.nonProxyHosts",settings2.getHTTPProxyBypassDomains());// Separated by |
+        }
+        //Setup Socks Proxy
+        if(settings2.getUseSocksProxy()){
+            Utils.getLogger().info("Socks Proxy is currently configured as \n  Socks Proxy Host: " + settings2.getSocksProxyHost()+ "\n  Socks Proxy Port: "+ settings2.getSocksProxyPort() +"\n Socks Proxy Using Version Five: "+settings2.getUseSocksProxyFive());
+            System.setProperty("socksProxyHost",settings2.getSocksProxyHost());
+            System.setProperty("socksProxyPort", String.valueOf(settings2.getSocksProxyPort()));
+            if(!settings2.getUseSocksProxyFive()){System.setProperty("socksProxyVersion","4");}//Set Socks Version To Four if we aren't using v5
+        }
+        //Setup Custom DNS
+        if(settings2.getUseCustomDNS()){
+            Utils.getLogger().info("Custom DNS / Name Service is currently configured as \n  Name Service Servers: " + settings2.getNameServers()+ "\n  Name Service Domains: "+ settings2.getNameServiceDomains());
+            String oldNameServiceProvider = System.getProperty("sun.net.spi.nameservice.provider.0");
+            System.setProperty("sun.net.spi.nameservice.provider.0","dns,sun"); //Override Default DNS Service and replace it with our ow// n
+            //System.setProperty("sun.net.spi.nameservice.provider.5",oldNameServiceProvider); //Set the default DNS to be the fallback DNS
+            System.setProperty("sun.net.spi.nameservice.nameservers",settings2.getNameServers());
+            System.setProperty("sun.net.spi.nameservice.domain",settings2.getNameServiceDomains());
+            System.getProperties();
         }
 
 
-    }
-
-    private static void startTorRelay(LauncherDirectories directories) {
-        //Make Tor Command
-        String torRelayPath = directories.getRuntimesDirectory().getAbsolutePath() + "\\tor-relay";
-        String torExecPath = torRelayPath + "\\Tor\\tor.exe";
-        String torTorrcPath = torRelayPath + "\\Data\\torrc";
-        String torCommand = torExecPath + " -f " + torTorrcPath;
-        Runtime runtime = Runtime.getRuntime();
-        try {
-            Process process = runtime.exec(torCommand);
-        } catch (IOException e) {
-            Utils.getLogger().info("Unable to start tor relay");
-        }
     }
 
     private static void checkIfRunningInsideOneDrive(File launcherRoot) {
@@ -398,6 +408,8 @@ public class LauncherMain {
         UIManager.put( "ComboBox.disabledForeground", LauncherFrame.COLOR_GREY_TEXT );
         System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
 
+        runProxySetup(settings); //Check and run proxy and custom dns settings
+
         //Remove all log files older than a week
         new Thread(() -> {
             Iterator<File> files = FileUtils.iterateFiles(new File(directories.getLauncherDirectory(), "logs"), new String[] {"log"}, false);
@@ -423,7 +435,7 @@ public class LauncherMain {
         javaVersions.selectVersion(settings.getJavaVersion(), settings.getJavaBitness());
 
         TantalumUserStore users = TantalumUserStore.load(new File(directories.getLauncherDirectory(),"users.json"));
-        TantalumAuthenticator tantalumAuthenticator = new TantalumAuthenticator(users.getClientToken());
+        TantalumAuthenticator tantalumAuthenticator = new TantalumAuthenticator(users.getClientToken(), settings.getAuthlibServerURL());
         UserModel userModel = new UserModel(users, tantalumAuthenticator);
 
         IModpackResourceType iconType = new IconResourceType();
@@ -442,10 +454,10 @@ public class LauncherMain {
         HttpSolderApi httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
 
-        HttpPlatformApi httpPlatform = new HttpPlatformApi("https://tantalum-auth.azurewebsites.net/platform/", buildNumber.getBuildNumber());
+        HttpPlatformApi httpPlatform = new HttpPlatformApi(settings.getDefaultPlatformURL());
         Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
         IPlatformApi platform = new ModpackCachePlatformApi(httpPlatform, 60 * 60, directories);
-        IPlatformSearchApi platformSearch = new HttpPlatformSearchApi("https://tantalum-auth.azurewebsites.net/platform/", buildNumber.getBuildNumber());
+        IPlatformSearchApi platformSearch = new HttpPlatformSearchApi(settings.getDefaultPlatformURL());
 
         IInstalledPackRepository packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks"));
         IAuthoritativePackSource packInfoRepository = new PlatformPackInfoRepository(platform, solder);
@@ -456,13 +468,13 @@ public class LauncherMain {
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
         PackLoader packList = new PackLoader(directories, packStore, packInfoRepository);
-        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource("https://tantalum-solder.azurewebsites.net/api/", solder), solder, platform, platformSearch, iconRepo);
+        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(settings.getDefaultPlatformURL(), solder), solder, platform, platformSearch, iconRepo);
         selector.setBorder(BorderFactory.createEmptyBorder());
         userModel.addAuthListener(selector);
 
         resources.registerResource(selector);
 
-        DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, startupParameters.getDiscoverUrl(), platform, directories, selector);
+        DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, settings.getDefaultDiscoverURL(), platform, directories, selector);
 
         MinecraftLauncher launcher = new MinecraftLauncher(platform, directories, userModel, javaVersions, buildNumber);
         //noinspection rawtypes
@@ -479,6 +491,9 @@ public class LauncherMain {
         };
 
         discoverInfoPanel.setLoadListener(listener);
+
+
+
         /*if(settings.getUseTorRelay()){
             if(checkTorRelay()){
                 Utils.getLogger().info("Using Tor Relay");

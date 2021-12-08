@@ -28,15 +28,13 @@ import net.tharow.tantalum.utilslib.Utils;
 
 public class HttpPlatformApi implements IPlatformApi {
     private String platformUrl;
-    private String launcherBuild;
 
-    public HttpPlatformApi(String rootUrl, String launcherBuild) {
+    public HttpPlatformApi(String rootUrl) {
         this.platformUrl = rootUrl;
-        this.launcherBuild = launcherBuild;
     }
 
     public String getPlatformUri(String packSlug) {
-        return platformUrl + "modpack.php?slug=" + packSlug;// + "?build="+launcherBuild;
+        return platformUrl + "modpack.php?slug=" + packSlug;
     }
 
     @Override
@@ -52,7 +50,7 @@ public class HttpPlatformApi implements IPlatformApi {
 
     @Override
     public void incrementPackRuns(String packSlug) {
-        String url = platformUrl + "modpack.php?slug=" + packSlug + "&stat=run";//?build="+launcherBuild;
+        String url = platformUrl + "modpack.php?slug=" + packSlug + "&stat=run";
         Utils.pingHttpURL(url);
     }
 

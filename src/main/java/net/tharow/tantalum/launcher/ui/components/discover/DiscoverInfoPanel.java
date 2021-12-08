@@ -56,8 +56,6 @@ public class DiscoverInfoPanel extends TiledBackground {
         this.directories = directories;
         this.resources = loader;
 
-        if (discoverUrl == null)
-            discoverUrl = "https://tantalum.tharow.net/discover.html";
 
         final String runnableAccessDiscover = discoverUrl;
 

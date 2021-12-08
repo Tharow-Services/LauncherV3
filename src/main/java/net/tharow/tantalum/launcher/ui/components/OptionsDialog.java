@@ -49,6 +49,7 @@ import net.tharow.tantalum.launchercore.util.LaunchAction;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.utilslib.Memory;
 import net.tharow.tantalum.utilslib.OperatingSystem;
+import org.checkerframework.checker.units.qual.Current;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -63,10 +64,12 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Locale;
-import java.util.Objects;
 
 public class OptionsDialog extends LauncherDialog implements IRelocalizableResource {
 
@@ -200,6 +203,23 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
+
+    private final DocumentListener torControlPortListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeTorControlPort();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeTorControlPort();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeTorControlPort();
+        }
+    };
 
     private final DocumentListener dimensionListener = new DocumentListener() {
         @Override
@@ -382,7 +402,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     }
 
     protected void changeJavaVersion() {
-        String version = ((JavaVersionItem) Objects.requireNonNull(versionSelect.getSelectedItem())).getVersionNumber();
+        String version = ((JavaVersionItem)versionSelect.getSelectedItem()).getVersionNumber();
         boolean is64 = ((JavaVersionItem)versionSelect.getSelectedItem()).is64Bit();
         javaVersions.selectVersion(version, is64);
         settings.setJavaVersion(version);
@@ -434,7 +454,6 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             javaVersions.addVersion(chosenJava);
             javaVersions.selectVersion(chosenJava.getVersionNumber(), chosenJava.is64Bit());
             JavaVersionItem item = new JavaVersionItem(chosenJava, resources);
-            //noinspection unchecked
             versionSelect.addItem(item);
             versionSelect.setSelectedItem(item);
             settings.setJavaVersion(chosenJava.getVersionNumber());
@@ -444,12 +463,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     }
 
     protected void changeMemory() {
-        settings.setMemory(((Memory) Objects.requireNonNull(memSelect.getSelectedItem())).getSettingsId());
+        settings.setMemory(((Memory) memSelect.getSelectedItem()).getSettingsId());
         settings.save();
     }
 
     protected void changeStream() {
-        settings.setBuildStream(((StreamItem) Objects.requireNonNull(streamSelect.getSelectedItem())).getStream());
+        settings.setBuildStream(((StreamItem) streamSelect.getSelectedItem()).getStream());
         settings.save();
 
         if (!hasShownStreamInfo) {
@@ -460,12 +479,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     }
 
     protected void changeLaunchAction() {
-        settings.setLaunchAction(((OnLaunchItem) Objects.requireNonNull(launchSelect.getSelectedItem())).getLaunchAction());
+        settings.setLaunchAction(((OnLaunchItem) launchSelect.getSelectedItem()).getLaunchAction());
         settings.save();
     }
 
     protected void changeLanguage() {
-        settings.setLanguageCode(((LanguageItem) Objects.requireNonNull(langSelect.getSelectedItem())).getLangCode());
+        settings.setLanguageCode(((LanguageItem) langSelect.getSelectedItem()).getLangCode());
         settings.save();
 
         resources.setLocale(((LanguageItem) langSelect.getSelectedItem()).getLangCode());
@@ -562,7 +581,11 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         nameServiceDomains.setText(settings.getNameServiceDomains());
         nameServiceDomains.setEnabled(settings.getUseCustomDNS());
         nameServiceDomains.getDocument().addDocumentListener(nameServiceDomainsListener);
-
+        /*
+        torControlPort.getDocument().removeDocumentListener(torControlPortListener);
+        torControlPort.setText(String.valueOf(settings.getTorControlPort()));
+        torControlPort.getDocument().addDocumentListener(torControlPortListener);
+        */
         wrapperCommand.getDocument().removeDocumentListener(wrapperCommandListener);
         wrapperCommand.setText(settings.getWrapperCommand());
         wrapperCommand.getDocument().addDocumentListener(wrapperCommandListener);
@@ -609,16 +632,13 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             versionSelect.removeActionListener(listener);
 
         versionSelect.removeAllItems();
-        //noinspection unchecked
         versionSelect.addItem(new DefaultVersionItem(javaVersions.getVersion(null, true), resources));
 
         IJavaVersion best64Bit = javaVersions.getBest64BitVersion();
         if (best64Bit != null)
-            //noinspection unchecked
             versionSelect.addItem(new Best64BitVersionItem(javaVersions.getVersion("64bit", true), resources));
 
         for (IJavaVersion version : javaVersions.getVersions()) {
-            //noinspection unchecked
             versionSelect.addItem(new JavaVersionItem(version, resources));
         }
 
@@ -645,9 +665,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             streamSelect.removeActionListener(listener);
         }
         streamSelect.removeAllItems();
-        //noinspection unchecked
         streamSelect.addItem(new StreamItem(resources.getString("launcheroptions.build.stable"), "stable"));
-        //noinspection unchecked
         streamSelect.addItem(new StreamItem(resources.getString("launcheroptions.build.beta"), "beta"));
         streamSelect.setSelectedIndex((settings.getBuildStream().equals("beta"))?1:0);
         streamSelect.addActionListener(e -> changeStream());
@@ -655,14 +673,14 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         for (ActionListener listener : launchSelect.getActionListeners())
             launchSelect.removeActionListener(listener);
         launchSelect.removeAllItems();
-        //noinspection unchecked
         launchSelect.addItem(new OnLaunchItem(resources.getString("launcheroptions.packlaunch.hide"), LaunchAction.HIDE));
-        //noinspection unchecked
         launchSelect.addItem(new OnLaunchItem(resources.getString("launcheroptions.packlaunch.close"), LaunchAction.CLOSE));
-        //noinspection unchecked
         launchSelect.addItem(new OnLaunchItem(resources.getString("launcheroptions.packlaunch.nothing"), LaunchAction.NOTHING));
 
         switch (settings.getLaunchAction()) {
+            case HIDE:
+                launchSelect.setSelectedIndex(0);
+                break;
             case CLOSE:
                 launchSelect.setSelectedIndex(1);
                 break;
@@ -682,12 +700,10 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         if (!resources.isDefaultLocaleSupported()) {
             defaultLocaleText = defaultLocaleText.concat(" (" + resources.getString("launcheroptions.language.unavailable") + ")");
         }
-        //noinspection unchecked
+
         langSelect.setRenderer(new LanguageCellRenderer(resources, null, langSelect.getBackground(), langSelect.getForeground()));
-        //noinspection unchecked
         langSelect.addItem(new LanguageItem(ResourceLoader.DEFAULT_LOCALE, defaultLocaleText, resources));
         for (int i = 0; i < LauncherMain.supportedLanguages.length; i++) {
-            //noinspection unchecked
             langSelect.addItem(new LanguageItem(resources.getCodeFromLocale(LauncherMain.supportedLanguages[i]), LauncherMain.supportedLanguages[i].getDisplayName(LauncherMain.supportedLanguages[i]), resources.getVariant(LauncherMain.supportedLanguages[i])));
         }
         if (!settings.getLanguageCode().equalsIgnoreCase(ResourceLoader.DEFAULT_LOCALE)) {
@@ -718,11 +734,8 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             windowSelect.removeActionListener(listener);
         }
         windowSelect.removeAllItems();
-        //noinspection unchecked
         windowSelect.addItem(resources.getString("launcheroptions.video.windowSize.default"));
-        //noinspection unchecked
         windowSelect.addItem(resources.getString("launcheroptions.video.windowSize.fullscreen"));
-        //noinspection unchecked
         windowSelect.addItem(resources.getString("launcheroptions.video.windowSize.custom"));
         switch (settings.getLaunchWindowType()) {
             case DEFAULT:
@@ -735,22 +748,30 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
                 windowSelect.setSelectedIndex(2);
                 break;
         }
-        windowSelect.addActionListener(e -> changeWindowType());
+        windowSelect.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeWindowType();
+            }
+        });
         updateDimensionsEnabled();
 
         for (ActionListener listener : useStencil.getActionListeners()) {
             useStencil.removeActionListener(listener);
         }
         useStencil.removeAllItems();
-        //noinspection unchecked
         useStencil.addItem(resources.getString("launcheroptions.video.stencil.enabled"));
-        //noinspection unchecked
         useStencil.addItem(resources.getString("launcheroptions.video.stencil.disabled"));
         if (settings.shouldUseStencilBuffer())
             useStencil.setSelectedIndex(0);
         else
             useStencil.setSelectedIndex(1);
-        useStencil.addActionListener(e -> changeEnableStencil());
+        useStencil.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeEnableStencil();
+            }
+        });
     }
 
     private void rebuildMemoryList() {
@@ -771,10 +792,8 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         memSelect.removeAllItems();
         long maxMemory = Memory.getAvailableMemory(javaVersions.getSelectedVersion().is64Bit());
         for (int i = 0; i < Memory.memoryOptions.length; i++) {
-            if (Memory.memoryOptions[i].getMemoryMB() <= maxMemory) {
-                //noinspection unchecked
+            if (Memory.memoryOptions[i].getMemoryMB() <= maxMemory)
                 memSelect.addItem(Memory.memoryOptions[i]);
-            }
         }
 
         Memory currentMem = Memory.getMemoryFromId(settings.getMemory());
@@ -785,7 +804,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             settings.save();
         }
         memSelect.setSelectedItem(availableMem);
-        memSelect.addActionListener(e -> changeMemory());
+        memSelect.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeMemory();
+            }
+        });
 
         if (parent != null) {
             boolean is64Bit = true;
@@ -807,8 +831,8 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
                 toolTip.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
 
 
-                String text;
-                Icon icon;
+                String text = null;
+                Icon icon = null;
 
                 if (has64Bit) {
                     text = resources.getString("launcheroptions.java.use64bit");
@@ -932,12 +956,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     private void setupProxyPanel(JPanel panel) {
 
         panel.setLayout(new GridBagLayout());
-        Insets blin = new Insets(0,0,0,0);
+        Insets blin = new Insets(0, 0, 0, 0);
 
         JLabel useSocksProxyField = new JLabel(resources.getString("launcheroptions.proxy.useSocks"));
         useSocksProxyField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         useSocksProxyField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(useSocksProxyField, new GridBagConstraints(0,3,1,1,0,0,17,0,new Insets(0,20,0,10),0,0));
+        panel.add(useSocksProxyField, new GridBagConstraints(0, 3, 1, 1, 0, 0, 17, 0, new Insets(0, 20, 0, 10), 0, 0));
 
         useSocksProxy = new JCheckBox("", false);
         useSocksProxy.setOpaque(false);
@@ -946,7 +970,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         useSocksProxy.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
         useSocksProxy.setIcon(resources.getIcon("checkbox_open.png"));
         useSocksProxy.setFocusPainted(false);
-        panel.add(useSocksProxy, new GridBagConstraints(1, 3, 1, 1, 0, 0, 17, 0, blin, 0 ,0));
+        panel.add(useSocksProxy, new GridBagConstraints(1, 3, 1, 1, 0, 0, 17, 0, blin, 0, 0));
 
         JLabel proxyHostLabel = new JLabel(resources.getString("launcheroptions.proxy.host"));
         proxyHostLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
@@ -982,7 +1006,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         JLabel useHTTPProxyField = new JLabel(resources.getString("launcheroptions.proxy.useHTTP"));
         useHTTPProxyField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         useHTTPProxyField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(useHTTPProxyField, new GridBagConstraints(0,4,1,1,0,0,17,0,new Insets(0,20,0,10),0,0));
+        panel.add(useHTTPProxyField, new GridBagConstraints(0, 4, 1, 1, 0, 0, 17, 0, new Insets(0, 20, 0, 10), 0, 0));
 
         useHTTPProxy = new JCheckBox("", false);
         useHTTPProxy.setOpaque(false);
@@ -991,7 +1015,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         useHTTPProxy.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
         useHTTPProxy.setIcon(resources.getIcon("checkbox_open.png"));
         useHTTPProxy.setFocusPainted(false);
-        panel.add(useHTTPProxy, new GridBagConstraints(1, 4, 1, 1, 0, 0, 17, 0, blin, 0 ,0));
+        panel.add(useHTTPProxy, new GridBagConstraints(1, 4, 1, 1, 0, 0, 17, 0, blin, 0, 0));
 
         JLabel HTTPHostLabel = new JLabel(resources.getString("launcheroptions.proxy.host"));
         HTTPHostLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
@@ -1026,7 +1050,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         JLabel useCustomDNSField = new JLabel(resources.getString("launcheroptions.proxy.useCustomDNS"));
         useCustomDNSField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         useCustomDNSField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(useCustomDNSField, new GridBagConstraints(0,5,1,1,0,0,17,0,new Insets(0,20,0,10),0,0));
+        panel.add(useCustomDNSField, new GridBagConstraints(0, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 20, 0, 10), 0, 0));
 
         useCustomDNS = new JCheckBox("", false);
         useCustomDNS.setOpaque(false);
@@ -1035,7 +1059,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         useCustomDNS.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
         useCustomDNS.setIcon(resources.getIcon("checkbox_open.png"));
         useCustomDNS.setFocusPainted(false);
-        panel.add(useCustomDNS, new GridBagConstraints(1, 5, 1, 1, 0, 0, 17, 0, blin, 0 ,0));
+        panel.add(useCustomDNS, new GridBagConstraints(1, 5, 1, 1, 0, 0, 17, 0, blin, 0, 0));
 
         JLabel nameServersField = new JLabel(resources.getString("launcheroptions.proxy.nameServer"));
         nameServersField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
@@ -1066,11 +1090,37 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         nameServiceDomains.setCursor(null);
         nameServiceDomains.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
         panel.add(nameServiceDomains, new GridBagConstraints(6, 5, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+        System.setProperty("networkaddress.cache.ttl","0");
+        LauncherMain.runProxySetup(settings);
 
-
-        panel.add(Box.createGlue(), new GridBagConstraints(0, 8, 5, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
-
+        String stackoverflowip = "Error 1";
+        try {
+            stackoverflowip = InetAddress.getByName("stackoverflow.com").getHostAddress();
+        } catch (UnknownHostException e) {
+            stackoverflowip = "Error";
         }
+        String  blockflowip = "Error 1";
+        try {
+            blockflowip = InetAddress.getByName("hit-adult.opendns.com").getHostAddress();
+        } catch (UnknownHostException e) {
+            blockflowip = "Error";
+        }
+
+
+        String currentblockedstr = "Blocked";
+        if(stackoverflowip == blockflowip){
+            currentblockedstr = "blocfhgfked";
+        }
+
+        JLabel CurrentBlocked = new JLabel(stackoverflowip);
+        CurrentBlocked.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        CurrentBlocked.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(CurrentBlocked, new GridBagConstraints(0, 6, 1, 1, 0, 0, 10, 0, new Insets(0, 20, 0, 20), 0, 0));
+
+
+        panel.add(Box.createGlue(), new GridBagConstraints(0, 8, 5, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+
+    }
 
     private void setupGeneralPanel(JPanel panel) {
 
@@ -1184,7 +1234,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         reinstallButton.setContentAreaFilled(false);
         reinstallButton.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         reinstallButton.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        reinstallButton.addActionListener(e -> reinstall());
+        reinstallButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reinstall();
+            }
+        });
         panel.add(reinstallButton, new GridBagConstraints(3, 3, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(8, 0, 8, 0), 0, 0));
 
         //Client ID field
@@ -1208,7 +1263,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         copyButton.setContentAreaFilled(false);
         copyButton.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         copyButton.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        copyButton.addActionListener(e -> copyCid());
+        copyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                copyCid();
+            }
+        });
         panel.add(copyButton, new GridBagConstraints(3, 4, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(8, 0, 8, 0), 0, 0));
 
         panel.add(Box.createRigidArea(new Dimension(60, 0)), new GridBagConstraints(4, 3, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0,0,0,0), 0,0));
@@ -1256,7 +1316,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         openLogs.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         openLogs.setHoverForeground(LauncherFrame.COLOR_BLUE);
         openLogs.setBorder(BorderFactory.createEmptyBorder(5, 17, 10, 17));
-        openLogs.addActionListener(e -> openLogs());
+        openLogs.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openLogs();
+            }
+        });
         panel.add(openLogs, new GridBagConstraints(0, 8, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 10, 0), 0, 0));
     }
 
@@ -1425,7 +1490,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         otherVersionButton.setContentAreaFilled(false);
         otherVersionButton.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         otherVersionButton.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        otherVersionButton.addActionListener(e -> selectOtherVersion());
+        otherVersionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectOtherVersion();
+            }
+        });
         panel.add(otherVersionButton, new GridBagConstraints(2, 0, 5, 1, 2, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(8, 8, 8, 80), 0, 0));
 
         JLabel memLabel = new JLabel(resources.getString("launcheroptions.java.memory"));
@@ -1535,9 +1605,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         initComponents();
         initControlValues();
 
-        EventQueue.invokeLater(() -> {
-            invalidate();
-            repaint();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                invalidate();
+                repaint();
+            }
         });
     }
 }

@@ -29,11 +29,9 @@ import java.net.URLEncoder;
 
 public class HttpPlatformSearchApi implements IPlatformSearchApi {
     private String rootUrl;
-    private String launcherBuild;
 
-    public HttpPlatformSearchApi(String rootUrl, String launcherBuild) {
+    public HttpPlatformSearchApi(String rootUrl) {
         this.rootUrl = rootUrl;
-        this.launcherBuild = launcherBuild;
     }
 
     @Override
