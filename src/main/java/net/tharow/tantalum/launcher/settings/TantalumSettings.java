@@ -61,39 +61,69 @@ public class TantalumSettings implements ILaunchOptions {
     private int windowHeight = 0;
     private boolean enableStencilBuffer = true;
     private boolean useMojangJava = true;
+    private boolean useCustomDNS = false;
+    private boolean useSocksProxy = false;
+    private boolean useHTTPProxy = false;
     private boolean useTorRelay = false;
-    private boolean useTorProxy = false;
-    private String proxyHost = "localhost";
-    private int proxyPort = 3652;
-    private boolean proxyVersion = true;
-    private int torControlPort = 3651;
+    private String socksProxyHost = "localhost";
+    private int socksProxyPort = 3652;
+    private boolean useSocksProxyFive = true; //If false
+    private String HTTPProxyHost = "localhost";
+    private int HTTPProxyPort = 3652;
+    private String HTTPProxyBypassDomains = "";
     private String nameServers = "localhost:3653";
     private String nameDomain = "localhost";
+    private String torControlHost = "localhost";
+    private int torControlPort = 3651;
+    private String getTorControlPassword = "ItsTorProxy";
+    //TODO Make Almost all urls be configurable
+    private String authlibServerURL = "https://tantalum-auth.azurewebsites.net"; //Authlib-Injector Server Address
+    private String defaultDiscoverURL = "";
+    //Socks Proxy Configs
+    public boolean getUseSocksProxy(){return this.useSocksProxy;}
+    public void setUseSocksProxy(boolean useSocksProxy){this.useSocksProxy = useSocksProxy;}
 
-    public String getProxyHost(){ return this.proxyHost;}
-    public void setProxyHost(String proxyHost){this.proxyHost = proxyHost;}
+    public String getSocksProxyHost(){ return this.socksProxyHost;}
+    public void setSocksProxyHost(String proxyHost){this.socksProxyHost = proxyHost;}
 
-    public int getProxyPort(){ return this.proxyPort;}
-    public void setProxyPort(int proxyPort){this.proxyPort = proxyPort;}
+    public int getSocksProxyPort(){ return this.socksProxyPort;}
+    public void setSocksProxyPort(int proxyPort){this.socksProxyPort = proxyPort;}
 
-    public boolean getProxyVersion(){ return this.proxyVersion;}
-    public void setProxyVersion(boolean proxyVersion){this.proxyVersion = proxyVersion;}
+    public boolean getUseSocksProxyFive(){return this.useSocksProxyFive;}
+    public void setUseSocksProxyFive(boolean useSocksProxyFive){this.useSocksProxyFive = useSocksProxyFive;}
+    //HTTP Proxy Config
+    public boolean getUseHTTPProxy(){return this.useHTTPProxy;}
+    public void setUseHTTPProxy(boolean useHTTPProxy){this.useHTTPProxy = useHTTPProxy;}
+    public String getHTTPProxyHost(){ return this.HTTPProxyHost;}
+    public void setHTTPProxyHost(String proxyHost){this.HTTPProxyHost = proxyHost;}
+
+    public int getHTTPProxyPort(){ return this.HTTPProxyPort;}
+    public void setHTTPProxyPort(int proxyPort){this.HTTPProxyPort = proxyPort;}
+
+    public String getHTTPProxyBypassDomains(){ return this.HTTPProxyBypassDomains;}
+    public void setHTTPProxyBypassDomains(String HTTPProxyBypassDomains){this.HTTPProxyBypassDomains = HTTPProxyBypassDomains;}
+    //Tor Relay Config
+    public boolean getUseTorRelay(){return this.useTorRelay;}
+    public void setUseTorRelay(boolean useTorRelay){this.useTorRelay = useTorRelay;}
+
+    public String getTorControlHost(){return this.torControlHost;}
+    public void setTorControlHost(String torControlHost){this.torControlHost = torControlHost;}
 
     public int getTorControlPort(){ return this.torControlPort;}
     public void setTorControlPort(int torControlPort){this.torControlPort = torControlPort;}
+
+    public String getTorControlPassword(){ return this.getTorControlPassword;}
+    public void setTorControlPassword(String torControlPassword){this.getTorControlPassword = torControlPassword;}
+    //Custom DNS Config
+    public boolean getUseCustomDNS(){ return  this.useCustomDNS;}
+    public void setUseCustomDNS(boolean useCustomDNS){this.useCustomDNS = useCustomDNS;}
 
     public String getNameServers(){ return this.nameServers;}
     public void setNameServers(String nameServers){this.nameServers = nameServers;}
 
     public String getNameServiceDomains(){ return this.nameDomain;}
     public void setNameServiceDomains(String nameServiceDomains){this.nameDomain = nameServiceDomains;}
-
-    public boolean getUseTorRelay(){ return this.useTorRelay;}
-    public void setUseTorRelay(boolean useRelay){this.useTorRelay = useRelay;}
-
-    public boolean getUseTorProxy(){ return this.useTorProxy;}
-    public void setUseTorProxy(boolean useProxy){this.useTorProxy = useProxy;}
-
+    //Other Launcher Settings
     public File getFilePath() { return this.settingsFile; }
     public void setFilePath(File settingsFile) {
         this.settingsFile = settingsFile;

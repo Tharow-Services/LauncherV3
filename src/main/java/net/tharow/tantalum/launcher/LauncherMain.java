@@ -479,7 +479,7 @@ public class LauncherMain {
         };
 
         discoverInfoPanel.setLoadListener(listener);
-        if(settings.getUseTorRelay()){
+        /*if(settings.getUseTorRelay()){
             if(checkTorRelay()){
                 Utils.getLogger().info("Using Tor Relay");
                 System.setProperty("sun.net.spi.nameservice.nameservers", settings.getNameServers());
@@ -491,7 +491,7 @@ public class LauncherMain {
                     //System.setProperty("socksProxyVersion", settings.getJavaVersion());
                 }
             }
-        }
+        }*/
         LoginFrame login = new LoginFrame(resources, settings, userModel, skinRepo, startupParameters, javaVersions, buildNumber, javaVersionFile);
         userModel.addAuthListener(login);
         userModel.addAuthListener(user -> {

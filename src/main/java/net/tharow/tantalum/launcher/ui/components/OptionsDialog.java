@@ -55,7 +55,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.plaf.metal.MetalComboBoxUI;
@@ -99,37 +98,70 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
-    private DocumentListener proxyHostListener = new DocumentListener() {
+    private DocumentListener socksProxyHostLisener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
-            changeProxyHost();
+            changeSocksProxyHost();
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            changeProxyHost();
+            changeSocksProxyHost();
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            changeProxyHost();
+            changeSocksProxyHost();
         }
     };
 
-    private DocumentListener proxyPortListener = new DocumentListener() {
+    private DocumentListener socksProxyPortListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
-            changeProxyPort();
+            changeSocksProxyPort();
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            changeProxyPort();
+            changeSocksProxyPort();
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            changeProxyPort();
+            changeSocksProxyPort();
+        }
+    };
+
+    private DocumentListener HTTPProxyHostListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeHTTPProxyHost();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeHTTPProxyHost();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeHTTPProxyHost();
+        }
+    };
+
+    private DocumentListener HTTPProxyPortListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeHTTPProxyPort();      }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeHTTPProxyPort();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeHTTPProxyPort();
         }
     };
 
@@ -240,11 +272,13 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     JTextField heightInput;
     JTextField wrapperCommand;
     JCheckBox useMojangJava;
-    JCheckBox useTorRelay;
-    JCheckBox useTorProxy;
-    JTextField proxyHost;
-    JTextField proxyPort;
-    JCheckBox proxyVersion;
+    JCheckBox useHTTPProxy;
+    JCheckBox useSocksProxy;
+    JCheckBox useCustomDNS;
+    JTextField socksProxyHost;
+    JTextField socksProxyPort;
+    JTextField HTTPProxyHost;
+    JTextField HTTPProxyPort;
     JTextField torControlPort;
     JTextField nameServers;
     JTextField nameServiceDomains;
@@ -268,24 +302,22 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         dispose();
     }
 
-    protected void changeUseTorRelay() {
-        settings.setUseTorRelay(useTorRelay.isSelected());
+
+    protected void changeUseSocksProxy() {
+        settings.setUseSocksProxy(useSocksProxy.isSelected());
         settings.save();
+        socksProxyHost.setEnabled(useSocksProxy.isSelected());
+        socksProxyPort.setEnabled(useSocksProxy.isSelected());
     }
 
-    protected void changeUseTorProxy() {
-        settings.setUseTorProxy(useTorProxy.isSelected());
-        settings.save();
-    }
-
-    protected void changeProxyHost(){
+    protected void changeSocksProxyHost(){
         //System.setProperty("proxyHost",proxyHost.getText().trim());
-        settings.setProxyHost(proxyHost.getText().trim());
+        settings.setSocksProxyHost(socksProxyHost.getText().trim());
         settings.save();
     }
 
-    protected void changeProxyPort(){
-        settings.setProxyPort(Integer.parseInt(proxyPort.getText().trim()));
+    protected void changeSocksProxyPort(){
+        settings.setSocksProxyPort(Integer.parseInt(socksProxyPort.getText().trim()));
         settings.save();
     }
 
@@ -293,10 +325,31 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         settings.setTorControlPort(Integer.parseInt(torControlPort.getText().trim()));
         settings.save();
     }
-
-    protected void changeProxyVersion(){
-        settings.setProxyVersion(proxyVersion.isSelected());
+    //HTTP Proxy
+    protected void changeUseHTTPProxy() {
+        settings.setUseHTTPProxy(useHTTPProxy.isSelected());
         settings.save();
+        HTTPProxyHost.setEnabled(useHTTPProxy.isSelected());
+        HTTPProxyPort.setEnabled(useHTTPProxy.isSelected());
+    }
+
+    protected void changeHTTPProxyHost(){
+        //System.setProperty("proxyHost",proxyHost.getText().trim());
+        settings.setHTTPProxyHost(HTTPProxyHost.getText().trim());
+        settings.save();
+    }
+
+    protected void changeHTTPProxyPort(){
+        settings.setHTTPProxyPort(Integer.parseInt(HTTPProxyPort.getText().trim()));
+        settings.save();
+    }
+
+    //Custom Dns
+    protected void changeUseCustomDNS(){
+        settings.setUseCustomDNS(useCustomDNS.isSelected());
+        settings.save();
+        nameServers.setEnabled(useCustomDNS.isSelected());
+        nameServiceDomains.setEnabled(useCustomDNS.isSelected());
     }
 
     protected void changeNameServers(){
@@ -495,20 +548,35 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         javaArgs.setText(settings.getJavaArgs());
         javaArgs.getDocument().addDocumentListener(javaArgsListener);
 
-        proxyHost.getDocument().removeDocumentListener(proxyHostListener);
-        proxyHost.setText(settings.getProxyHost());
-        proxyHost.getDocument().addDocumentListener(proxyHostListener);
+        socksProxyHost.getDocument().removeDocumentListener(socksProxyHostLisener);
+        socksProxyHost.setText(settings.getSocksProxyHost());
+        socksProxyHost.setEnabled(settings.getUseSocksProxy());
+        socksProxyHost.getDocument().addDocumentListener(socksProxyHostLisener);
 
-        proxyPort.getDocument().removeDocumentListener(proxyPortListener);
-        proxyPort.setText(String.valueOf(settings.getProxyPort()));
-        proxyPort.getDocument().addDocumentListener(proxyPortListener);
+        socksProxyPort.getDocument().removeDocumentListener(socksProxyPortListener);
+        socksProxyPort.setText(String.valueOf(settings.getSocksProxyPort()));
+        socksProxyPort.setEnabled(settings.getUseSocksProxy());
+        socksProxyPort.getDocument().addDocumentListener(socksProxyPortListener);
+
+        HTTPProxyHost.getDocument().removeDocumentListener(HTTPProxyHostListener);
+        HTTPProxyHost.setText(settings.getHTTPProxyHost());
+        HTTPProxyHost.setEnabled(settings.getUseHTTPProxy());
+        HTTPProxyHost.getDocument().addDocumentListener(HTTPProxyHostListener);
+
+        HTTPProxyPort.getDocument().removeDocumentListener(HTTPProxyPortListener);
+        HTTPProxyPort.setText(String.valueOf(settings.getHTTPProxyPort()));
+        HTTPProxyPort.setEnabled(settings.getUseHTTPProxy());
+        HTTPProxyPort.getDocument().addDocumentListener(HTTPProxyPortListener);
+
 
         nameServers.getDocument().removeDocumentListener(nameServerListener);
         nameServers.setText(settings.getNameServers());
+        nameServers.setEnabled(settings.getUseCustomDNS());
         nameServers.getDocument().addDocumentListener(nameServerListener);
 
         nameServiceDomains.getDocument().removeDocumentListener(nameServiceDomainsListener);
         nameServiceDomains.setText(settings.getNameServiceDomains());
+        nameServiceDomains.setEnabled(settings.getUseCustomDNS());
         nameServiceDomains.getDocument().addDocumentListener(nameServiceDomainsListener);
         /*
         torControlPort.getDocument().removeDocumentListener(torControlPortListener);
@@ -527,21 +595,21 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         showConsole.setSelected(settings.getShowConsole());
         showConsole.addActionListener(e -> changeShowConsole());
 
-        for (ActionListener listener : useTorRelay.getActionListeners())
-            useTorRelay.removeActionListener(listener);
-        useTorRelay.setSelected(settings.getUseTorRelay());
-        useTorRelay.addActionListener(e -> changeUseTorRelay());
+        for (ActionListener listener : useHTTPProxy.getActionListeners())
+            useHTTPProxy.removeActionListener(listener);
+        useHTTPProxy.setSelected(settings.getUseTorRelay());
+        useHTTPProxy.addActionListener(e -> changeUseHTTPProxy());
 
-        for (ActionListener listener : useTorProxy.getActionListeners())
-            useTorProxy.removeActionListener(listener);
-        useTorProxy.setSelected(settings.getUseTorProxy());
-        useTorProxy.addActionListener(e -> changeUseTorProxy());
-/*
-        for (ActionListener listener : proxyVersion.getActionListeners())
-            proxyVersion.removeActionListener(listener);
-        proxyVersion.setSelected(settings.getProxyVersion());
-        proxyVersion.addActionListener(e -> changeProxyVersion());
-*/
+        for (ActionListener listener : useSocksProxy.getActionListeners())
+            useSocksProxy.removeActionListener(listener);
+        useSocksProxy.setSelected(settings.getUseSocksProxy());
+        useSocksProxy.addActionListener(e -> changeUseSocksProxy());
+
+        for (ActionListener listener : useCustomDNS.getActionListeners())
+            useCustomDNS.removeActionListener(listener);
+        useCustomDNS.setSelected(settings.getUseCustomDNS());
+        useCustomDNS.addActionListener(e -> changeUseCustomDNS());
+
         for (ActionListener listener : askFirstBox.getActionListeners())
             askFirstBox.removeActionListener(listener);
         askFirstBox.setSelected(!settings.shouldAutoAcceptModpackRequirements());
@@ -888,42 +956,115 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     private void setupProxyPanel(JPanel panel) {
 
         panel.setLayout(new GridBagLayout());
+        Insets blin = new Insets(0,0,0,0);
+
+        JLabel useSocksProxyField = new JLabel(resources.getString("launcheroptions.proxy.useSocks"));
+        useSocksProxyField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        useSocksProxyField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(useSocksProxyField, new GridBagConstraints(0,3,1,1,0,0,17,0,new Insets(0,20,0,10),0,0));
+
+        useSocksProxy = new JCheckBox("", false);
+        useSocksProxy.setOpaque(false);
+        useSocksProxy.setBorder(BorderFactory.createEmptyBorder());
+        useSocksProxy.setIconTextGap(0);
+        useSocksProxy.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
+        useSocksProxy.setIcon(resources.getIcon("checkbox_open.png"));
+        useSocksProxy.setFocusPainted(false);
+        panel.add(useSocksProxy, new GridBagConstraints(1, 3, 1, 1, 0, 0, 17, 0, blin, 0 ,0));
 
         JLabel proxyHostLabel = new JLabel(resources.getString("launcheroptions.proxy.host"));
         proxyHostLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         proxyHostLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(proxyHostLabel, new GridBagConstraints(0, 3, 1, 1, 0, 0, 13, GridBagConstraints.NONE, new Insets(0, 40, 0, 0), 0, 0));
+        panel.add(proxyHostLabel, new GridBagConstraints(2, 3, 1, 1, 0, 0, 17, 0, new Insets(0, 10, 0, 0), 0, 0));
 
-        proxyHost = new JTextField("");
-        proxyHost.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        proxyHost.setForeground(LauncherFrame.COLOR_BLUE);
-        proxyHost.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
-        proxyHost.setHighlighter(null);
-        proxyHost.setEditable(true);
-        proxyHost.setCursor(null);
-        proxyHost.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
-        panel.add(proxyHost, new GridBagConstraints(1, 3, 2, 1, 5, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+        socksProxyHost = new JTextField("");
+        socksProxyHost.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        socksProxyHost.setForeground(LauncherFrame.COLOR_BLUE);
+        socksProxyHost.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        socksProxyHost.setHighlighter(null);
+        socksProxyHost.setEditable(true);
+        socksProxyHost.setCursor(null);
+        socksProxyHost.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(socksProxyHost, new GridBagConstraints(3, 3, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
 
 
         JLabel proxyPortLabel = new JLabel(resources.getString("launcheroptions.proxy.port"));
         proxyPortLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         proxyPortLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(proxyPortLabel, new GridBagConstraints(3, 3, 1, 1, 0, 0, 17, 1, new Insets(0, 40, 0, 0), 0, 0));
+        panel.add(proxyPortLabel, new GridBagConstraints(5, 3, 1, 1, 0, 0, 17, 0, new Insets(0, 0, 0, 0), 0, 0));
 
-        proxyPort = new JTextField("");
-        proxyPort.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        proxyPort.setForeground(LauncherFrame.COLOR_BLUE);
-        proxyPort.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
-        proxyPort.setHighlighter(null);
-        proxyPort.setEditable(true);
-        proxyPort.setCursor(null);
-        proxyPort.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
-        panel.add(proxyPort, new GridBagConstraints(4, 3, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+        socksProxyPort = new JTextField("");
+        socksProxyPort.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        socksProxyPort.setForeground(LauncherFrame.COLOR_BLUE);
+        socksProxyPort.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        socksProxyPort.setHighlighter(null);
+        socksProxyPort.setEditable(true);
+        socksProxyPort.setCursor(null);
+        socksProxyPort.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(socksProxyPort, new GridBagConstraints(6, 3, 2, 1, 1, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+        // Start Of HTTP Proxy
+        JLabel useHTTPProxyField = new JLabel(resources.getString("launcheroptions.proxy.useHTTP"));
+        useHTTPProxyField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        useHTTPProxyField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(useHTTPProxyField, new GridBagConstraints(0,4,1,1,0,0,17,0,new Insets(0,20,0,10),0,0));
+
+        useHTTPProxy = new JCheckBox("", false);
+        useHTTPProxy.setOpaque(false);
+        useHTTPProxy.setBorder(BorderFactory.createEmptyBorder());
+        useHTTPProxy.setIconTextGap(0);
+        useHTTPProxy.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
+        useHTTPProxy.setIcon(resources.getIcon("checkbox_open.png"));
+        useHTTPProxy.setFocusPainted(false);
+        panel.add(useHTTPProxy, new GridBagConstraints(1, 4, 1, 1, 0, 0, 17, 0, blin, 0 ,0));
+
+        JLabel HTTPHostLabel = new JLabel(resources.getString("launcheroptions.proxy.host"));
+        HTTPHostLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        HTTPHostLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(HTTPHostLabel, new GridBagConstraints(2, 4, 1, 1, 0, 0, 17, 0, new Insets(0, 10, 0, 0), 0, 0));
+
+        HTTPProxyHost = new JTextField("");
+        HTTPProxyHost.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        HTTPProxyHost.setForeground(LauncherFrame.COLOR_BLUE);
+        HTTPProxyHost.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        HTTPProxyHost.setHighlighter(null);
+        HTTPProxyHost.setEditable(true);
+        HTTPProxyHost.setCursor(null);
+        HTTPProxyHost.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(HTTPProxyHost, new GridBagConstraints(3, 4, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+
+        JLabel HTTPPortLabel = new JLabel(resources.getString("launcheroptions.proxy.port"));
+        HTTPPortLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        HTTPPortLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(HTTPPortLabel, new GridBagConstraints(5, 4, 1, 1, 0, 0, 17, 0, new Insets(0, 0, 0, 0), 0, 0));
+
+        HTTPProxyPort = new JTextField("");
+        HTTPProxyPort.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        HTTPProxyPort.setForeground(LauncherFrame.COLOR_BLUE);
+        HTTPProxyPort.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        HTTPProxyPort.setHighlighter(null);
+        HTTPProxyPort.setEditable(true);
+        HTTPProxyPort.setCursor(null);
+        HTTPProxyPort.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(HTTPProxyPort, new GridBagConstraints(6, 4, 2, 1, 1, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+        //Custom DNS Settings
+        JLabel useCustomDNSField = new JLabel(resources.getString("launcheroptions.proxy.useCustomDNS"));
+        useCustomDNSField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        useCustomDNSField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(useCustomDNSField, new GridBagConstraints(0,5,1,1,0,0,17,0,new Insets(0,20,0,10),0,0));
+
+        useCustomDNS = new JCheckBox("", false);
+        useCustomDNS.setOpaque(false);
+        useCustomDNS.setBorder(BorderFactory.createEmptyBorder());
+        useCustomDNS.setIconTextGap(0);
+        useCustomDNS.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
+        useCustomDNS.setIcon(resources.getIcon("checkbox_open.png"));
+        useCustomDNS.setFocusPainted(false);
+        panel.add(useCustomDNS, new GridBagConstraints(1, 5, 1, 1, 0, 0, 17, 0, blin, 0 ,0));
 
         JLabel nameServersField = new JLabel(resources.getString("launcheroptions.proxy.nameServer"));
         nameServersField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         nameServersField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(nameServersField, new GridBagConstraints(0, 4, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 40, 0, 0), 0, 0));
+        panel.add(nameServersField, new GridBagConstraints(2, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 10, 0, 0), 0, 0));
 
         nameServers = new JTextField("");
         nameServers.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
@@ -933,12 +1074,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         nameServers.setEditable(true);
         nameServers.setCursor(null);
         nameServers.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
-        panel.add(nameServers, new GridBagConstraints(1, 4, 2, 1, 1, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(8, 16, 8, 16), 0, 16));
+        panel.add(nameServers, new GridBagConstraints(3, 5, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
 
         JLabel nameServiceDomainsField = new JLabel(resources.getString("launcheroptions.proxy.nameServiceDomains"));
         nameServiceDomainsField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         nameServiceDomainsField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(nameServiceDomainsField, new GridBagConstraints(0, 5, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 40, 0, 0), 0, 0));
+        panel.add(nameServiceDomainsField, new GridBagConstraints(5, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 0, 0, 0), 0, 0));
 
         nameServiceDomains = new JTextField("");
         nameServiceDomains.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
@@ -948,41 +1089,8 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         nameServiceDomains.setEditable(true);
         nameServiceDomains.setCursor(null);
         nameServiceDomains.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
-        panel.add(nameServiceDomains, new GridBagConstraints(1, 5, 2, 1, 1, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(8, 16, 8, 16), 0, 16));
+        panel.add(nameServiceDomains, new GridBagConstraints(6, 5, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
 
-        //Add show console field
-        JLabel useTorRelayField = new JLabel(resources.getString("launcheroptions.proxy.useTorRelay"));
-        useTorRelayField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        useTorRelayField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(useTorRelayField, new GridBagConstraints(0, 6, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(10, 40, 0, 0), 0, 0));
-
-        useTorRelay = new JCheckBox("", false);
-        useTorRelay.setOpaque(false);
-        useTorRelay.setHorizontalAlignment(SwingConstants.RIGHT);
-        useTorRelay.setBorder(BorderFactory.createEmptyBorder());
-        useTorRelay.setIconTextGap(0);
-        useTorRelay.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
-        useTorRelay.setIcon(resources.getIcon("checkbox_open.png"));
-        useTorRelay.setFocusPainted(false);
-
-        panel.add(useTorRelay, new GridBagConstraints(1, 6, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(16, 16, 0, 0), 0, 0));
-
-        //Add launch to modpacks
-        JLabel useTorProxyField = new JLabel(resources.getString("launcheroptions.proxy.useTorProxy"));
-        useTorProxyField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        useTorProxyField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(useTorProxyField, new GridBagConstraints(0,7,1,1,0,0,GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(10,40,0,0),0,0));
-
-        useTorProxy = new JCheckBox("", false);
-        useTorProxy.setOpaque(false);
-        useTorProxy.setHorizontalAlignment(SwingConstants.RIGHT);
-        useTorProxy.setBorder(BorderFactory.createEmptyBorder());
-        useTorProxy.setIconTextGap(0);
-        useTorProxy.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
-        useTorProxy.setIcon(resources.getIcon("checkbox_open.png"));
-        useTorProxy.setFocusPainted(false);
-
-        panel.add(useTorProxy, new GridBagConstraints(1, 7, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(16, 16 ,0, 0), 0,0));
 
         panel.add(Box.createGlue(), new GridBagConstraints(0, 8, 5, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
 
