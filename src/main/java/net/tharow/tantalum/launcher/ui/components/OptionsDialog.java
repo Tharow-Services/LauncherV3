@@ -597,7 +597,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
 
         for (ActionListener listener : useHTTPProxy.getActionListeners())
             useHTTPProxy.removeActionListener(listener);
-        useHTTPProxy.setSelected(settings.getUseTorRelay());
+        useHTTPProxy.setSelected(settings.getUseHTTPProxy());
         useHTTPProxy.addActionListener(e -> changeUseHTTPProxy());
 
         for (ActionListener listener : useSocksProxy.getActionListeners())
