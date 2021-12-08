@@ -20,6 +20,7 @@
 package net.tharow.tantalum.launchercore.auth;
 
 import com.google.common.base.Charsets;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.launchercore.exception.ResponseException;
@@ -29,18 +30,21 @@ import net.tharow.tantalum.launchercore.auth.request.AuthRequest;
 import net.tharow.tantalum.launchercore.auth.request.RefreshRequest;
 import net.tharow.tantalum.launchercore.auth.response.AuthResponse;
 import org.apache.commons.io.IOUtils;
+import sun.net.www.protocol.http.HttpURLConnection;
+
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class TantalumAuthenticator {
     private final String clientToken;
-    public TantalumAuthenticator(String clientToken) {
+    private final String authServerURL;
+    public TantalumAuthenticator(String clientToken, String authServerURL) {
         this.clientToken = clientToken;
+        this.authServerURL = authServerURL;
     }
 
     public TantalumUser loginNewUser(String username, String password) throws AuthenticationException {
@@ -49,7 +53,7 @@ public class TantalumAuthenticator {
 
         AuthResponse response;
         try {
-            String returned = postJson(TantalumConstants.authAuthenticationURL, data);
+            String returned = postJson(this.authServerURL + "authserver/authenticate", data);
             response = MojangUtils.getGson().fromJson(returned, AuthResponse.class);
             if (response == null) {
                 throw new ResponseException("Auth Error", "Invalid credentials. Invalid username or password.");
@@ -61,7 +65,7 @@ public class TantalumAuthenticator {
             throw e;
         }  catch (IOException e) {
             throw new AuthenticationException(
-                    "An error was raised while attempting to communicate with " + TantalumConstants.authserverURL + ".", e);
+                    "An error was raised while attempting to communicate with " + this.authServerURL + ".", e);
         }
 
         return new TantalumUser(username, response);
@@ -73,7 +77,7 @@ public class TantalumAuthenticator {
 
         AuthResponse response;
         try {
-            String returned = postJson(TantalumConstants.authRefreshURL, data);
+            String returned = postJson(this.authServerURL + "authserver/refresh", data);
             response = MojangUtils.getGson().fromJson(returned, AuthResponse.class);
             if (response == null) {
                 throw new SessionException("Session Error. Try logging in again.");

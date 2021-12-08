@@ -49,6 +49,7 @@ import net.tharow.tantalum.launchercore.util.LaunchAction;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.utilslib.Memory;
 import net.tharow.tantalum.utilslib.OperatingSystem;
+import org.checkerframework.checker.units.qual.Current;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -66,6 +67,8 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Locale;
 
 public class OptionsDialog extends LauncherDialog implements IRelocalizableResource {
@@ -73,7 +76,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     private static final int DIALOG_WIDTH = 830;
     private static final int DIALOG_HEIGHT = 564;
 
-    private TantalumSettings settings;
+    private final TantalumSettings settings;
 
     private boolean hasShownStreamInfo = false;
     private ResourceLoader resources;
@@ -81,7 +84,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     private final FileJavaSource fileJavaSource;
     private final IBuildNumber buildNumber;
 
-    private DocumentListener javaArgsListener = new DocumentListener() {
+    private final DocumentListener javaArgsListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
             changeJavaArgs();
@@ -98,7 +101,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
-    private DocumentListener socksProxyHostLisener = new DocumentListener() {
+    private final DocumentListener socksProxyHostLisener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
             changeSocksProxyHost();
@@ -115,7 +118,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
-    private DocumentListener socksProxyPortListener = new DocumentListener() {
+    private final DocumentListener socksProxyPortListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
             changeSocksProxyPort();
@@ -132,7 +135,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
-    private DocumentListener HTTPProxyHostListener = new DocumentListener() {
+    private final DocumentListener HTTPProxyHostListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
             changeHTTPProxyHost();
@@ -149,7 +152,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
-    private DocumentListener HTTPProxyPortListener = new DocumentListener() {
+    private final DocumentListener HTTPProxyPortListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
             changeHTTPProxyPort();      }
@@ -165,7 +168,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
-    private DocumentListener nameServerListener = new DocumentListener() {
+    private final DocumentListener nameServerListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
             changeNameServers();
@@ -183,7 +186,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     };
 
 
-    private DocumentListener nameServiceDomainsListener = new DocumentListener() {
+    private final DocumentListener nameServiceDomainsListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
             changeNameServiceDomains();
@@ -201,7 +204,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     };
 
 
-    private DocumentListener torControlPortListener = new DocumentListener() {
+    private final DocumentListener torControlPortListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
             changeTorControlPort();
@@ -218,7 +221,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
-    private DocumentListener dimensionListener = new DocumentListener() {
+    private final DocumentListener dimensionListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
             changeWindowDimensions();
@@ -235,7 +238,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
-    private DocumentListener wrapperCommandListener = new DocumentListener() {
+    private final DocumentListener wrapperCommandListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
             changeWrapperCommand();
@@ -810,10 +813,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
 
         if (parent != null) {
             boolean is64Bit = true;
-            boolean has64Bit = true;
-            if (javaVersions.getBest64BitVersion() == null) {
-                has64Bit = false;
-            }
+            boolean has64Bit = javaVersions.getBest64BitVersion() != null;
 
             if (!javaVersions.getSelectedVersion().is64Bit()) {
                 is64Bit = false;
@@ -956,12 +956,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     private void setupProxyPanel(JPanel panel) {
 
         panel.setLayout(new GridBagLayout());
-        Insets blin = new Insets(0,0,0,0);
+        Insets blin = new Insets(0, 0, 0, 0);
 
         JLabel useSocksProxyField = new JLabel(resources.getString("launcheroptions.proxy.useSocks"));
         useSocksProxyField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         useSocksProxyField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(useSocksProxyField, new GridBagConstraints(0,3,1,1,0,0,17,0,new Insets(0,20,0,10),0,0));
+        panel.add(useSocksProxyField, new GridBagConstraints(0, 3, 1, 1, 0, 0, 17, 0, new Insets(0, 20, 0, 10), 0, 0));
 
         useSocksProxy = new JCheckBox("", false);
         useSocksProxy.setOpaque(false);
@@ -970,7 +970,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         useSocksProxy.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
         useSocksProxy.setIcon(resources.getIcon("checkbox_open.png"));
         useSocksProxy.setFocusPainted(false);
-        panel.add(useSocksProxy, new GridBagConstraints(1, 3, 1, 1, 0, 0, 17, 0, blin, 0 ,0));
+        panel.add(useSocksProxy, new GridBagConstraints(1, 3, 1, 1, 0, 0, 17, 0, blin, 0, 0));
 
         JLabel proxyHostLabel = new JLabel(resources.getString("launcheroptions.proxy.host"));
         proxyHostLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
@@ -1006,7 +1006,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         JLabel useHTTPProxyField = new JLabel(resources.getString("launcheroptions.proxy.useHTTP"));
         useHTTPProxyField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         useHTTPProxyField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(useHTTPProxyField, new GridBagConstraints(0,4,1,1,0,0,17,0,new Insets(0,20,0,10),0,0));
+        panel.add(useHTTPProxyField, new GridBagConstraints(0, 4, 1, 1, 0, 0, 17, 0, new Insets(0, 20, 0, 10), 0, 0));
 
         useHTTPProxy = new JCheckBox("", false);
         useHTTPProxy.setOpaque(false);
@@ -1015,7 +1015,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         useHTTPProxy.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
         useHTTPProxy.setIcon(resources.getIcon("checkbox_open.png"));
         useHTTPProxy.setFocusPainted(false);
-        panel.add(useHTTPProxy, new GridBagConstraints(1, 4, 1, 1, 0, 0, 17, 0, blin, 0 ,0));
+        panel.add(useHTTPProxy, new GridBagConstraints(1, 4, 1, 1, 0, 0, 17, 0, blin, 0, 0));
 
         JLabel HTTPHostLabel = new JLabel(resources.getString("launcheroptions.proxy.host"));
         HTTPHostLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
@@ -1050,7 +1050,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         JLabel useCustomDNSField = new JLabel(resources.getString("launcheroptions.proxy.useCustomDNS"));
         useCustomDNSField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         useCustomDNSField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(useCustomDNSField, new GridBagConstraints(0,5,1,1,0,0,17,0,new Insets(0,20,0,10),0,0));
+        panel.add(useCustomDNSField, new GridBagConstraints(0, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 20, 0, 10), 0, 0));
 
         useCustomDNS = new JCheckBox("", false);
         useCustomDNS.setOpaque(false);
@@ -1059,7 +1059,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         useCustomDNS.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
         useCustomDNS.setIcon(resources.getIcon("checkbox_open.png"));
         useCustomDNS.setFocusPainted(false);
-        panel.add(useCustomDNS, new GridBagConstraints(1, 5, 1, 1, 0, 0, 17, 0, blin, 0 ,0));
+        panel.add(useCustomDNS, new GridBagConstraints(1, 5, 1, 1, 0, 0, 17, 0, blin, 0, 0));
 
         JLabel nameServersField = new JLabel(resources.getString("launcheroptions.proxy.nameServer"));
         nameServersField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
@@ -1090,11 +1090,37 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         nameServiceDomains.setCursor(null);
         nameServiceDomains.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
         panel.add(nameServiceDomains, new GridBagConstraints(6, 5, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+        System.setProperty("networkaddress.cache.ttl","0");
+        LauncherMain.runProxySetup(settings);
 
-
-        panel.add(Box.createGlue(), new GridBagConstraints(0, 8, 5, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
-
+        String stackoverflowip = "Error 1";
+        try {
+            stackoverflowip = InetAddress.getByName("stackoverflow.com").getHostAddress();
+        } catch (UnknownHostException e) {
+            stackoverflowip = "Error";
         }
+        String  blockflowip = "Error 1";
+        try {
+            blockflowip = InetAddress.getByName("hit-adult.opendns.com").getHostAddress();
+        } catch (UnknownHostException e) {
+            blockflowip = "Error";
+        }
+
+
+        String currentblockedstr = "Blocked";
+        if(stackoverflowip == blockflowip){
+            currentblockedstr = "blocfhgfked";
+        }
+
+        JLabel CurrentBlocked = new JLabel(stackoverflowip);
+        CurrentBlocked.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        CurrentBlocked.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(CurrentBlocked, new GridBagConstraints(0, 6, 1, 1, 0, 0, 10, 0, new Insets(0, 20, 0, 20), 0, 0));
+
+
+        panel.add(Box.createGlue(), new GridBagConstraints(0, 8, 5, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+
+    }
 
     private void setupGeneralPanel(JPanel panel) {
 
