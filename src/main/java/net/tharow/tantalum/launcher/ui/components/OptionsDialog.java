@@ -49,7 +49,6 @@ import net.tharow.tantalum.launchercore.util.LaunchAction;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.utilslib.Memory;
 import net.tharow.tantalum.utilslib.OperatingSystem;
-import org.checkerframework.checker.units.qual.Current;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -168,56 +167,72 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         }
     };
 
-    private final DocumentListener nameServerListener = new DocumentListener() {
+    private final DocumentListener platformURLListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
-            changeNameServers();
+            changePlatformURL();
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            changeNameServers();
+            changePlatformURL();
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            changeNameServers();
+            changePlatformURL();
+        }
+    };
+
+    private final DocumentListener authServerURLListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeAuthlibURL();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeAuthlibURL();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeAuthlibURL();
+        }
+    };
+
+    private final DocumentListener discoverURLListener = new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeDiscoverURL();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeDiscoverURL();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeDiscoverURL();
         }
     };
 
 
-    private final DocumentListener nameServiceDomainsListener = new DocumentListener() {
+    private final DocumentListener defaultSolderListener = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
-            changeNameServiceDomains();
+            changeSolderURL();
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            changeNameServiceDomains();
+            changeSolderURL();
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            changeNameServiceDomains();
-        }
-    };
-
-
-    private final DocumentListener torControlPortListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeTorControlPort();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeTorControlPort();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeTorControlPort();
+            changeSolderURL();
         }
     };
 
@@ -277,16 +292,18 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     JCheckBox useMojangJava;
     JCheckBox useHTTPProxy;
     JCheckBox useSocksProxy;
-    JCheckBox useCustomDNS;
+    JCheckBox useDNSOnly;
+    JCheckBox useTorRelay;
     JTextField socksProxyHost;
     JTextField socksProxyPort;
     JTextField HTTPProxyHost;
     JTextField HTTPProxyPort;
-    JTextField torControlPort;
-    JTextField nameServers;
-    JTextField nameServiceDomains;
+    JTextField authServerURL;
+    JTextField platformURL;
+    JTextField discoverURL;
+    JTextField solderURL;
 
-
+    private final boolean showAdvancedOptions;
 
     public OptionsDialog(final Frame owner, final TantalumSettings settings, final ResourceLoader resourceLoader, final StartupParameters params, final JavaVersionRepository javaVersions, final FileJavaSource fileJavaSource, final IBuildNumber buildNumber) {
         super(owner);
@@ -296,7 +313,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         this.javaVersions = javaVersions;
         this.fileJavaSource = fileJavaSource;
         this.buildNumber = buildNumber;
-
+        this.showAdvancedOptions = settings.getAdvOptions();
         relocalize(resourceLoader);
     }
 
@@ -324,8 +341,8 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         settings.save();
     }
 
-    protected void changeTorControlPort(){
-        settings.setTorControlPort(Integer.parseInt(torControlPort.getText().trim()));
+    protected void changeUseTorRelay(){
+        settings.setUseTorRelay(useTorRelay.isSelected());
         settings.save();
     }
     //HTTP Proxy
@@ -348,20 +365,28 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     }
 
     //Custom Dns
-    protected void changeUseCustomDNS(){
-        settings.setUseCustomDNS(useCustomDNS.isSelected());
-        settings.save();
-        nameServers.setEnabled(useCustomDNS.isSelected());
-        nameServiceDomains.setEnabled(useCustomDNS.isSelected());
-    }
-
-    protected void changeNameServers(){
-        settings.setNameServers(nameServers.getText().trim());
+    protected void changeUseDNSOnly(){
+        settings.setUseDNSOnly(useDNSOnly.isSelected());
         settings.save();
     }
 
-    protected void changeNameServiceDomains(){
-        settings.setNameServiceDomains(nameServiceDomains.getText().trim());
+    protected void changeAuthlibURL(){
+        settings.setAuthlibServerURL(discoverURL.getText().trim());
+        settings.save();
+    }
+
+    protected void changeSolderURL(){
+        settings.setSolderURL(solderURL.getText().trim());
+        settings.save();
+    }
+
+    protected void changePlatformURL(){
+        settings.setPlatformURL(platformURL.getText().trim());
+        settings.save();
+    }
+
+    protected void changeDiscoverURL(){
+        settings.setDiscoverURL(discoverURL.getText().trim());
         settings.save();
     }
 
@@ -572,20 +597,22 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         HTTPProxyPort.getDocument().addDocumentListener(HTTPProxyPortListener);
 
 
-        nameServers.getDocument().removeDocumentListener(nameServerListener);
-        nameServers.setText(settings.getNameServers());
-        nameServers.setEnabled(settings.getUseCustomDNS());
-        nameServers.getDocument().addDocumentListener(nameServerListener);
+        discoverURL.getDocument().removeDocumentListener(discoverURLListener);
+        discoverURL.setText(settings.getDiscoverURL());
+        discoverURL.getDocument().addDocumentListener(discoverURLListener);
 
-        nameServiceDomains.getDocument().removeDocumentListener(nameServiceDomainsListener);
-        nameServiceDomains.setText(settings.getNameServiceDomains());
-        nameServiceDomains.setEnabled(settings.getUseCustomDNS());
-        nameServiceDomains.getDocument().addDocumentListener(nameServiceDomainsListener);
-        /*
-        torControlPort.getDocument().removeDocumentListener(torControlPortListener);
-        torControlPort.setText(String.valueOf(settings.getTorControlPort()));
-        torControlPort.getDocument().addDocumentListener(torControlPortListener);
-        */
+        solderURL.getDocument().removeDocumentListener(defaultSolderListener);
+        solderURL.setText(settings.getSolderURL());
+        solderURL.getDocument().addDocumentListener(defaultSolderListener);
+
+        platformURL.getDocument().removeDocumentListener(platformURLListener);
+        platformURL.setText(settings.getPlatformURL());
+        platformURL.getDocument().addDocumentListener(platformURLListener);
+
+        authServerURL.getDocument().removeDocumentListener(authServerURLListener);
+        authServerURL.setText(settings.getAuthlibServerURL());
+        authServerURL.getDocument().addDocumentListener(authServerURLListener);
+
         wrapperCommand.getDocument().removeDocumentListener(wrapperCommandListener);
         wrapperCommand.setText(settings.getWrapperCommand());
         wrapperCommand.getDocument().addDocumentListener(wrapperCommandListener);
@@ -608,10 +635,10 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         useSocksProxy.setSelected(settings.getUseSocksProxy());
         useSocksProxy.addActionListener(e -> changeUseSocksProxy());
 
-        for (ActionListener listener : useCustomDNS.getActionListeners())
-            useCustomDNS.removeActionListener(listener);
-        useCustomDNS.setSelected(settings.getUseCustomDNS());
-        useCustomDNS.addActionListener(e -> changeUseCustomDNS());
+        for (ActionListener listener : useDNSOnly.getActionListeners())
+            useDNSOnly.removeActionListener(listener);
+        useDNSOnly.setSelected(settings.getUseDNSOnly());
+        useDNSOnly.addActionListener(e -> changeUseDNSOnly());
 
         for (ActionListener listener : askFirstBox.getActionListeners())
             askFirstBox.removeActionListener(listener);
@@ -627,6 +654,11 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             launchToModpacks.removeActionListener(listener);
         launchToModpacks.setSelected(settings.getLaunchToModpacks());
         launchToModpacks.addActionListener(e -> changeLaunchToModpacks());
+
+        for (ActionListener listener : useTorRelay.getActionListeners())
+            useTorRelay.removeActionListener(listener);
+        useTorRelay.setSelected(settings.getUseTorRelay());
+        useTorRelay.addActionListener(e -> changeUseTorRelay());
 
         for (ActionListener listener : versionSelect.getActionListeners())
             versionSelect.removeActionListener(listener);
@@ -946,10 +978,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         about.add(textPane, BorderLayout.CENTER);
 
         centerPanel.addTab(resources.getString("launcheroptions.tab.general").toUpperCase(), general);
-        centerPanel.addTab(resources.getString("launcheroptions.tab.java").toUpperCase(), javaOptions);
-        centerPanel.addTab(resources.getString("launcheroptions.tab.video").toUpperCase(), videoOptions);
         centerPanel.addTab(resources.getString("launcheroptions.tab.about").toUpperCase(), about);
-        centerPanel.addTab(resources.getString("launcheroptions.tab.proxy").toUpperCase(), proxy);
+        if(showAdvancedOptions) {
+            centerPanel.addTab(resources.getString("launcheroptions.tab.java").toUpperCase(), javaOptions);
+            centerPanel.addTab(resources.getString("launcheroptions.tab.video").toUpperCase(), videoOptions);
+            centerPanel.addTab(resources.getString("launcheroptions.tab.proxy").toUpperCase(), proxy);
+        }
         centerPanel.setFocusable(false);
     }
 
@@ -1047,75 +1081,101 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         HTTPProxyPort.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
         panel.add(HTTPProxyPort, new GridBagConstraints(6, 4, 2, 1, 1, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
         //Custom DNS Settings
-        JLabel useCustomDNSField = new JLabel(resources.getString("launcheroptions.proxy.useCustomDNS"));
-        useCustomDNSField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        useCustomDNSField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(useCustomDNSField, new GridBagConstraints(0, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 20, 0, 10), 0, 0));
 
-        useCustomDNS = new JCheckBox("", false);
-        useCustomDNS.setOpaque(false);
-        useCustomDNS.setBorder(BorderFactory.createEmptyBorder());
-        useCustomDNS.setIconTextGap(0);
-        useCustomDNS.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
-        useCustomDNS.setIcon(resources.getIcon("checkbox_open.png"));
-        useCustomDNS.setFocusPainted(false);
-        panel.add(useCustomDNS, new GridBagConstraints(1, 5, 1, 1, 0, 0, 17, 0, blin, 0, 0));
+        JLabel launchToModpacksField = new JLabel(resources.getString("launcheroptions.general.modpacktab"));
+        launchToModpacksField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        launchToModpacksField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(launchToModpacksField, new GridBagConstraints(0, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 20, 0, 10), 0, 0));
 
-        JLabel nameServersField = new JLabel(resources.getString("launcheroptions.proxy.nameServer"));
-        nameServersField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        nameServersField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(nameServersField, new GridBagConstraints(2, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 10, 0, 0), 0, 0));
+        launchToModpacks = new JCheckBox("", false);
+        launchToModpacks.setOpaque(false);
+        launchToModpacks.setHorizontalAlignment(SwingConstants.RIGHT);
+        launchToModpacks.setBorder(BorderFactory.createEmptyBorder());
+        launchToModpacks.setIconTextGap(0);
+        launchToModpacks.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
+        launchToModpacks.setIcon(resources.getIcon("checkbox_open.png"));
+        launchToModpacks.setFocusPainted(false);
+        panel.add(launchToModpacks, new GridBagConstraints(1, 5, 1, 1, 0, 0, 17, 0, blin, 0, 0));
 
-        nameServers = new JTextField("");
-        nameServers.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        nameServers.setForeground(LauncherFrame.COLOR_BLUE);
-        nameServers.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
-        nameServers.setHighlighter(null);
-        nameServers.setEditable(true);
-        nameServers.setCursor(null);
-        nameServers.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
-        panel.add(nameServers, new GridBagConstraints(3, 5, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+        JLabel discoverURLField = new JLabel(resources.getString("launcheroptions.proxy.discoverUrl"));
+        discoverURLField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        discoverURLField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(discoverURLField, new GridBagConstraints(2, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 10, 0, 0), 0, 0));
 
-        JLabel nameServiceDomainsField = new JLabel(resources.getString("launcheroptions.proxy.nameServiceDomains"));
-        nameServiceDomainsField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        nameServiceDomainsField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(nameServiceDomainsField, new GridBagConstraints(5, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 0, 0, 0), 0, 0));
+        discoverURL = new JTextField("");
+        discoverURL.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        discoverURL.setForeground(LauncherFrame.COLOR_BLUE);
+        discoverURL.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        discoverURL.setHighlighter(null);
+        discoverURL.setEditable(true);
+        discoverURL.setCursor(null);
+        discoverURL.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(discoverURL, new GridBagConstraints(3, 5, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
 
-        nameServiceDomains = new JTextField("");
-        nameServiceDomains.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        nameServiceDomains.setForeground(LauncherFrame.COLOR_BLUE);
-        nameServiceDomains.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
-        nameServiceDomains.setHighlighter(null);
-        nameServiceDomains.setEditable(true);
-        nameServiceDomains.setCursor(null);
-        nameServiceDomains.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
-        panel.add(nameServiceDomains, new GridBagConstraints(6, 5, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
-        System.setProperty("networkaddress.cache.ttl","0");
-        LauncherMain.runProxySetup(settings);
+        JLabel solderURLField = new JLabel(resources.getString("launcheroptions.proxy.solderUrl"));
+        solderURLField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        solderURLField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(solderURLField, new GridBagConstraints(5, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 0, 0, 0), 0, 0));
 
-        String stackoverflowip = "Error 1";
-        try {
-            stackoverflowip = InetAddress.getByName("stackoverflow.com").getHostAddress();
-        } catch (UnknownHostException e) {
-            stackoverflowip = "Error";
-        }
-        String  blockflowip = "Error 1";
-        try {
-            blockflowip = InetAddress.getByName("hit-adult.opendns.com").getHostAddress();
-        } catch (UnknownHostException e) {
-            blockflowip = "Error";
-        }
+        solderURL = new JTextField("");
+        solderURL.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        solderURL.setForeground(LauncherFrame.COLOR_BLUE);
+        solderURL.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        solderURL.setHighlighter(null);
+        solderURL.setEditable(true);
+        solderURL.setCursor(null);
+        solderURL.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(solderURL, new GridBagConstraints(6, 5, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
 
 
-        String currentblockedstr = "Blocked";
-        if(stackoverflowip == blockflowip){
-            currentblockedstr = "blocfhgfked";
-        }
+        //Other
+        JLabel showConsoleField = new JLabel(resources.getString("launcheroptions.general.console"));
+        showConsoleField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        showConsoleField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
 
-        JLabel CurrentBlocked = new JLabel(stackoverflowip);
-        CurrentBlocked.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        CurrentBlocked.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(CurrentBlocked, new GridBagConstraints(0, 6, 1, 1, 0, 0, 10, 0, new Insets(0, 20, 0, 20), 0, 0));
+        showConsole = new JCheckBox("", false);
+        showConsole.setOpaque(false);
+        showConsole.setHorizontalAlignment(SwingConstants.RIGHT);
+        showConsole.setBorder(BorderFactory.createEmptyBorder());
+        showConsole.setIconTextGap(0);
+        showConsole.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
+        showConsole.setIcon(resources.getIcon("checkbox_open.png"));
+        showConsole.setFocusPainted(false);
+        panel.add(showConsoleField, new GridBagConstraints(0, 6, 1, 1, 0, 0, 17, 0, new Insets(0, 20, 0, 10), 0, 0));
+        panel.add(showConsole, new GridBagConstraints(1, 6, 1, 1, 0, 0, 17, 0, blin, 0, 0));
+
+        // Other
+
+        JLabel authServerField = new JLabel(resources.getString("launcheroptions.proxy.authServerUrl"));
+        authServerField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        authServerField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(authServerField, new GridBagConstraints(2, 6, 1, 1, 0, 0, 17, 0, new Insets(0, 10, 0, 0), 0, 0));
+
+        authServerURL = new JTextField("");
+        authServerURL.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        authServerURL.setForeground(LauncherFrame.COLOR_BLUE);
+        authServerURL.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        authServerURL.setHighlighter(null);
+        authServerURL.setEditable(true);
+        authServerURL.setCursor(null);
+        authServerURL.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(authServerURL, new GridBagConstraints(3, 6, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+
+        JLabel platformServerField = new JLabel(resources.getString("launcheroptions.proxy.platformUrl"));
+        platformServerField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        platformServerField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(platformServerField, new GridBagConstraints(6, 6, 1, 1, 0, 0, 17, 0, new Insets(0, 0, 0, 0), 0, 0));
+
+        platformURL = new JTextField("");
+        platformURL.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        platformURL.setForeground(LauncherFrame.COLOR_BLUE);
+        platformURL.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        platformURL.setHighlighter(null);
+        platformURL.setEditable(true);
+        platformURL.setCursor(null);
+        platformURL.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        panel.add(platformURL, new GridBagConstraints(7, 6, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
+
 
 
         panel.add(Box.createGlue(), new GridBagConstraints(0, 8, 5, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
@@ -1274,38 +1334,35 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         panel.add(Box.createRigidArea(new Dimension(60, 0)), new GridBagConstraints(4, 3, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0,0,0,0), 0,0));
 
         //Add show console field
-        JLabel showConsoleField = new JLabel(resources.getString("launcheroptions.general.console"));
-        showConsoleField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        showConsoleField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(showConsoleField, new GridBagConstraints(0, 5, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(10, 40, 0, 0), 0, 0));
+        JLabel useCustomDNSField = new JLabel(resources.getString("launcheroptions.proxy.useDNSOnly"));
+        useCustomDNSField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        useCustomDNSField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
 
-        showConsole = new JCheckBox("", false);
-        showConsole.setOpaque(false);
-        showConsole.setHorizontalAlignment(SwingConstants.RIGHT);
-        showConsole.setBorder(BorderFactory.createEmptyBorder());
-        showConsole.setIconTextGap(0);
-        showConsole.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
-        showConsole.setIcon(resources.getIcon("checkbox_open.png"));
-        showConsole.setFocusPainted(false);
+        useDNSOnly = new JCheckBox("", false);
+        useDNSOnly.setOpaque(false);
+        useDNSOnly.setBorder(BorderFactory.createEmptyBorder());
+        useDNSOnly.setIconTextGap(0);
+        useDNSOnly.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
+        useDNSOnly.setIcon(resources.getIcon("checkbox_open.png"));
+        useDNSOnly.setFocusPainted(false);
 
-        panel.add(showConsole, new GridBagConstraints(1, 5, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(16, 16, 0, 0), 0, 0));
+        panel.add(useCustomDNSField, new GridBagConstraints(0, 5, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(10, 40, 0, 0), 0, 0));
+        panel.add(useDNSOnly, new GridBagConstraints(1, 5, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(16, 16, 0, 0), 0, 0));
 
         //Add launch to modpacks
-        JLabel launchToModpacksField = new JLabel(resources.getString("launcheroptions.general.modpacktab"));
-        launchToModpacksField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
-        launchToModpacksField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        panel.add(launchToModpacksField, new GridBagConstraints(0,6,1,1,0,0,GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(10,40,0,0),0,0));
+        JLabel useTorRelayField = new JLabel(resources.getString("launcheroptions.proxy.useTorRelay"));
+        useTorRelayField.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        useTorRelayField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        panel.add(useTorRelayField, new GridBagConstraints(0,6,1,1,0,0,GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(10,40,0,0),0,0));
 
-        launchToModpacks = new JCheckBox("", false);
-        launchToModpacks.setOpaque(false);
-        launchToModpacks.setHorizontalAlignment(SwingConstants.RIGHT);
-        launchToModpacks.setBorder(BorderFactory.createEmptyBorder());
-        launchToModpacks.setIconTextGap(0);
-        launchToModpacks.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
-        launchToModpacks.setIcon(resources.getIcon("checkbox_open.png"));
-        launchToModpacks.setFocusPainted(false);
-
-        panel.add(launchToModpacks, new GridBagConstraints(1, 6, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(16, 16 ,0, 0), 0,0));
+        useTorRelay = new JCheckBox("", false);
+        useTorRelay.setOpaque(false);
+        useTorRelay.setBorder(BorderFactory.createEmptyBorder());
+        useTorRelay.setIconTextGap(0);
+        useTorRelay.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
+        useTorRelay.setIcon(resources.getIcon("checkbox_open.png"));
+        useTorRelay.setFocusPainted(false);
+        panel.add(useTorRelay, new GridBagConstraints(1, 6, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(16, 16 ,0, 0), 0,0));
 
         panel.add(Box.createGlue(), new GridBagConstraints(0, 7, 5, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0, 0));
 

@@ -30,12 +30,11 @@ import net.tharow.tantalum.launchercore.auth.request.AuthRequest;
 import net.tharow.tantalum.launchercore.auth.request.RefreshRequest;
 import net.tharow.tantalum.launchercore.auth.response.AuthResponse;
 import org.apache.commons.io.IOUtils;
-import sun.net.www.protocol.http.HttpURLConnection;
-
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 

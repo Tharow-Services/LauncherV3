@@ -74,7 +74,6 @@ import net.tharow.tantalum.solder.ISolderApi;
 import net.tharow.tantalum.solder.SolderPackSource;
 import net.tharow.tantalum.solder.cache.CachedSolderApi;
 import net.tharow.tantalum.solder.http.HttpSolderApi;
-import net.tharow.tantalum.torcontrol.Communicator;
 import net.tharow.tantalum.ui.components.Console;
 import net.tharow.tantalum.ui.components.ConsoleFrame;
 import net.tharow.tantalum.ui.components.ConsoleHandler;
@@ -85,13 +84,13 @@ import net.tharow.tantalum.utilslib.JavaUtils;
 import net.tharow.tantalum.utilslib.OperatingSystem;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.params.ConnRoutePNames;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.joda.time.DateTime;
+import org.silvertunnel_ng.netlib.adapter.java.JvmGlobalUtil;
+import org.silvertunnel_ng.netlib.adapter.nameservice.NameServiceGlobalUtil;
+import org.silvertunnel_ng.netlib.api.NetAddressNameService;
+import org.silvertunnel_ng.netlib.api.NetFactory;
+import org.silvertunnel_ng.netlib.api.NetLayer;
+import org.silvertunnel_ng.netlib.api.NetLayerIDs;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -225,35 +224,41 @@ public class LauncherMain {
 
 
     public static void runProxySetup(TantalumSettings settings2) {
-        if(false){//settings2.getUseTorRelay()){
-
+        if(settings2.getUseTorRelay()){
+            if(settings2.getUseDNSOnly()){
+                //Setup tor to handle dns
+                NetLayer netLayer = NetFactory.getInstance().getNetLayerById(NetLayerIDs.TOR);
+                //  wait (block the current thread) until this netLayer instance is up and ready
+                netLayer.waitUntilReady();
+                // get the name service the corresponds to the netLayer
+                NetAddressNameService ns = netLayer.getNetAddressNameService();
+                // redirect to the selected name service implementation
+                NameServiceGlobalUtil.setIpNetAddressNameService(ns);
+            } else {
+                //Proxy Everything through tor
+                JvmGlobalUtil.init();
+                NetLayer netLayer = NetFactory.getInstance().getNetLayerById(NetLayerIDs.TOR);
+                JvmGlobalUtil.setNetLayerAndNetAddressNameService(netLayer, true);
+            }
         }
-        //Setup http Proxy
-        if(settings2.getUseHTTPProxy()){
-            Utils.getLogger().info("HTTP Proxy is currently configured as \n  HTTP Proxy Host: " + settings2.getHTTPProxyHost()+ "\n  HTTP Proxy Port: "+ settings2.getHTTPProxyPort() +"\n HTTP Proxy Non Proxies Hosts: " +settings2.getHTTPProxyBypassDomains());
-            System.setProperty("http.proxyHost",settings2.getHTTPProxyHost());
-            System.setProperty("http.proxyPort", String.valueOf(settings2.getHTTPProxyPort()));
-            System.setProperty("http.nonProxyHosts",settings2.getHTTPProxyBypassDomains());// Separated by |
+        if(settings2.getUseDNSOnly()) {
+            //Setup http Proxy
+            if (settings2.getUseHTTPProxy()) {
+                Utils.getLogger().info("HTTP Proxy is currently configured as \n  HTTP Proxy Host: " + settings2.getHTTPProxyHost() + "\n  HTTP Proxy Port: " + settings2.getHTTPProxyPort() + "\n HTTP Proxy Non Proxies Hosts: " + settings2.getHTTPProxyBypassDomains());
+                System.setProperty("http.proxyHost", settings2.getHTTPProxyHost());
+                System.setProperty("http.proxyPort", String.valueOf(settings2.getHTTPProxyPort()));
+                System.setProperty("http.nonProxyHosts", settings2.getHTTPProxyBypassDomains());// Separated by |
+            }
+            //Setup Socks Proxy
+            if (settings2.getUseSocksProxy()) {
+                Utils.getLogger().info("Socks Proxy is currently configured as \n  Socks Proxy Host: " + settings2.getSocksProxyHost() + "\n  Socks Proxy Port: " + settings2.getSocksProxyPort() + "\n Socks Proxy Using Version Five: " + settings2.getUseSocksProxyFive());
+                System.setProperty("socksProxyHost", settings2.getSocksProxyHost());
+                System.setProperty("socksProxyPort", String.valueOf(settings2.getSocksProxyPort()));
+                if (!settings2.getUseSocksProxyFive()) {
+                    System.setProperty("socksProxyVersion", "4");
+                }//Set Socks Version To Four if we aren't using v5
+            }
         }
-        //Setup Socks Proxy
-        if(settings2.getUseSocksProxy()){
-            Utils.getLogger().info("Socks Proxy is currently configured as \n  Socks Proxy Host: " + settings2.getSocksProxyHost()+ "\n  Socks Proxy Port: "+ settings2.getSocksProxyPort() +"\n Socks Proxy Using Version Five: "+settings2.getUseSocksProxyFive());
-            System.setProperty("socksProxyHost",settings2.getSocksProxyHost());
-            System.setProperty("socksProxyPort", String.valueOf(settings2.getSocksProxyPort()));
-            if(!settings2.getUseSocksProxyFive()){System.setProperty("socksProxyVersion","4");}//Set Socks Version To Four if we aren't using v5
-        }
-        //Setup Custom DNS
-        if(settings2.getUseCustomDNS()){
-            Utils.getLogger().info("Custom DNS / Name Service is currently configured as \n  Name Service Servers: " + settings2.getNameServers()+ "\n  Name Service Domains: "+ settings2.getNameServiceDomains());
-            String oldNameServiceProvider = System.getProperty("sun.net.spi.nameservice.provider.0");
-            System.setProperty("sun.net.spi.nameservice.provider.0","dns,sun"); //Override Default DNS Service and replace it with our ow// n
-            //System.setProperty("sun.net.spi.nameservice.provider.5",oldNameServiceProvider); //Set the default DNS to be the fallback DNS
-            System.setProperty("sun.net.spi.nameservice.nameservers",settings2.getNameServers());
-            System.setProperty("sun.net.spi.nameservice.domain",settings2.getNameServiceDomains());
-            System.getProperties();
-        }
-
-
     }
 
     private static void checkIfRunningInsideOneDrive(File launcherRoot) {
@@ -454,10 +459,10 @@ public class LauncherMain {
         HttpSolderApi httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
 
-        HttpPlatformApi httpPlatform = new HttpPlatformApi(settings.getDefaultPlatformURL());
+        HttpPlatformApi httpPlatform = new HttpPlatformApi(settings.getPlatformURL() + "platform/");
         Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
         IPlatformApi platform = new ModpackCachePlatformApi(httpPlatform, 60 * 60, directories);
-        IPlatformSearchApi platformSearch = new HttpPlatformSearchApi(settings.getDefaultPlatformURL());
+        IPlatformSearchApi platformSearch = new HttpPlatformSearchApi(settings.getPlatformURL() + "platform/");
 
         IInstalledPackRepository packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks"));
         IAuthoritativePackSource packInfoRepository = new PlatformPackInfoRepository(platform, solder);
@@ -468,13 +473,13 @@ public class LauncherMain {
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
         PackLoader packList = new PackLoader(directories, packStore, packInfoRepository);
-        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(settings.getDefaultPlatformURL(), solder), solder, platform, platformSearch, iconRepo);
+        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(settings.getSolderURL(), solder), solder, platform, platformSearch, iconRepo);
         selector.setBorder(BorderFactory.createEmptyBorder());
         userModel.addAuthListener(selector);
 
         resources.registerResource(selector);
 
-        DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, settings.getDefaultDiscoverURL(), platform, directories, selector);
+        DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, settings.getDiscoverURL(), platform, directories, selector);
 
         MinecraftLauncher launcher = new MinecraftLauncher(platform, directories, userModel, javaVersions, buildNumber);
         //noinspection rawtypes
@@ -494,19 +499,7 @@ public class LauncherMain {
 
 
 
-        /*if(settings.getUseTorRelay()){
-            if(checkTorRelay()){
-                Utils.getLogger().info("Using Tor Relay");
-                System.setProperty("sun.net.spi.nameservice.nameservers", settings.getNameServers());
-                System.setProperty("sun.net.spi.nameservice.domain", settings.getNameServiceDomains());
-                if(settings.getUseTorProxy()){
-                    Utils.getLogger().info("Using Tor Proxy");
-                    System.setProperty("socksProxyHost", settings.getProxyHost());
-                    System.setProperty("socksProxyPort", String.valueOf(settings.getProxyPort()));
-                    //System.setProperty("socksProxyVersion", settings.getJavaVersion());
-                }
-            }
-        }*/
+
         LoginFrame login = new LoginFrame(resources, settings, userModel, skinRepo, startupParameters, javaVersions, buildNumber, javaVersionFile);
         userModel.addAuthListener(login);
         userModel.addAuthListener(user -> {

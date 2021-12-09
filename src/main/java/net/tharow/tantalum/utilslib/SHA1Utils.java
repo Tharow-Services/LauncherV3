@@ -21,17 +21,15 @@ package net.tharow.tantalum.utilslib;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
-import static org.apache.commons.codec.digest.MessageDigestAlgorithms.SHA_1;
 
 public class SHA1Utils {
 
     public static String getSHA1(File file) {
         try {
-            return new DigestUtils(SHA_1).digestAsHex(file);
+            InputStream filestream = new FileInputStream(file);
+            return DigestUtils.sha1Hex(filestream);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

@@ -46,7 +46,7 @@ public class TantalumSettings implements ILaunchOptions {
     private String javaArgs;
     private String wrapperCommand;
     private int latestNewsArticle;
-    private boolean launchToModpacks;
+    private boolean launchToModpacks = true;
     private String javaVersion = "default";
     private boolean autoAcceptRequirements = false;
     /**
@@ -71,29 +71,31 @@ public class TantalumSettings implements ILaunchOptions {
     private String HTTPProxyHost = "localhost";
     private int HTTPProxyPort = 3652;
     private String HTTPProxyBypassDomains = "";
-    private String nameServers = "localhost:3653";
-    private String nameDomain = "localhost";
-    private String torControlHost = "localhost";
-    private int torControlPort = 3651;
-    private String getTorControlPassword = "ItsTorProxy";
-    //TODO Make Almost all urls be configurable
-    private String authlibServerURL = "https://tantalum-auth.azurewebsites.net"; //Authlib-Injector Server Address
-    private String defaultDiscoverURL = "https://example.net";
-    private String defaultSolderURL = "https://tantalum-solder.azurewebsites.net/api/";
-    private String defaultPlatformURL = "https://tantalum-auth.azurewebsites.net/platform/";
+    private String authlibServerURL = ""; //Authlib-Injector Server Address
+    private String discoverURL = "https://check.torproject.org";
+    private String solderURL = "https://tantalum-solder.azurewebsites.net/api/";
+    private String platformURL = "https://tantalum-auth.azurewebsites.net/";
+    private Boolean advOptions = false;
+
+    public boolean getAdvOptions(){return this.advOptions;}
+    public void setAdvOptions(boolean advOptions){this.advOptions = advOptions;}
 
     //Website Urls
-    public String getAuthlibServerURL(){return this.authlibServerURL;}
+    public String getAuthlibServerURL(){
+        if(authlibServerURL.equals("")){
+            return platformURL;
+        } else {return  this.authlibServerURL;}
+    }
     public void setAuthlibServerURL(String authlibServerURL){this.authlibServerURL = authlibServerURL;}
 
-    public String getDefaultDiscoverURL(){return this.defaultDiscoverURL;}
-    public void setDefaultDiscoverURL(String defaultDiscoverURL){this.defaultDiscoverURL = defaultDiscoverURL;}
+    public String getDiscoverURL(){return this.discoverURL;}
+    public void setDiscoverURL(String discoverURL){this.discoverURL = discoverURL;}
 
-    public String getDefaultSolderURL(){return this.defaultSolderURL;}
-    public void setDefaultSolderURL(String defaultSolderURL){this.defaultSolderURL = defaultSolderURL;}
+    public String getSolderURL(){return this.solderURL;}
+    public void setSolderURL(String solderURL){this.solderURL = solderURL;}
 
-    public String getDefaultPlatformURL(){return this.defaultPlatformURL;}
-    public void setDefaultPlatformURL(String defaultPlatformURL){this.defaultPlatformURL = defaultPlatformURL;}
+    public String getPlatformURL(){return this.platformURL;}
+    public void setPlatformURL(String platformURL){this.platformURL = platformURL;}
 
     //Socks Proxy Configs
     public boolean getUseSocksProxy(){return this.useSocksProxy;}
@@ -122,23 +124,10 @@ public class TantalumSettings implements ILaunchOptions {
     public boolean getUseTorRelay(){return this.useTorRelay;}
     public void setUseTorRelay(boolean useTorRelay){this.useTorRelay = useTorRelay;}
 
-    public String getTorControlHost(){return this.torControlHost;}
-    public void setTorControlHost(String torControlHost){this.torControlHost = torControlHost;}
-
-    public int getTorControlPort(){ return this.torControlPort;}
-    public void setTorControlPort(int torControlPort){this.torControlPort = torControlPort;}
-
-    public String getTorControlPassword(){ return this.getTorControlPassword;}
-    public void setTorControlPassword(String torControlPassword){this.getTorControlPassword = torControlPassword;}
     //Custom DNS Config
-    public boolean getUseCustomDNS(){ return  this.useCustomDNS;}
-    public void setUseCustomDNS(boolean useCustomDNS){this.useCustomDNS = useCustomDNS;}
+    public boolean getUseDNSOnly(){ return  this.useCustomDNS;}
+    public void setUseDNSOnly(boolean useCustomDNS){this.useCustomDNS = useCustomDNS;}
 
-    public String getNameServers(){ return this.nameServers;}
-    public void setNameServers(String nameServers){this.nameServers = nameServers;}
-
-    public String getNameServiceDomains(){ return this.nameDomain;}
-    public void setNameServiceDomains(String nameServiceDomains){this.nameDomain = nameServiceDomains;}
     //Other Launcher Settings
     public File getFilePath() { return this.settingsFile; }
     public void setFilePath(File settingsFile) {
@@ -254,7 +243,7 @@ public class TantalumSettings implements ILaunchOptions {
     public String getJavaArgs() {
         if (javaArgs == null || javaArgs.isEmpty()) {
             // These are the default JVM args in the vanilla launcher
-            javaArgs = "-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -javaagent:" + this.getTechnicRoot().getAbsolutePath() + "\\assets\\launcher\\authlib-injector.jar=tantalum-auth.azurewebsites.net";
+            javaArgs = "-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -javaagent:" + this.getTechnicRoot().getAbsolutePath() + "\\assets\\launcher\\authlib-injector.jar=" + this.authlibServerURL;
         }
         return javaArgs;
     }
