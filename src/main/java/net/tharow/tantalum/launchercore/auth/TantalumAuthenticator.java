@@ -20,7 +20,6 @@
 package net.tharow.tantalum.launchercore.auth;
 
 import com.google.common.base.Charsets;
-import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.launchercore.exception.ResponseException;

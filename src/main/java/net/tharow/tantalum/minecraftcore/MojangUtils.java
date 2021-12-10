@@ -64,7 +64,7 @@ public class MojangUtils {
 
     public static final String assets = "https://resources.download.minecraft.net/";
 
-    public static final String RUNTIMES_URL = "https://launchermeta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
+    public static final String RUNTIMES_URL = "https://github.com/Tharow-Services/Tantalum-Modpacks/releases/download/latest/MC-Runtimes.json";
     private static JavaRuntimes javaRuntimes;
 
     /** @deprecated Uses old S3 bucket */

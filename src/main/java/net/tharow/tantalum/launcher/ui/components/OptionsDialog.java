@@ -1357,6 +1357,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
 
         useTorRelay = new JCheckBox("", false);
         useTorRelay.setOpaque(false);
+        useTorRelay.setEnabled(settings.getAdvOptions());
         useTorRelay.setBorder(BorderFactory.createEmptyBorder());
         useTorRelay.setIconTextGap(0);
         useTorRelay.setSelectedIcon(resources.getIcon("checkbox_closed.png"));
