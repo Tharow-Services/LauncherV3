@@ -85,7 +85,7 @@ public class TantalumAuthenticator {
             }
         } catch (IOException e) {
             throw new AuthenticationException(
-                    "An error was raised while attempting to communicate with " + TantalumConstants.authserverURL + ".", e);
+                    "An error was raised while attempting to communicate with " + this.authServerURL + ".", e);
         }
 
         return response;

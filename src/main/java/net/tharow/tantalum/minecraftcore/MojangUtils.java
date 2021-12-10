@@ -18,9 +18,9 @@
  */
 
 package net.tharow.tantalum.minecraftcore;
-
 import com.google.api.client.http.*;
-import com.google.api.client.http.apache.ApacheHttpTransport.Builder;
+//import com.google.api.client.http.apache.ApacheHttpTransport.Builder;
+import com.google.api.client.http.javanet.NetHttpTransport.Builder;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.gson.GsonFactory;
@@ -64,7 +64,7 @@ public class MojangUtils {
 
     public static final String assets = "https://resources.download.minecraft.net/";
 
-    public static final String RUNTIMES_URL = "https://github.com/Tharow-Services/Tantalum-Modpacks/releases/download/latest/MC-Runtimes.json";
+    public static final String RUNTIMES_URL = "https://tantalum.tharow.net/launcher/java.json";
     private static JavaRuntimes javaRuntimes;
 
     /** @deprecated Uses old S3 bucket */
