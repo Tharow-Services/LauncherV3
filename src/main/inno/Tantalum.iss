@@ -17,16 +17,17 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\.tantalum
+DefaultDirName={userappdata}\.tantalum
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\LICENSE.txt
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
-PrivilegesRequiredOverridesAllowed=dialog
+;PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\target
 OutputBaseFilename=tantalum-setup
 SetupIconFile=C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\src\main\resources\icon.ico
+UninstallIconFile=C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\src\main\resources\icon.ico
 Password=tantalum
 Encryption=yes
 Compression=lzma
@@ -38,14 +39,19 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\target\TantalumLauncher.exe";DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\src\inno\settings.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\src\main\inno\settings.json"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
-Source: "{tmp}\jre.zip"; DestDir: "{app}"; Flags: external
+Source: "{tmp}\jre.zip"; DestDir: "{app}"; Flags: deleteafterinstall external
 [Icons]
+Name: "{group}\{#MyAppName}"; Filename: "{app}\TantalumLauncher.exe";
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\TantalumLauncher.exe";
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{sys}\tar.exe"; Parameters: "-xf .\jre.zip"; WorkingDir: "{app}"; StatusMsg: "Installing Java Runtime"; Flags: runhidden
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}"
 
 [Code]
 var
@@ -74,7 +80,6 @@ begin
       try
         DownloadPage.Download; // This downloads the files to {tmp}
         Result := True;
-        Unzip
       except
         if DownloadPage.AbortedByUser then
           Log('Aborted by user.')
