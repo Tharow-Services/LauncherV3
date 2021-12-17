@@ -320,11 +320,6 @@ public class LauncherMain {
 
         System.setOut(new PrintStream(new LoggerOutputStream(console, Level.ALL, logger), true));
         System.setErr(new PrintStream(new LoggerOutputStream(console, Level.SEVERE, logger), true));
-        org.apache.log4j.Appender rootappender = new org.apache.log4j.ConsoleAppender(new org.apache.log4j.SimpleLayout(), "System.out");
-        org.apache.log4j.LogManager.getRootLogger().addAppender(rootappender);
-        org.apache.log4j.LogManager.getRootLogger().setLevel(org.apache.log4j.Level.INFO);
-        org.apache.log4j.LogManager.getRootLogger().info("Tor Logger Init");
-
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             e.printStackTrace();
             logger.log(Level.SEVERE, "Unhandled Exception in " + t, e);

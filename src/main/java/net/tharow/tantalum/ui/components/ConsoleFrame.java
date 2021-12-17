@@ -49,7 +49,7 @@ public class ConsoleFrame extends JFrame implements MouseListener {
      * @param numLines     number of lines to show at a time
      */
     public ConsoleFrame(int numLines, Image frameIcon) {
-        super("Technic Launcher Console");
+        super("Tantalum Launcher Console");
         this.numLines = numLines;
 
         this.highlightedAttributes = new SimpleAttributeSet();

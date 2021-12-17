@@ -84,12 +84,7 @@ public class DiscoverInfoPanel extends TiledBackground {
                 if (!hasReloaded) {
                     hasReloaded = true;
 
-                    EventQueue.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            panel.setDocument(getDiscoverDocumentFromResource(), runnableAccessDiscover);
-                        }
-                    });
+                    EventQueue.invokeLater(() -> panel.setDocument(getDiscoverDocumentFromResource(), runnableAccessDiscover));
                 }
             }
 
@@ -100,12 +95,7 @@ public class DiscoverInfoPanel extends TiledBackground {
                 if (!hasReloaded) {
                     hasReloaded = true;
 
-                    EventQueue.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            panel.setDocument(getDiscoverDocumentFromResource(), runnableAccessDiscover);
-                        }
-                    });
+                    EventQueue.invokeLater(() -> panel.setDocument(getDiscoverDocumentFromResource(), runnableAccessDiscover));
                 }
             }
         });
@@ -128,18 +118,15 @@ public class DiscoverInfoPanel extends TiledBackground {
         panel.getSharedContext().setReplacedElementFactory(factory);
         panel.getSharedContext().setFontMapping("Raleway", resources.getFont(ResourceLoader.FONT_RALEWAY, 12));
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    File localCache = new File(directories.getCacheDirectory(), "discover.html");
-                    panel.setDocument(getDiscoverDocument(runnableAccessDiscover, localCache), runnableAccessDiscover);
-                } catch (Exception ex) {
-                    //Can't load document from internet- don't beef
-                    ex.printStackTrace();
+        EventQueue.invokeLater(() -> {
+            try {
+                File localCache = new File(directories.getCacheDirectory(), "discover.html");
+                panel.setDocument(getDiscoverDocument(runnableAccessDiscover, localCache), runnableAccessDiscover);
+            } catch (Exception ex) {
+                //Can't load document from internet- don't beef
+                ex.printStackTrace();
 
-                    triggerLoadListener();
-                }
+                triggerLoadListener();
             }
         });
 
@@ -192,8 +179,8 @@ public class DiscoverInfoPanel extends TiledBackground {
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
         } catch (SSLException ex){
-            Utils.getLogger().warning("DiscoverSSL Error");
-            ex.printStackTrace();
+            Utils.getLogger().warning("Discover Page Gave An SSL Error");
+            //ex.printStackTrace();
         }
         catch (IOException ex) {
             ex.printStackTrace();

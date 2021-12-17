@@ -52,7 +52,7 @@ public class SettingsFactory {
             return portableSettings;
         }
 
-        File installedSettingsDir = OperatingSystem.getOperatingSystem().getUserDirectoryForApp("technic");
+        File installedSettingsDir = OperatingSystem.getOperatingSystem().getUserDirectoryForApp("tantalum");
 
         TantalumSettings settings = tryGetSettings(installedSettingsDir);
 
@@ -93,13 +93,16 @@ public class SettingsFactory {
             return null;
         }
     }
-
+    @Deprecated
     private static File getPortableSettingsDir(String runningDir, boolean isMover) {
         File runningFolder = new File(runningDir).getParentFile();
-
+        return runningFolder;
+        //Legacy//
+        /*
         if (isMover)
             return runningFolder;
         else
             return new File(runningFolder,"tantalum");
+        */
     }
 }

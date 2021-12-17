@@ -1,0 +1,8 @@
+{
+  "memory": 8,
+  "launchAction": "HIDE",
+  "buildStream": "stable",
+  "languageCode": "default",
+  "launchToModpacks": true,
+  "launcherSettingsVersion": "1"
+}

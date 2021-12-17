@@ -3,35 +3,50 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Project information -->
-    <name>Technic Launcher</name>
+    <name>Tantalum Launcher</name>
     <groupId>net.tharow.tantalum</groupId>
     <artifactId>launcher</artifactId>
+    <developers>
+        <developer>
+            <id>TharowT</id>
+            <name>Theray Tharow</name>
+            <email>Tharowt@tharow.net</email>
+            <organization>Tharow Services</organization>
+            <organizationUrl>https://tharow.net/</organizationUrl>
+            <roles>
+                <role>CEO of Tharow Services</role>
+                <role>Head Developer</role>
+                <role>Platform Admin</role>
+                <role>Platform Developer</role>
+            </roles>
+        </developer>
+    </developers>
     <version>${revision}</version>
-    <url>https://www.tantalum.tharow.net</url>
+    <url>https://www.tantalum.tharow.net/</url>
     <inceptionYear>2021</inceptionYear>
-    <description>Minecraft launcher for installing and updating Modpacks from the Technic Platform.</description>
+    <description>Minecraft launcher for installing and updating Modpacks from the Tantalum Platform.</description>
 
     <!-- Build properties -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>${project.groupId}.${project.artifactId}.LauncherMain</mainClass>
-        <buildNumber>3</buildNumber>
+        <buildNumber>204</buildNumber>
         <revision>5.1-${buildNumber}</revision>
     </properties>
 
     <!-- Company information -->
     <organization>
-        <url>https://www.tharow.net</url>
         <name>Tharow Services</name>
+        <url>https://www.tharow.net</url>
     </organization>
 
-    <!-- Source code access
+    <!-- Source code access -->
     <scm>
-        <developerConnection>scm:git:git@github.com:TechnicPack/LauncherV3.git</developerConnection>
-        <connection>scm:git:git://github.com/TechnicPack/LauncherV3.git</connection>
-        <url>https://github.com/TechnicPack/LauncherV3/tree/dev</url>
+        <developerConnection>scm:git:git@github.com:Tharow-Services/Tantalum-Launcher.git</developerConnection>
+        <connection>scm:git:git://github.com/Tharow-Services/Tantalum-Launcher.git</connection>
+        <url>https://github.com/TechnicPack/LauncherV3/tree/master</url>
     </scm>
-    -->
+
     <!-- Build server
     <ciManagement>
         <system>jenkins</system>
@@ -76,39 +91,17 @@
     <!-- Project dependencies -->
     <dependencies>
         <!-- Included in final JAR -->
-        <!-- https://mvnrepository.com/artifact/net.freehaven.tor.control/jtorctl -->
         <dependency>
             <groupId>org.briarproject</groupId>
             <artifactId>jtorctl</artifactId>
             <version>0.3</version>
         </dependency>
 
-
-
-        <!--<dependency>
-            <groupId>com.msopentech.thali</groupId>
-            <artifactId>java</artifactId>
-            <version>0.0.2</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.msopentech.thali</groupId>
-            <artifactId>universal</artifactId>
-            <version>0.0.2</version>
-        </dependency>-->
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.7</version>
         </dependency>
-
-        <!--<dependency>
-            <groupId>com.github.torproject</groupId>
-            <artifactId>jtorctl</artifactId>
-            <version>master-SNAPSHOT</version>
-        </dependency>-->
 
         <dependency>
             <groupId>com.github.thaliproject.Tor_Onion_Proxy_Library</groupId>
@@ -292,7 +285,7 @@
                                     </includes>
                                 </filter>
                                 <filter>
-                                    <artifact>net.technicpack:*</artifact>
+                                    <artifact>net.tharow.tantalum:*</artifact>
                                     <includes>
                                         <include>**</include>
                                     </includes>
@@ -321,18 +314,19 @@
     <!-- Build profiles -->
     <profiles>
         <profile>
-            <id>DropBox Deploy</id>
+            <id>Dynamic Build Number</id>
             <activation>
                 <property>
-                    <name>!env.BUILD_NUMBER</name>
+                    <name>env.BUILD_NUMBER</name>
                 </property>
             </activation>
             <properties>
-                <buildNumber>4</buildNumber>
+                <buildNumber>${env.BUILD_NUMBER}</buildNumber>
             </properties>
         </profile>
+        <!-- Make Inno Setup -->
         <profile>
-            <id>Build Number As Revision</id>
+            <id>Make Inno Setup</id>
             <activation>
                 <property>
                     <name>env.BUILD_NUMBER</name>
@@ -369,6 +363,7 @@
                                         <preCp>anything</preCp>
                                     </classPath>
                                     <jre>
+                                        <path>./jre</path>
                                         <minVersion>1.8.0</minVersion>
                                         <maxVersion>1.8.0_999</maxVersion>
                                         <opts>

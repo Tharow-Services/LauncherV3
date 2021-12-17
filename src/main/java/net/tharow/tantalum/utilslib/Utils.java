@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 
 public class Utils {
     private static final Gson gson;
-    private static final Logger logger = Logger.getLogger("net.technicpack.launcher.Main");
+    private static final Logger logger = Logger.getLogger("net.tharow.tantalum.launcher.Main");
     private static final int DOWNLOAD_RETRIES = 3;
 
     static {
@@ -231,8 +231,6 @@ public class Utils {
                     md5 = eTag;
                 }
             }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
