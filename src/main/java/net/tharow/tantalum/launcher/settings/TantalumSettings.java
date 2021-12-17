@@ -75,10 +75,14 @@ public class TantalumSettings implements ILaunchOptions {
     private String discoverURL = "https://check.torproject.org/";
     private String solderURL = "https://tantalum-solder.azurewebsites.net/api/";
     private String platformURL = "https://tantalum-auth.azurewebsites.net/";
+    private Boolean forceOverrideRootCerts = false;
     private Boolean advOptions = false;
 
     public boolean getAdvOptions(){return this.advOptions;}
     public void setAdvOptions(boolean advOptions){this.advOptions = advOptions;}
+    //Force the over ride of the JVM's root ca certificates
+    public boolean getForceOverrideRootCerts(){return this.forceOverrideRootCerts;}
+    public void setForceOverrideRootCerts(boolean forceOverrideRootCerts){this.forceOverrideRootCerts = forceOverrideRootCerts;}
 
     //Website Urls
     public String getAuthlibServerURL(){

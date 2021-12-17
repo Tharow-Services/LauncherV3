@@ -35,6 +35,7 @@ import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.ImageResourceLoader;
 import org.xhtmlrenderer.swing.SwingReplacedElementFactory;
 
+import javax.net.ssl.SSLException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -190,7 +191,11 @@ public class DiscoverInfoPanel extends TiledBackground {
             }
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
-        } catch (IOException ex) {
+        } catch (SSLException ex){
+            Utils.getLogger().warning("DiscoverSSL Error");
+            ex.printStackTrace();
+        }
+        catch (IOException ex) {
             ex.printStackTrace();
         }
 

@@ -72,4 +72,12 @@ public class TechnicLauncherDirectories implements LauncherDirectories {
 
         return runtimes;
     }
+    public File getTorRelayDirectory(){
+        File torRelay = new File(getLauncherDirectory(), "torRelay");
+
+        if (!torRelay.exists()){
+            getRuntimesDirectory().mkdir();
+        }
+        return torRelay;
+    }
 }

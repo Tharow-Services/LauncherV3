@@ -2,9 +2,34 @@
 <project version="4">
   <component name="RemoteRepositoriesConfiguration">
     <remote-repository>
+      <option name="id" value="guardianproject" />
+      <option name="name" value="GuardianProject Maven" />
+      <option name="url" value="https://raw.githubusercontent.com/guardianproject/gpmaven/master/" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Central Repository" />
       <option name="url" value="https://repo.maven.apache.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="springio" />
+      <option name="name" value="Repo spring Io" />
+      <option name="url" value="https://repo.spring.io/plugins-release" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="springio" />
+      <option name="name" value="Repo spring Io" />
+      <option name="url" value="https://repo.spring.io/plugins-release/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="googlemaven" />
+      <option name="name" value="google maven" />
+      <option name="url" value="https://maven.google.com/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="google" />
+      <option name="name" value="Google Maven" />
+      <option name="url" value="https://maven.google.com/" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />
@@ -12,9 +37,84 @@
       <option name="url" value="https://repo1.maven.org/maven2" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Central" />
+      <option name="url" value="https://repo1.maven.org/maven2/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="guardianproject" />
+      <option name="name" value="Guardian Project" />
+      <option name="url" value="https://raw.githubusercontent.com/guardianproject/gpmaven/master/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="googlemaven" />
+      <option name="name" value="google maven" />
+      <option name="url" value="http://maven.google.com/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="mavenCentral" />
+      <option name="name" value="Maven Central" />
+      <option name="url" value="http://repo1.maven.org/maven2/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jitpack.io" />
+      <option name="name" value="Jit Pack io" />
+      <option name="url" value="https://jitpack.io/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="guardianproject" />
+      <option name="name" value="Guardian Project" />
+      <option name="url" value="http://raw.githubusercontent.com/guardianproject/gpmaven/master/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="springpugins" />
+      <option name="name" value="Spring Plugins" />
+      <option name="url" value="https://repo.spring.io/plugins-release/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="googlemaven" />
+      <option name="name" value="google maven" />
+      <option name="url" value="http://maven.google.com" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="guardianproject" />
+      <option name="name" value="Guardian Project" />
+      <option name="url" value="https://raw.githubusercontent.com/guardianproject/gpmaven/master" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="googlemaven" />
+      <option name="name" value="google maven" />
+      <option name="url" value="https://maven.google.com" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="mavenCentral" />
+      <option name="name" value="Maven Central" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="mavenCentral" />
+      <option name="name" value="Maven Central" />
+      <option name="url" value="http://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="guardianproject" />
+      <option name="name" value="Guardian Project" />
+      <option name="url" value="http://raw.githubusercontent.com/guardianproject/gpmaven/master" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="jboss.community" />
       <option name="name" value="JBoss Community repository" />
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jcenter" />
+      <option name="name" value="Java Center" />
+      <option name="url" value="https://jcenter.bintray.com/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="spring" />
+      <option name="name" value="Spring Plugins" />
+      <option name="url" value="https://repo.spring.io/plugins-release/" />
     </remote-repository>
   </component>
 </project>

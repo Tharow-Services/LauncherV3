@@ -19,6 +19,9 @@
 package net.tharow.tantalum.launcher;
 
 import com.beust.jcommander.JCommander;
+import com.msopentech.thali.java.toronionproxy.JavaOnionProxyContext;
+import com.msopentech.thali.java.toronionproxy.JavaTorInstaller;
+import com.msopentech.thali.toronionproxy.*;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.autoupdate.Relauncher;
 import net.tharow.tantalum.autoupdate.http.HttpUpdateStream;
@@ -85,13 +88,8 @@ import net.tharow.tantalum.utilslib.OperatingSystem;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
-import org.silvertunnel_ng.netlib.adapter.java.JvmGlobalUtil;
-import org.silvertunnel_ng.netlib.adapter.nameservice.NameServiceGlobalUtil;
-import org.silvertunnel_ng.netlib.api.NetAddressNameService;
-import org.silvertunnel_ng.netlib.api.NetFactory;
-import org.silvertunnel_ng.netlib.api.NetLayer;
-import org.silvertunnel_ng.netlib.api.NetLayerIDs;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -111,6 +109,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -204,8 +203,11 @@ public class LauncherMain {
         Utils.getLogger().info("Current Build Number is " + build);
         // These 2 need to happen *before* the launcher or the updater run, so we have valuable debug information, and so
         // we can properly use websites that use Let's Encrypt (and other current certs not supported by old Java versions)
+
+        //runProxySetup(settings);
         runStartupDebug();
-        injectNewRootCerts();
+        //injectNewRootCerts();
+        injectNewRootCerts(settings.getForceOverrideRootCerts());
         //startLauncher(settings, params, directories, resources);
         Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream("https://tantalum-auth.azurewebsites.net/platform/"), settings.getBuildStream()+"4", build, directories, resources, params);
         try {
@@ -223,26 +225,27 @@ public class LauncherMain {
     }
 
 
-    public static void runProxySetup(TantalumSettings settings2) {
+    public static void runProxySetup(TantalumSettings settings2, File torRelayDir) {
         if(settings2.getUseTorRelay()){
-            if(settings2.getUseDNSOnly()){
-                //Setup tor to handle dns
-                NetLayer netLayer = NetFactory.getInstance().getNetLayerById(NetLayerIDs.TOR);
-                //  wait (block the current thread) until this netLayer instance is up and ready
-                netLayer.waitUntilReady();
-                // get the name service the corresponds to the netLayer
-                NetAddressNameService ns = netLayer.getNetAddressNameService();
-                // redirect to the selected name service implementation
-                NameServiceGlobalUtil.setIpNetAddressNameService(ns);
-            } else {
-                //Proxy Everything through tor
-                JvmGlobalUtil.init();
-                NetLayer netLayer = NetFactory.getInstance().getNetLayerById(NetLayerIDs.TOR);
-                JvmGlobalUtil.setNetLayerAndNetAddressNameService(netLayer, true);
+            //Setup Tor Config and other things//
+            TorConfig torConfig = TorConfig.createDefault(torRelayDir);
+            //torConfig.getTorrcFile();
+            TorInstaller torInstaller = new JavaTorInstaller(torConfig);
+            OnionProxyContext proxyContext = new JavaOnionProxyContext(torConfig, torInstaller, null);
+            final OnionProxyManager onionProxyManager = new OnionProxyManager(proxyContext);
+            final TorConfigBuilder torConfigBuilder = onionProxyManager.getContext().newConfigBuilder();
+            try {
+                onionProxyManager.getContext().getInstaller().updateTorConfigCustom(torConfigBuilder.asString());
+                onionProxyManager.setup();
+            } catch (IOException | TimeoutException e) {
+                e.printStackTrace();
             }
+
+
         }
         if(settings2.getUseDNSOnly()) {
             //Setup http Proxy
+
             if (settings2.getUseHTTPProxy()) {
                 Utils.getLogger().info("HTTP Proxy is currently configured as \n  HTTP Proxy Host: " + settings2.getHTTPProxyHost() + "\n  HTTP Proxy Port: " + settings2.getHTTPProxyPort() + "\n HTTP Proxy Non Proxies Hosts: " + settings2.getHTTPProxyBypassDomains());
                 System.setProperty("http.proxyHost", settings2.getHTTPProxyHost());
@@ -315,7 +318,7 @@ public class LauncherMain {
 
         logger.addHandler(new ConsoleHandler(console));
 
-        System.setOut(new PrintStream(new LoggerOutputStream(console, Level.INFO, logger), true));
+        System.setOut(new PrintStream(new LoggerOutputStream(console, Level.ALL, logger), true));
         System.setErr(new PrintStream(new LoggerOutputStream(console, Level.SEVERE, logger), true));
         org.apache.log4j.Appender rootappender = new org.apache.log4j.ConsoleAppender(new org.apache.log4j.SimpleLayout(), "System.out");
         org.apache.log4j.LogManager.getRootLogger().addAppender(rootappender);
@@ -333,7 +336,7 @@ public class LauncherMain {
         Utils.getLogger().info("OS: " + System.getProperty("os.name").toLowerCase(Locale.ENGLISH));
         Utils.getLogger().info("Identified as "+ OperatingSystem.getOperatingSystem().getName());
         Utils.getLogger().info("Java: " + System.getProperty("java.version") + " " + JavaUtils.getJavaBitness() + "-bit (" + System.getProperty("os.arch") + ")");
-        final String[] domains = {"minecraft.net", "session.minecraft.net", "textures.minecraft.net", "libraries.minecraft.net", "authserver.mojang.com", "account.mojang.com", "technicpack.net", "launcher.technicpack.net", "api.technicpack.net", "mirror.technicpack.net", "solder.technicpack.net", "files.minecraftforge.net"};
+        final String[] domains = {"tantalum.tharow.net","tantalum-auth.azurewebsites.net","minecraft.net", "session.minecraft.net", "textures.minecraft.net", "libraries.minecraft.net", "authserver.mojang.com", "account.mojang.com", "technicpack.net", "launcher.technicpack.net", "api.technicpack.net", "mirror.technicpack.net", "solder.technicpack.net", "files.minecraftforge.net"};
         for (String domain : domains) {
             try {
                 Collection<InetAddress> inetAddresses = Arrays.asList(InetAddress.getAllByName(domain));
@@ -347,15 +350,21 @@ public class LauncherMain {
 
     @SuppressWarnings("ConstantConditions")
     private static void injectNewRootCerts() {
+        injectNewRootCerts(false);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private static void injectNewRootCerts(boolean forceInjection) {
         // Adapted from Forge installer
         final String javaVersion = System.getProperty("java.version");
-        if (javaVersion == null || !javaVersion.startsWith("1.8.0_")) {
+        if(forceInjection){Utils.getLogger().warning("Forcing New Root Certificates");}
+        if ((javaVersion == null || !javaVersion.startsWith("1.8.0_")) && !forceInjection) {
             Utils.getLogger().log(Level.INFO, "Don't need to inject new root certificates: Java is newer than 8 (" + javaVersion + ")");
             return;
         }
 
         try {
-            if (Integer.parseInt(javaVersion.substring("1.8.0_".length())) >= 101) {
+            if ((Integer.parseInt(javaVersion.substring("1.8.0_".length())) >= 101) && !forceInjection) {
                 Utils.getLogger().log(Level.INFO, "Don't need to inject new root certificates: Java 8 is 101+ (" + javaVersion + ")");
                 return;
             }
@@ -417,7 +426,7 @@ public class LauncherMain {
         UIManager.put( "ComboBox.disabledForeground", LauncherFrame.COLOR_GREY_TEXT );
         System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
 
-        runProxySetup(settings); //Check and run proxy and custom dns settings
+        runProxySetup(settings, directories.getTorRelayDirectory()); //Check and run proxy and custom dns settings
 
         //Remove all log files older than a week
         new Thread(() -> {

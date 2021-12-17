@@ -38,19 +38,88 @@
         <url>http://jenkins.technicpack.net/job/LauncherV3/</url>
     </ciManagement>
     -->
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>google</id>
+            <name>Google Maven</name>
+            <url>https://maven.google.com/</url>
+        </repository>
+        <repository>
+            <id>guardianproject</id>
+            <name>GuardianProject Maven</name>
+            <url>https://raw.githubusercontent.com/guardianproject/gpmaven/master/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <name>Jit Pack io</name>
+            <url>https://jitpack.io/</url>
+        </repository>
+        <repository>
+            <id>jcenter</id>
+            <name>Java Center</name>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
+
+        <!--<repository>
+            <id>springpugins</id>
+            <name>Spring Plugins</name>
+            <url>https://repo.spring.io/plugins-release/</url>
+        </repository>-->
+
+
+    </repositories>
     <!-- Project dependencies -->
     <dependencies>
         <!-- Included in final JAR -->
+        <!-- https://mvnrepository.com/artifact/net.freehaven.tor.control/jtorctl -->
         <dependency>
-            <groupId>org.silvertunnel-ng</groupId>
-            <artifactId>netlib</artifactId>
-            <version>0.0.5</version>
+            <groupId>org.briarproject</groupId>
+            <artifactId>jtorctl</artifactId>
+            <version>0.3</version>
         </dependency>
+
+
+
+        <!--<dependency>
+            <groupId>com.msopentech.thali</groupId>
+            <artifactId>java</artifactId>
+            <version>0.0.2</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.msopentech.thali</groupId>
+            <artifactId>universal</artifactId>
+            <version>0.0.2</version>
+        </dependency>-->
 
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.12</version>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.7</version>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>com.github.torproject</groupId>
+            <artifactId>jtorctl</artifactId>
+            <version>master-SNAPSHOT</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.github.thaliproject.Tor_Onion_Proxy_Library</groupId>
+            <artifactId>universal</artifactId>
+            <version>master-v0.0.0-g71dc2a1-111</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.thaliproject.Tor_Onion_Proxy_Library</groupId>
+            <artifactId>java</artifactId>
+            <version>master-v0.0.0-g71dc2a1-111</version>
         </dependency>
 
         <dependency>

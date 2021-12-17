@@ -25,7 +25,7 @@ public class TantalumConstants {
     public static final String technicURL = "https://mirror.technicpack.net/Technic/";
     public static final String technicVersions = "https://tantalum.tharow.net/launcher/version/";
     public static final String technicFmlLibRepo = technicURL + "lib/fml/";
-    public static final String technicForgeRepo = "https://repo.maven.apache.org/maven2/";
+    public static final String technicForgeRepo = technicURL + "lib/";
 
     private static IBuildNumber buildNumber;
     private static String userAgent;
