@@ -22,6 +22,9 @@ import com.beust.jcommander.JCommander;
 import com.msopentech.thali.java.toronionproxy.JavaOnionProxyContext;
 import com.msopentech.thali.java.toronionproxy.JavaTorInstaller;
 import com.msopentech.thali.toronionproxy.*;
+import net.tharow.tantalum.authlib.AuthlibAuthenticator;
+import net.tharow.tantalum.authlib.AuthlibServer;
+import net.tharow.tantalum.authlib.IAuthlibServerInfo;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.autoupdate.Relauncher;
 import net.tharow.tantalum.autoupdate.http.HttpUpdateStream;
@@ -65,15 +68,19 @@ import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.LogoReso
 import net.tharow.tantalum.launchercore.modpacks.sources.IAuthoritativePackSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.IInstalledPackRepository;
 import net.tharow.tantalum.minecraftcore.launch.MinecraftLauncher;
-import net.tharow.tantalum.launchercore.auth.TantalumAuthenticator;
+import net.tharow.tantalum.minecraftcore.microsoft.auth.MicrosoftAuthenticator;
+import net.tharow.tantalum.minecraftcore.mojang.auth.MojangAuthenticator;
 import net.tharow.tantalum.platform.IPlatformApi;
+import net.tharow.tantalum.platform.IPlatformInfo;
 import net.tharow.tantalum.platform.IPlatformSearchApi;
 import net.tharow.tantalum.platform.PlatformPackInfoRepository;
 import net.tharow.tantalum.platform.cache.ModpackCachePlatformApi;
 import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.http.HttpPlatformSearchApi;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
+import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.solder.ISolderApi;
+import net.tharow.tantalum.solder.ISolderInfo;
 import net.tharow.tantalum.solder.SolderPackSource;
 import net.tharow.tantalum.solder.cache.CachedSolderApi;
 import net.tharow.tantalum.solder.http.HttpSolderApi;
@@ -89,7 +96,6 @@ import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -116,6 +122,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class LauncherMain {
+
+    private static TantalumSettings tantalumSettings;
 
     public static ConsoleFrame consoleFrame;
 
@@ -203,11 +211,16 @@ public class LauncherMain {
         Utils.getLogger().info("Current Build Number is " + build);
         // These 2 need to happen *before* the launcher or the updater run, so we have valuable debug information, and so
         // we can properly use websites that use Let's Encrypt (and other current certs not supported by old Java versions)
-
+        String platformUrl;
+        if(params.getPlatformUrl() != null){platformUrl = params.getPlatformUrl();}
+        else if(settings.getPlatformURL().toLowerCase(Locale.ROOT).contains("technicpack.net")){
+            platformUrl = "https://api.technicpack.net/";
+        } else {platformUrl = settings.getPlatformURL() + "platform/";}
         //runProxySetup(settings);
-        runStartupDebug();
+
+        runStartupDebug(settings, params);
         //injectNewRootCerts();
-        injectNewRootCerts(settings.getForceOverrideRootCerts());
+        injectNewRootCerts(settings.getForceOverrideRootCerts() || params.isOverrideRoots());
         //startLauncher(settings, params, directories, resources);
         Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream("https://tantalum-auth.azurewebsites.net/platform/"), settings.getBuildStream()+"4", build, directories, resources, params);
         try {
@@ -228,8 +241,8 @@ public class LauncherMain {
     public static void runProxySetup(TantalumSettings settings2, File torRelayDir) {
         if(settings2.getUseTorRelay()){
             //Setup Tor Config and other things//
-            TorConfig torConfig = TorConfig.createDefault(torRelayDir);
-            //torConfig.getTorrcFile();
+            TorConfig torConfig = TorConfig.createFlatConfig(torRelayDir);
+            //TorConfig torConfig = TorConfig.createConfig(torRelayDir,torRelayDir,torRelayDir);
             TorInstaller torInstaller = new JavaTorInstaller(torConfig);
             OnionProxyContext proxyContext = new JavaOnionProxyContext(torConfig, torInstaller, null);
             final OnionProxyManager onionProxyManager = new OnionProxyManager(proxyContext);
@@ -237,6 +250,8 @@ public class LauncherMain {
             try {
                 onionProxyManager.getContext().getInstaller().updateTorConfigCustom(torConfigBuilder.asString());
                 onionProxyManager.setup();
+                Utils.getLogger().info("List of bridges "+ onionProxyManager.getContext().getSettings().getListOfSupportedBridges());
+                onionProxyManager.start();
             } catch (IOException | TimeoutException e) {
                 e.printStackTrace();
             }
@@ -302,7 +317,7 @@ public class LauncherMain {
             }
 
         }
-        File logs = new File(logDirectory, "techniclauncher_%D.log");
+        File logs = new File(logDirectory, "tantalumLauncher_%D.log");
         RotatingFileHandler fileHandler = new RotatingFileHandler(logs.getPath());
 
         fileHandler.setFormatter(new BuildLogFormatter(buildNumber.getBuildNumber()));
@@ -318,19 +333,65 @@ public class LauncherMain {
 
         logger.addHandler(new ConsoleHandler(console));
 
-        System.setOut(new PrintStream(new LoggerOutputStream(console, Level.ALL, logger), true));
+        System.setOut(new PrintStream(new LoggerOutputStream(console, Level.WARNING, logger), true));
         System.setErr(new PrintStream(new LoggerOutputStream(console, Level.SEVERE, logger), true));
+        org.apache.log4j.Appender rootappender = new org.apache.log4j.ConsoleAppender(new org.apache.log4j.SimpleLayout(), "System.out");
+        org.apache.log4j.LogManager.getRootLogger().addAppender(rootappender);
+        org.apache.log4j.LogManager.getRootLogger().setLevel(org.apache.log4j.Level.ALL);
+        org.apache.log4j.LogManager.getRootLogger().info("Apache Logger Has Initialised");
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             e.printStackTrace();
             logger.log(Level.SEVERE, "Unhandled Exception in " + t, e);
         });
     }
 
-    private static void runStartupDebug() {
+    private static void runStartupDebug(TantalumSettings settings, StartupParameters parameters) {
         // Startup debug messages
+        //Try and Get default Platform and Solder Info//
+        String platformUri = settings.getPlatformURL();
+        String solderUri = settings.getSolderURL();
+        String authlibUri = "https://tantalum-auth.azurewebsites.net/";
+        if(parameters.getSolderUrl() != null) {
+            solderUri = parameters.getSolderUrl();
+        }
+        if(parameters.getPlatformUrl() != null){platformUri = parameters.getPlatformUrl();}
+        if (platformUri.contains("technicpack.net")) {
+            platformUri = "https://api.technicpack.net/";
+        }
+        if(solderUri.contains("technicpack.net"))
+            solderUri = "https://solder.technicpack.net/api";
+
+
+
+        IPlatformInfo platformInfo= null;
+        ISolderInfo solderInfo=null;
+        IAuthlibServerInfo serverInfo=null;
+        try {
+            platformInfo = new HttpPlatformApi(platformUri).getPlatformInfo();
+            solderInfo = new HttpSolderApi(UUID.randomUUID().toString()).getSolderInfo(solderUri);
+            //serverInfo = AuthlibServer.getAuthlibServerInfo(authlibUri);
+        } catch (RestfulAPIException e) {
+            e.printStackTrace();
+        }
+
+
         Utils.getLogger().info("OS: " + System.getProperty("os.name").toLowerCase(Locale.ENGLISH));
         Utils.getLogger().info("Identified as "+ OperatingSystem.getOperatingSystem().getName());
         Utils.getLogger().info("Java: " + System.getProperty("java.version") + " " + JavaUtils.getJavaBitness() + "-bit (" + System.getProperty("os.arch") + ")");
+        Utils.getLogger().info("Launcher Build: " + TantalumConstants.getBuildNumber().getBuildNumber());
+        Utils.getLogger().info("Tor Status: N/a");
+        Utils.getLogger().info("Platform Uri: " + platformUri);
+        Utils.getLogger().info("Platform Solder Uri: " + solderUri);
+        if (platformInfo != null)
+            Utils.getLogger().info("Platform: " + platformInfo.getName() + " Version: " + platformInfo.getVersion());
+        else {Utils.getLogger().warning("Platform: Error Platform Couldn't Be Contacted");}
+        if (solderInfo != null)
+            Utils.getLogger().info("Platform Solder Api: " + solderInfo.getApi() + " Version: " + solderInfo.getVersion() + " Stream: " + solderInfo.getStream());
+        else {Utils.getLogger().warning("Platform Solder: Error Platform Solder Couldn't Be Contacted");}
+        if (serverInfo != null)
+            Utils.getLogger().info(serverInfo.toReadable());
+        else {Utils.getLogger().warning("Platform Auth Server: Error Platform Auth Server Couldn't Be Contacted");}
+
         final String[] domains = {"tantalum.tharow.net","tantalum-auth.azurewebsites.net","minecraft.net", "session.minecraft.net", "textures.minecraft.net", "libraries.minecraft.net", "authserver.mojang.com", "account.mojang.com", "technicpack.net", "launcher.technicpack.net", "api.technicpack.net", "mirror.technicpack.net", "solder.technicpack.net", "files.minecraftforge.net"};
         for (String domain : domains) {
             try {
@@ -343,7 +404,6 @@ public class LauncherMain {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     private static void injectNewRootCerts() {
         injectNewRootCerts(false);
     }
@@ -416,6 +476,14 @@ public class LauncherMain {
         }
     }
 
+    public static TantalumSettings getTantalumSettings() {
+        return tantalumSettings;
+    }
+
+    public static void setTantalumSettings(TantalumSettings settings){
+        tantalumSettings = settings;
+    }
+
     private static void startLauncher(final TantalumSettings settings, StartupParameters startupParameters, final LauncherDirectories directories, ResourceLoader resources) {
         UIManager.put( "ComboBox.disabledBackground", LauncherFrame.COLOR_FORMELEMENT_INTERNAL );
         UIManager.put( "ComboBox.disabledForeground", LauncherFrame.COLOR_GREY_TEXT );
@@ -448,8 +516,10 @@ public class LauncherMain {
         javaVersions.selectVersion(settings.getJavaVersion(), settings.getJavaBitness());
 
         TantalumUserStore users = TantalumUserStore.load(new File(directories.getLauncherDirectory(),"users.json"));
-        TantalumAuthenticator tantalumAuthenticator = new TantalumAuthenticator(users.getClientToken(), settings.getAuthlibServerURL());
-        UserModel userModel = new UserModel(users, tantalumAuthenticator);
+        MojangAuthenticator mojangAuthenticator = new MojangAuthenticator(users.getClientToken());
+        AuthlibAuthenticator authlibAuthenticator = new AuthlibAuthenticator(users.getClientToken());
+        MicrosoftAuthenticator microsoftAuthenticator = new MicrosoftAuthenticator(new File(directories.getLauncherDirectory(), "oauth"));
+        UserModel userModel = new UserModel(users, microsoftAuthenticator, mojangAuthenticator, authlibAuthenticator);
 
         IModpackResourceType iconType = new IconResourceType();
         IModpackResourceType logoType = new LogoResourceType();
@@ -466,11 +536,17 @@ public class LauncherMain {
 
         HttpSolderApi httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
+        String platformUrl;
+        if(startupParameters.getPlatformUrl() != null){platformUrl = startupParameters.getPlatformUrl();}
+        else if(settings.getPlatformURL().toLowerCase(Locale.ROOT).contains("technicpack.net")){
+            platformUrl = "https://api.technicpack.net/";
+        } else {platformUrl = settings.getPlatformURL() + "platform/";}
 
-        HttpPlatformApi httpPlatform = new HttpPlatformApi(settings.getPlatformURL() + "platform/");
+
+        HttpPlatformApi httpPlatform = new HttpPlatformApi(platformUrl);
         Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
         IPlatformApi platform = new ModpackCachePlatformApi(httpPlatform, 60 * 60, directories);
-        IPlatformSearchApi platformSearch = new HttpPlatformSearchApi(settings.getPlatformURL() + "platform/");
+        IPlatformSearchApi platformSearch = new HttpPlatformSearchApi(platformUrl);
 
         IInstalledPackRepository packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks"));
         IAuthoritativePackSource packInfoRepository = new PlatformPackInfoRepository(platform, solder);
@@ -481,7 +557,10 @@ public class LauncherMain {
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
         PackLoader packList = new PackLoader(directories, packStore, packInfoRepository);
-        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(settings.getSolderURL(), solder), solder, platform, platformSearch, iconRepo);
+        String solderUrl;
+        if(startupParameters.getSolderUrl() != null){solderUrl = startupParameters.getSolderUrl();}
+        else{solderUrl = settings.getSolderURL();}
+        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(solderUrl, solder), solder, platform, platformSearch, iconRepo);
         selector.setBorder(BorderFactory.createEmptyBorder());
         userModel.addAuthListener(selector);
 

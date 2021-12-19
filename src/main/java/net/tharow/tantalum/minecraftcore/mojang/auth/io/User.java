@@ -17,40 +17,24 @@
  * along with Technic Minecraft Core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.tharow.tantalum.launchercore.auth.io;
+package net.tharow.tantalum.minecraftcore.mojang.auth.io;
+
+import net.tharow.tantalum.minecraftcore.mojang.auth.io.UserProperties;
 
 @SuppressWarnings({"unused"})
-public class Profile {
+public class User {
 	private String id;
-	private String name;
-	private boolean legacy;
+	private UserProperties properties;
 
-    public Profile() {
+	public User() {
 
-    }
-
-    public Profile(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+	}
 
 	public String getId() {
 		return id;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public boolean isLegacy() {
-		return legacy;
-	}
-
-	@Override
-	public String toString() {
-		return "Profile{" +
-				"id='" + id + '\'' +
-				", name='" + name + '\'' +
-				'}';
+	public UserProperties getUserProperties() {
+		return properties;
 	}
 }

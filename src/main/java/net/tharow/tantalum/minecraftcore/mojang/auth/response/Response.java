@@ -17,7 +17,7 @@
  * along with Technic Minecraft Core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.tharow.tantalum.launchercore.auth.response;
+package net.tharow.tantalum.minecraftcore.mojang.auth.response;
 
 @SuppressWarnings({"unused"})
 public class Response {

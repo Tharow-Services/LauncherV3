@@ -37,7 +37,7 @@ public class TantalumConstants {
     public static void setBuildNumber(IBuildNumber buildNumber) {
         TantalumConstants.buildNumber = buildNumber;
 
-        userAgent = "Mozilla/5.0 (Java) TechnicLauncher/4." + buildNumber.getBuildNumber();
+        userAgent = "Mozilla/5.0 (Java) TechnicLauncher/5.1." + buildNumber.getBuildNumber();
     }
 
     public static String getUserAgent() {

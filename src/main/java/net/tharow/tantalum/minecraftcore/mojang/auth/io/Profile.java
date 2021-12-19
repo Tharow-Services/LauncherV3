@@ -17,21 +17,40 @@
  * along with Technic Minecraft Core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.tharow.tantalum.launchercore.auth.request;
+package net.tharow.tantalum.minecraftcore.mojang.auth.io;
 
-import net.tharow.tantalum.launchercore.auth.response.Response;
+@SuppressWarnings({"unused"})
+public class Profile {
+	private String id;
+	private String name;
+	private boolean legacy;
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
-public class RefreshRequest extends Response {
-	private String accessToken;
-	private String clientToken;
+    public Profile() {
 
-	public RefreshRequest() {
+    }
 
+    public Profile(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+	public String getId() {
+		return id;
 	}
 
-	public RefreshRequest(String accessToken, String clientToken) {
-		this.accessToken = accessToken;
-		this.clientToken = clientToken;
+	public String getName() {
+		return name;
+	}
+
+	public boolean isLegacy() {
+		return legacy;
+	}
+
+	@Override
+	public String toString() {
+		return "Profile{" +
+				"id='" + id + '\'' +
+				", name='" + name + '\'' +
+				'}';
 	}
 }

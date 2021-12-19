@@ -83,12 +83,12 @@ public class HandleVersionFileTask implements IInstallTask {
 
         if (isLegacy) {
             Library legacyWrapper = new Library();
-            legacyWrapper.setName("net.technicpack:legacywrapper:1.2.1");
+            legacyWrapper.setName("net.tharow.tantalum:legacywrapper:1.2.1");
             legacyWrapper.setUrl("https://mirror.technicpack.net/Technic/lib/");
 
             version.addLibrary(legacyWrapper);
 
-            version.setMainClass("net.technicpack.legacywrapper.Launch");
+            version.setMainClass("net.tharow.tantalum.legacywrapper.Launch");
         }
 
         // In Forge 1.13+ and 1.12.2 > 2847, there's an installer jar, and the universal jar can't be used since it

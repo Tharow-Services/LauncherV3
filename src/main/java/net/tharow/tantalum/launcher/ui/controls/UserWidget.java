@@ -18,10 +18,10 @@
 
 package net.tharow.tantalum.launcher.ui.controls;
 
+import net.tharow.tantalum.authlib.AuthlibUser;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.launchercore.auth.IUserType;
-import net.tharow.tantalum.launchercore.auth.TantalumUser;
 import net.tharow.tantalum.launchercore.image.IImageJobListener;
 import net.tharow.tantalum.launchercore.image.ImageJob;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
@@ -31,7 +31,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class UserWidget extends JPanel implements IImageJobListener<TantalumUser> {
+public class UserWidget extends JPanel implements IImageJobListener<AuthlibUser> {
 
     private ImageRepository<IUserType> skinRepository;
 
@@ -110,7 +110,7 @@ public class UserWidget extends JPanel implements IImageJobListener<TantalumUser
     }
 
     @Override
-    public void jobComplete(ImageJob<TantalumUser> job) {
+    public void jobComplete(ImageJob<AuthlibUser> job) {
         if (job.getJobData() == currentMojangUser)
             refreshFace(job.getImage());
     }

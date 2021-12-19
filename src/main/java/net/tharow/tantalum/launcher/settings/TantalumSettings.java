@@ -72,7 +72,7 @@ public class TantalumSettings implements ILaunchOptions {
     private int HTTPProxyPort = 3652;
     private String HTTPProxyBypassDomains = "";
     private String authlibServerURL = ""; //Authlib-Injector Server Address
-    private String discoverURL = "https://check.torproject.org/";
+    private String discoverURL = "https://api.technicpack.net/discover";
     private String solderURL = "https://tantalum-solder.azurewebsites.net/api/";
     private String platformURL = "https://tantalum-auth.azurewebsites.net/";
     private Boolean forceOverrideRootCerts = false;
@@ -85,11 +85,13 @@ public class TantalumSettings implements ILaunchOptions {
     public void setForceOverrideRootCerts(boolean forceOverrideRootCerts){this.forceOverrideRootCerts = forceOverrideRootCerts;}
 
     //Website Urls
+    /** @deprecated Unused Set By User Profile*/
     public String getAuthlibServerURL(){
         if(authlibServerURL.equals("")){
             return platformURL;
         } else {return  this.authlibServerURL;}
     }
+    /** @deprecated Unused Set By User Profile*/
     public void setAuthlibServerURL(String authlibServerURL){this.authlibServerURL = authlibServerURL;}
 
     public String getDiscoverURL(){return this.discoverURL;}
@@ -247,7 +249,7 @@ public class TantalumSettings implements ILaunchOptions {
     public String getJavaArgs() {
         if (javaArgs == null || javaArgs.isEmpty()) {
             // These are the default JVM args in the vanilla launcher
-            javaArgs = "-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M -javaagent:" + this.getTechnicRoot().getAbsolutePath() + "\\assets\\launcher\\authlib-injector.jar=" + this.authlibServerURL;
+            javaArgs = "-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M";
         }
         return javaArgs;
     }

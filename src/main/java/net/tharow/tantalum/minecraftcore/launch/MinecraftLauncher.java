@@ -19,6 +19,7 @@
 
 package net.tharow.tantalum.minecraftcore.launch;
 
+import net.tharow.tantalum.authlib.AuthlibUser;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.auth.UserModel;
@@ -44,10 +45,7 @@ import org.apache.commons.text.StringSubstitutor;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
+import java.util.*;
 
 public class MinecraftLauncher {
 
@@ -159,6 +157,9 @@ public class MinecraftLauncher {
         params.put("auth_player_name", user.getDisplayName());
         params.put("auth_uuid", user.getId());
 
+
+
+
         params.put("profile_name", user.getDisplayName());
         params.put("version_name", version.getId());
         params.put("version_type", version.getType().getName());
@@ -220,6 +221,9 @@ public class MinecraftLauncher {
         } else if (memory >= 2048) {
             permSize = 256;
         }
+
+        if(Objects.equals(user.getUserType(), AuthlibUser.AUTHLIB_USER_TYPE))
+            commands.addRaw("-javaagent:" + directories.getAssetsDirectory().getAbsolutePath() + "\\launcher\\authlib-injector.jar=" + user.getServerUrl());
 
         commands.addRaw("-Xms" + memory + "m");
         commands.addRaw("-Xmx" + memory + "m");

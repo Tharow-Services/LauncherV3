@@ -17,15 +17,17 @@
  * along with Technic Minecraft Core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.tharow.tantalum.launchercore.auth;
+package net.tharow.tantalum.minecraftcore.mojang.auth;
 
+import net.tharow.tantalum.launchercore.auth.IUserType;
+import net.tharow.tantalum.launchercore.auth.UserModel;
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.launchercore.auth.io.Profile;
-import net.tharow.tantalum.launchercore.auth.io.UserProperties;
-import net.tharow.tantalum.launchercore.auth.response.AuthResponse;
+import net.tharow.tantalum.minecraftcore.mojang.auth.io.Profile;
+import net.tharow.tantalum.minecraftcore.mojang.auth.io.UserProperties;
+import net.tharow.tantalum.minecraftcore.mojang.auth.response.AuthResponse;
 
-public class TantalumUser implements IUserType {
+public class MojangUser implements IUserType {
     public static final String MOJANG_USER_TYPE = "mojang";
     private static final String LEGACY = "legacy";
 
@@ -37,12 +39,12 @@ public class TantalumUser implements IUserType {
     private UserProperties userProperties;
     private transient boolean isOffline;
 
-    public TantalumUser() {
+    public MojangUser() {
         this.isOffline = false;
     }
 
     //This constructor is used to build a user for offline mode
-    public TantalumUser(String username) {
+    public MojangUser(String username) {
         this.username = username;
         this.displayName = username;
         this.accessToken = "0";
@@ -52,7 +54,7 @@ public class TantalumUser implements IUserType {
         this.userProperties = new UserProperties();
     }
 
-    public TantalumUser(String username, AuthResponse response) {
+    public MojangUser(String username, AuthResponse response) {
         this.isOffline = false;
         this.username = username;
         refreshToken(response);
@@ -74,6 +76,11 @@ public class TantalumUser implements IUserType {
     @Override
     public void login(UserModel userModel) throws AuthenticationException {
         refreshToken(userModel.getMojangAuthenticator().requestRefresh(this));
+    }
+
+    @Override
+    public String getServerUrl() {
+        return null;
     }
 
     @Override
@@ -124,7 +131,7 @@ public class TantalumUser implements IUserType {
             return "{}";
     }
 
-    public void mergeUserProperties(TantalumUser mergeUser) {
+    public void mergeUserProperties(MojangUser mergeUser) {
         if (this.userProperties != null && mergeUser.userProperties != null)
             this.userProperties.merge(mergeUser.userProperties);
     }

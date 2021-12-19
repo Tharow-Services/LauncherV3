@@ -61,6 +61,11 @@ public class SolderPackInfo extends RestObject implements PackInfo {
     }
 
     @Override
+    public String getAuthoritativePackSource() {
+        return null;
+    }
+
+    @Override
     public String getName() {
         return name;
     }

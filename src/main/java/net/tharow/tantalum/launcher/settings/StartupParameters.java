@@ -19,8 +19,10 @@
 package net.tharow.tantalum.launcher.settings;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.converters.FileConverter;
 import com.beust.jcommander.internal.Lists;
 
+import java.io.File;
 import java.util.List;
 
 public final class StartupParameters {
@@ -42,14 +44,24 @@ public final class StartupParameters {
     private boolean update = false;
     @Parameter(names = {"-movetarget"}, description = "The path of the originally-run package to copy to")
     private String moveTarget = null;
-    @Parameter(names = {"-discover"}, description = "An override param for the discover URL")
-    private String discover = null;
+    @Parameter(names = {"-solder","-s"}, description = "An override param for the discover URL")
+    private String solder = null;
+    @Parameter(names = {"-platform","-p"}, description = "An override param for the platform URL")
+    private String platform = null;
+    @Parameter(names = {"-overrideRoots"}, description = "Force the override of root ca Certificates")
+    private boolean overrideRoots = false;
+    @Parameter(names = {"-modpackFile","-mf"}, description = "Install a modpack from file", converter = FileConverter.class)
+    private File modpackFile = null;
+    @Parameter(names = {"-modpackUri","-mu"}, description = "Install a modpack from api link")
+    private String modpackUri = null;
     @Parameter(names = {"-blockReboot"}, description = "Prevent rebooting the launcher due to bad java properties.")
     private boolean blockReboot = false;
     @Parameter(names = {"-buildNumber"}, description = "Force build number to this value for debugging.")
     private String buildNumber = "";
     @Parameter(names = {"-offline"}, description = "Force offline mode")
     private boolean offline = false;
+    @Parameter(names = {"-technic","-t"}, description = "Start In Technic Launcher Mode")
+    private boolean isTechnic = false;
 
     public StartupParameters(String[] args) {
         this.args = args;
@@ -81,7 +93,25 @@ public final class StartupParameters {
 
     public String getMoveTarget() { return moveTarget; }
 
-    public String getDiscoverUrl() { return discover; }
+    public String getSolderUrl() {
+        if(isTechnic){
+            return "https://solder.technicpack.net/api";
+        }else
+            return solder;
+    }
 
     public String getBuildNumber() { return buildNumber; }
+
+    public String getPlatformUrl() {
+        if(isTechnic){
+            return "https://api.technicpack.net/";
+        } else
+            return platform;
+    }
+
+    public boolean isOverrideRoots() {return overrideRoots;}
+
+    public File getModpackFile() {return modpackFile;}
+
+    public String getModpackUri() {return modpackUri;}
 }

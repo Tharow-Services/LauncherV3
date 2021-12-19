@@ -19,25 +19,38 @@
 
 package net.tharow.tantalum.platform.http;
 
+import net.tharow.tantalum.autoupdate.io.StreamVersion;
 import net.tharow.tantalum.platform.IPlatformSearchApi;
 import net.tharow.tantalum.platform.io.SearchResultsData;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.RestfulAPIException;
+import net.tharow.tantalum.utilslib.Utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Locale;
 
 public class HttpPlatformSearchApi implements IPlatformSearchApi {
     private String rootUrl;
+    private boolean isTechnicPlatform;
+    private String buildnumber;
 
     public HttpPlatformSearchApi(String rootUrl) {
         this.rootUrl = rootUrl;
+        this.isTechnicPlatform = rootUrl.toLowerCase(Locale.ROOT).contains("technicpack.net");
+        if(this.isTechnicPlatform){
+            try {
+                this.buildnumber = String.valueOf(RestObject.getRestObject(StreamVersion.class, "https://api.technicpack.net/launcher/version/stable4").getBuild());
+            } catch (RestfulAPIException e) {
+                Utils.getLogger().warning("Couldn't Contact Technic Platform For Build Number");
+            }
+        }
     }
 
     @Override
     public SearchResultsData getSearchResults(String searchTerm) throws RestfulAPIException {
         try {
-            String url = rootUrl + "search.php?q=" + URLEncoder.encode(searchTerm.trim(), "UTF-8");
+            String url = rootUrl + "search.php?q=" + URLEncoder.encode(searchTerm.trim(), "UTF-8") + "&build=" + this.buildnumber;
             return RestObject.getRestObject(SearchResultsData.class, url);
         } catch (UnsupportedEncodingException ex) {
             return new SearchResultsData();

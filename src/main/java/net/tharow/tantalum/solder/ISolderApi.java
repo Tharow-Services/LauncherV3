@@ -25,6 +25,8 @@ import net.tharow.tantalum.solder.io.SolderPackInfo;
 import java.util.Collection;
 
 public interface ISolderApi {
+    ISolderInfo getSolderInfo(String solderRoot) throws RestfulAPIException;
+
     ISolderPackApi getSolderPack(String solderRoot, String modpackSlug, String mirrorUrl) throws RestfulAPIException;
 
     Collection<SolderPackInfo> getPublicSolderPacks(String solderRoot) throws RestfulAPIException;

@@ -24,13 +24,16 @@ import com.google.common.cache.CacheBuilder;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.solder.ISolderApi;
+import net.tharow.tantalum.solder.ISolderInfo;
 import net.tharow.tantalum.solder.ISolderPackApi;
+import net.tharow.tantalum.solder.http.HttpSolderApi;
 import net.tharow.tantalum.solder.io.SolderPackInfo;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class CachedSolderApi implements ISolderApi {
@@ -94,6 +97,11 @@ public class CachedSolderApi implements ISolderApi {
     }
 
     @Override
+    public ISolderInfo getSolderInfo(String solderRoot) throws RestfulAPIException {
+        return innerApi.getSolderInfo(solderRoot);
+    }
+
+    @Override
     public ISolderPackApi getSolderPack(String solderRoot, String modpackSlug, String mirrorUrl) throws RestfulAPIException {
         CacheTuple tuple = new CacheTuple(solderRoot, modpackSlug, mirrorUrl);
         ISolderPackApi pack = packs.getIfPresent(tuple);
@@ -119,7 +127,7 @@ public class CachedSolderApi implements ISolderApi {
         }
 
         if (Seconds.secondsBetween(lastSolderPull, DateTime.now()).isLessThan(Seconds.seconds(cacheInSeconds / 10)))
-            return new ArrayList<SolderPackInfo>(0);
+            return new ArrayList<>(0);
 
         try {
             cachedPublicPacks = innerApi.internalGetPublicSolderPacks(solderRoot, this);

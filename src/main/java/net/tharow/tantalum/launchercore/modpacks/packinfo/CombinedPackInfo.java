@@ -38,6 +38,11 @@ public class CombinedPackInfo implements PackInfo {
     }
 
     @Override
+    public String getAuthoritativePackSource() {
+        return null;
+    }
+
+    @Override
     public String getName() {
         if (platformPackInfo != null)
             return platformPackInfo.getName();

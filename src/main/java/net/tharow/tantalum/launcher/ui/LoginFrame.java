@@ -18,14 +18,19 @@
 
 package net.tharow.tantalum.launcher.ui;
 
+import net.tharow.tantalum.authlib.AuthlibServer;
+import net.tharow.tantalum.authlib.AuthlibUser;
+import net.tharow.tantalum.authlib.IAuthlibServerInfo;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.launcher.LauncherMain;
 import net.tharow.tantalum.launcher.settings.StartupParameters;
 import net.tharow.tantalum.launcher.ui.components.OptionsDialog;
-import net.tharow.tantalum.launchercore.exception.ResponseException;
-import net.tharow.tantalum.launchercore.exception.SessionException;
+import net.tharow.tantalum.launchercore.exception.*;
 import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.launch.java.source.FileJavaSource;
+import net.tharow.tantalum.minecraftcore.microsoft.auth.MicrosoftUser;
+import net.tharow.tantalum.minecraftcore.mojang.auth.MojangUser;
+import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.ui.controls.list.popupformatters.RoundedBorderFormatter;
 import net.tharow.tantalum.ui.controls.lang.LanguageCellRenderer;
 import net.tharow.tantalum.ui.controls.lang.LanguageCellUI;
@@ -40,9 +45,7 @@ import net.tharow.tantalum.ui.controls.login.*;
 import net.tharow.tantalum.ui.listitems.LanguageItem;
 import net.tharow.tantalum.launchercore.auth.IAuthListener;
 import net.tharow.tantalum.launchercore.auth.IUserType;
-import net.tharow.tantalum.launchercore.auth.TantalumUser;
 import net.tharow.tantalum.launchercore.auth.UserModel;
-import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.utilslib.Utils;
@@ -67,17 +70,24 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
     private TantalumSettings settings;
 
     private RoundedButton addMojang;
-    private RoundedButton addRegistration;
+    private RoundedButton addMicrosoft;
+    private RoundedButton addAuthlib;
     private RoundedButton login;
     private JTextField username;
+    private JTextField username2;
+    private JTextField authServer;
     private JLabel selectLabel;
+    private JLabel authServerLabel;
     private JLabel usernameLabel;
+    private JLabel usernameLabel2;
     private JLabel passwordLabel;
+    private JLabel passwordLabel2;
     private JLabel addAccounts;
     private JLabel visitBrowser;
     private JComboBox<IUserType> nameSelect;
     private JCheckBox rememberAccount;
     private JPasswordField password;
+    private JPasswordField password2;
     private JComboBox<LanguageItem> languages;
     private final StartupParameters params;
     private final JavaVersionRepository javaVersions;
@@ -85,7 +95,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
     private final FileJavaSource fileJavaSource;
 
     private static final int FRAME_WIDTH = 347;
-    private static final int FRAME_HEIGHT = 399;
+    private static final int FRAME_HEIGHT = 460;//399
 
     public LoginFrame(ResourceLoader resources, TantalumSettings settings, UserModel userModel, ImageRepository<IUserType> skinRepository, StartupParameters params, JavaVersionRepository javaVersions, IBuildNumber buildNumber, FileJavaSource fileJavaSource) {
         this.skinRepository = skinRepository;
@@ -260,27 +270,98 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         login.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         login.setHoverForeground(LauncherFrame.COLOR_BLUE);
         login.addActionListener(e -> login());
-        add(login, new GridBagConstraints(0, 6, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
+        add(login, new GridBagConstraints(0, 8, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
 
         // Add mojang account button
-        addMojang = new RoundedButton(resources.getString("login.addaccount"));
+        addMojang = new RoundedButton(resources.getString("login.addmojang"));
         addMojang.setBorder(BorderFactory.createEmptyBorder(5,17,10,17));
         addMojang.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
         addMojang.setContentAreaFilled(false);
         addMojang.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         addMojang.setHoverForeground(LauncherFrame.COLOR_BLUE);
         addMojang.addActionListener(e -> addMojangAccount());
-        add(addMojang, new GridBagConstraints(0, 7, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(50,20,0,20),0,0));
+        add(addMojang, new GridBagConstraints(0, 10, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
 
-        // Register button
-        addRegistration = new RoundedButton("Register");
-        addRegistration.setBorder(BorderFactory.createEmptyBorder(5,17,10,17));
-        addRegistration.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
-        addRegistration.setContentAreaFilled(false);
-        addRegistration.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
-        addRegistration.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        addRegistration.addActionListener(e -> visitTerms());
-        //add(addRegistration, new GridBagConstraints(0, 8, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
+        // Microsoft login button
+        addMicrosoft = new RoundedButton(resources.getString("login.addmicrosoft"));
+        addMicrosoft.setBorder(BorderFactory.createEmptyBorder(5,17,10,17));
+        addMicrosoft.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
+        addMicrosoft.setContentAreaFilled(false);
+        addMicrosoft.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
+        addMicrosoft.setHoverForeground(LauncherFrame.COLOR_BLUE);
+        addMicrosoft.addActionListener(e -> addMicrosoftAccount());
+        add(addMicrosoft, new GridBagConstraints(0, 11, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
+
+
+
+        // Add Authlib Account
+        addAuthlib = new RoundedButton(resources.getString("login.addauthlib"));
+        addAuthlib.setBorder(BorderFactory.createEmptyBorder(5,17,10,17));
+        addAuthlib.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
+        addAuthlib.setContentAreaFilled(false);
+        addAuthlib.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
+        addAuthlib.setHoverForeground(LauncherFrame.COLOR_BLUE);
+        addAuthlib.addActionListener(e -> addAuthlibAccount());
+        add(addAuthlib, new GridBagConstraints(0, 9, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(50,20,0,20),0,0));
+
+        //Authlib Auther Label
+        authServerLabel = new JLabel(resources.getString("login.authserver"));
+        authServerLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        authServerLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        add(authServerLabel, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10,20,0,20), 0,0));
+
+        // Authlib field
+        authServer = new JTextField();
+        authServer.setText("tantalum-auth.azurewebsites.net");
+        authServer.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 10));
+        authServer.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        authServer.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        authServer.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
+        authServer.setCaretColor(LauncherFrame.COLOR_BUTTON_BLUE);
+        authServer.addKeyListener(this);
+        add(authServer, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(3,20,0,20),4,17));
+
+        // Authlib username label
+        usernameLabel2 = new JLabel(resources.getString("login.username"));
+        usernameLabel2.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        usernameLabel2.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        add(usernameLabel2, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10,20,0,20), 0,0));
+
+        // Authlib username field
+        username2 = new JTextField();
+        username2.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 10));
+        username2.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        username2.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        username2.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
+        username2.setCaretColor(LauncherFrame.COLOR_BUTTON_BLUE);
+        username2.addKeyListener(this);
+        add(username2, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(3,20,0,20),4,17));
+
+        // Authlib password2 label
+        passwordLabel2 = new JLabel(resources.getString("login.password"));
+        passwordLabel2.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        passwordLabel2.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
+        add(passwordLabel2, new GridBagConstraints(0, 6, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(12,20,0,20),0,0));
+
+        // Setup password2 box
+        password2 = new JPasswordField();
+        password2.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        password2.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 10));
+        password2.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
+        password2.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        password2.addKeyListener(this);
+        password2.setEchoChar('*');
+        password2.addActionListener(e -> login());
+        password2.setCaretColor(LauncherFrame.COLOR_BUTTON_BLUE);
+        add(password2, new GridBagConstraints(0, 7, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(3, 20, 0, 20), 4, 17));
+
+        // Disable Authlib login elements
+        authServerLabel.setVisible(false);
+        authServer.setVisible(false);
+        usernameLabel2.setVisible(false);
+        username2.setVisible(false);
+        passwordLabel2.setVisible(false);
+        password2.setVisible(false);
 
         // Mojang username label
         usernameLabel = new JLabel(resources.getString("login.username"));
@@ -391,7 +472,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         linkPane.add(termsLink);
         linkPane.add(Box.createHorizontalStrut(8));
 
-        add(linkPane, new GridBagConstraints(0, 9, 3, 1, 1.0, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+        add(linkPane, new GridBagConstraints(0, 12, 3, 1, 1.0, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
     }
 
     protected void closeButtonClicked() {
@@ -399,7 +480,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
     }
 
     protected void toggleRemember() {
-        if (!rememberAccount.isSelected() && nameSelect.isVisible() && nameSelect.getSelectedItem() instanceof TantalumUser) {
+        if (!rememberAccount.isSelected() && nameSelect.isVisible() && nameSelect.getSelectedItem() instanceof MojangUser) {
             forgetUser((IUserType)nameSelect.getSelectedItem());
         }
     }
@@ -444,6 +525,10 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
             newMojangLogin(username.getText());
             return;
         }
+        if (username2.isVisible()) {
+            newAuthlibLogin(username2.getText(),authServer.getText());
+            return;
+        }
 
         IUserType user = (IUserType) nameSelect.getSelectedItem();
 
@@ -464,6 +549,15 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         login.setVisible(true);
     }
 
+    protected void addMicrosoftAccount(){newMicrosoftLogin();}
+
+    protected void addAuthlibAccount() {
+        setAuthlibLoginVisibility(true);
+        setAddAccountVisibility(false);
+        setAccountSelectVisibility(false);
+        login.setVisible(true);
+
+    }
 
     protected void clearCurrentUser() {
         password.setText("");
@@ -485,6 +579,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         setAccountSelectVisibility(true);
         setAddAccountVisibility(true);
         setMojangLoginVisibility(false);
+        setAuthlibLoginVisibility(false);
         login.setVisible(true);
         rememberAccount.setSelected(true);
         nameSelect.setSelectedItem(user);
@@ -508,6 +603,16 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         password.setVisible(visible);
     }
 
+    private void setAuthlibLoginVisibility(boolean visible) {
+        authServerLabel.setVisible(visible);
+        authServer.setVisible(visible);
+        usernameLabel2.setVisible(visible);
+        username2.setVisible(visible);
+        passwordLabel2.setVisible(visible);
+        password2.setVisible(visible);
+    }
+
+
     private void setAccountSelectVisibility(boolean visible) {
         selectLabel.setVisible(visible);
         nameSelect.setVisible(visible);
@@ -516,7 +621,8 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
 
     private void setAddAccountVisibility(boolean visible) {
         addMojang.setVisible(visible);
-        addRegistration.setVisible(visible);
+        addMicrosoft.setVisible(visible);
+        addAuthlib.setVisible(visible);
     }
 
     private void login(IUserType user) {
@@ -552,9 +658,47 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
     }
 
 
+    private void newMicrosoftLogin() {
+        setAccountSelectVisibility(false);
+        setAddAccountVisibility(false);
+        // TODO: Setup info message + cancel flow
+
+        try {
+            MicrosoftUser microsoftUser = userModel.getMicrosoftAuthenticator().loginNewUser();
+            userModel.addUser(microsoftUser);
+            userModel.setCurrentUser(microsoftUser);
+            setCurrentUser(microsoftUser);
+        } catch (MicrosoftAuthException e) {
+            switch (e.getType()) {
+                case UNDERAGE:
+                    showMessageDialog(this,
+                            "Your Xbox account is underage and will need to be added to a Family to play this game.",
+                            "Underage Error", ERROR_MESSAGE);
+                    break;
+                case NO_XBOX_ACCOUNT:
+                    showMessageDialog(this,
+                            "You don't have an Xbox account associated with this Microsoft account.\n" +
+                                    "Please login at minecraft.net and set up an Xbox account, then try to login here again.",
+                            "No Xbox Account", ERROR_MESSAGE);
+                    DesktopUtils.browseUrl("https://www.minecraft.net/login");
+                    break;
+                case NO_MINECRAFT:
+                    showMessageDialog(this,
+                            "This account has not purchased Minecraft Java Edition.", "No Minecraft", ERROR_MESSAGE);
+                    break;
+                default:
+                    e.printStackTrace();
+                    showMessageDialog(this, e.getMessage(), "Add Microsoft Account Failed", ERROR_MESSAGE);
+            }
+        } finally {
+            setAccountSelectVisibility(!userModel.getUsers().isEmpty());
+            setAddAccountVisibility(true);
+        }
+    }
+
     private void newMojangLogin(String name) {
         try {
-            TantalumUser newUser;
+            MojangUser newUser;
             newUser = userModel.getMojangAuthenticator().loginNewUser(name, new String(this.password.getPassword()));
             userModel.addUser(newUser);
             userModel.setCurrentUser(newUser);
@@ -564,6 +708,35 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         } catch (AuthenticationException e) {
             // What else is uncaught here? Nothing As Far As I Can Tell
             showMessageDialog(this, e.getMessage(), "Authentication error", ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    private void newAuthlibLogin(String name, String srvUrl) {
+        try {
+            if(srvUrl.startsWith("http://"))
+                showMessageDialog(this, "Authlib Requires Https\n Press Ok to try with Https", "SSL", ERROR_MESSAGE);
+                srvUrl = srvUrl.replace("http://","https://");
+            if(!srvUrl.startsWith("https://")){srvUrl = "https://" + srvUrl;}
+            if(!srvUrl.endsWith("/"))
+                srvUrl = srvUrl +"/";
+            AuthlibUser newUser;
+            IAuthlibServerInfo serverInfo = AuthlibServer.getAuthlibServerInfo(Utils.getFullUrl(srvUrl).toString());
+            newUser = userModel.getAuthlibAuthenticator().loginNewUser(name, new String(this.password2.getPassword()), serverInfo);
+            userModel.addUser(newUser);
+            userModel.setCurrentUser(newUser);
+            setCurrentUser(newUser);
+        } catch(ResponseException e) {
+            showMessageDialog(this, e.getMessage(), e.getError(), ERROR_MESSAGE);
+        } catch (AuthenticationException e) {
+            // What else is uncaught here? Nothing As Far As I Can Tell
+            showMessageDialog(this, e.getMessage(), "Authentication error", ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (RestfulAPIException e) {
+            showMessageDialog(this, e.getMessage(), "Auth Server Error", ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (DownloadException e) {
+            showMessageDialog(this, e.getMessage(), "Improper Url", ERROR_MESSAGE);
             e.printStackTrace();
         }
     }

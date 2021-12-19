@@ -18,8 +18,11 @@
 
 package net.tharow.tantalum.utilslib;
 
+import com.beust.jcommander.IStringConverter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.msopentech.thali.toronionproxy.Utilities;
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
@@ -30,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +42,6 @@ public class Utils {
     private static final Gson gson;
     private static final Logger logger = Logger.getLogger("net.tharow.tantalum.launcher.Main");
     private static final int DOWNLOAD_RETRIES = 3;
-
     static {
         GsonBuilder builder = new GsonBuilder();
         builder.setPrettyPrinting();
@@ -46,6 +49,7 @@ public class Utils {
 
         // Make sure we're logging everything we want to be logging
         logger.setLevel(Level.ALL);
+        logger.config("Doing the Thing");
     }
 
     public static Gson getGson() {
@@ -64,6 +68,7 @@ public class Utils {
      * @throws IOException The openConnection() method throws an IOException and the calling method is responsible for handling it.
      */
     public static HttpURLConnection openHttpConnection(URL url) throws IOException {
+
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setDoInput(true);
         conn.setDoOutput(false);
@@ -167,17 +172,14 @@ public class Utils {
             Process process = pb.start();
             final StringBuilder response=new StringBuilder();
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try (final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                        String line;
-                        while ((line = bufferedReader.readLine()) != null) {
-                            response.append(line + "\n");
-                        }
-                    } catch (IOException ex) {
-                        //Don't let other process' problems concern us
+            new Thread(() -> {
+                try (final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        response.append(line + "\n");
                     }
+                } catch (IOException ex) {
+                    //Don't let other process' problems concern us
                 }
             }).start();
             process.waitFor();
@@ -283,4 +285,5 @@ public class Utils {
     public static Download downloadFile(String url, String name, String output) throws IOException, InterruptedException {
         return downloadFile(url, name, output, null);
     }
+
 }

@@ -1,4 +1,4 @@
-package net.tharow.tantalum.launchercore.auth.io;
+package net.tharow.tantalum.minecraftcore.mojang.auth.io;
 
 import com.google.gson.*;
 

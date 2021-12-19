@@ -17,17 +17,16 @@
  * along with Technic Minecraft Core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.tharow.tantalum.launchercore.auth;
+package net.tharow.tantalum.authlib;
 
 import com.google.common.base.Charsets;
-import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.launchercore.exception.ResponseException;
 import net.tharow.tantalum.launchercore.exception.SessionException;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.launchercore.auth.request.AuthRequest;
-import net.tharow.tantalum.launchercore.auth.request.RefreshRequest;
-import net.tharow.tantalum.launchercore.auth.response.AuthResponse;
+import net.tharow.tantalum.minecraftcore.mojang.auth.request.AuthRequest;
+import net.tharow.tantalum.minecraftcore.mojang.auth.request.RefreshRequest;
+import net.tharow.tantalum.minecraftcore.mojang.auth.response.AuthResponse;
 import org.apache.commons.io.IOUtils;
 
 import java.io.DataOutputStream;
@@ -37,21 +36,23 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class TantalumAuthenticator {
+public class AuthlibAuthenticator {
     private final String clientToken;
-    private final String authServerURL;
-    public TantalumAuthenticator(String clientToken, String authServerURL) {
+    //TODO Implement non email login
+
+
+    public AuthlibAuthenticator(String clientToken){
         this.clientToken = clientToken;
-        this.authServerURL = authServerURL;
     }
 
-    public TantalumUser loginNewUser(String username, String password) throws AuthenticationException {
-        AuthRequest request = new AuthRequest(username, password, clientToken);
-        String data = MojangUtils.getGson().toJson(request);
 
+    public AuthlibUser loginNewUser(String username, String password, IAuthlibServerInfo authlibServerInfo) throws AuthenticationException {
+        AuthRequest request = new AuthRequest(username, password, this.clientToken);
+        String data = MojangUtils.getGson().toJson(request);
+        String authServer = authlibServerInfo.getServerUrl();
         AuthResponse response;
         try {
-            String returned = postJson(this.authServerURL + "authserver/authenticate", data);
+            String returned = postJson(authServer + "authserver/authenticate", data);
             response = MojangUtils.getGson().fromJson(returned, AuthResponse.class);
             if (response == null) {
                 throw new ResponseException("Auth Error", "Invalid credentials. Invalid username or password.");
@@ -63,19 +64,21 @@ public class TantalumAuthenticator {
             throw e;
         }  catch (IOException e) {
             throw new AuthenticationException(
-                    "An error was raised while attempting to communicate with " + this.authServerURL + ".", e);
+                    "An error was raised while attempting to communicate with " + authServer + ".", e);
         }
 
-        return new TantalumUser(username, response);
+        return new AuthlibUser(username, response, authlibServerInfo);
     }
 
-    public AuthResponse requestRefresh(TantalumUser tantalumUser) throws AuthenticationException {
-        RefreshRequest refreshRequest = new RefreshRequest(tantalumUser.getAccessToken(), tantalumUser.getClientToken());
+    public AuthResponse requestRefresh(AuthlibUser authlibUser) throws AuthenticationException {
+        RefreshRequest refreshRequest = new RefreshRequest(authlibUser.getAccessToken(), authlibUser.getClientToken());
         String data = MojangUtils.getGson().toJson(refreshRequest);
+        String authServer = authlibUser.getServerUrl();
+
 
         AuthResponse response;
         try {
-            String returned = postJson(this.authServerURL + "authserver/refresh", data);
+            String returned = postJson(authServer + "authserver/refresh", data);
             response = MojangUtils.getGson().fromJson(returned, AuthResponse.class);
             if (response == null) {
                 throw new SessionException("Session Error. Try logging in again.");
@@ -85,7 +88,7 @@ public class TantalumAuthenticator {
             }
         } catch (IOException e) {
             throw new AuthenticationException(
-                    "An error was raised while attempting to communicate with " + this.authServerURL + ".", e);
+                    "An error was raised while attempting to communicate with " + authServer + ".", e);
         }
 
         return response;
@@ -124,14 +127,13 @@ public class TantalumAuthenticator {
             try {
                 if (stream != null)
                     stream.close();
-            } catch (IOException e) {
-            }
+            } catch (IOException ignored) {}
         }
 
         return returnable;
     }
 
-    public TantalumUser createOfflineUser(String displayName) {
-        return new TantalumUser(displayName);
+    public AuthlibUser createOfflineUser(String displayName) {
+        return new AuthlibUser(displayName);
     }
 }

@@ -24,6 +24,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonSyntaxException;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.platform.IPlatformApi;
+import net.tharow.tantalum.platform.IPlatformInfo;
 import net.tharow.tantalum.platform.io.NewsData;
 import net.tharow.tantalum.platform.io.PlatformPackInfo;
 import net.tharow.tantalum.rest.RestfulAPIException;
@@ -178,6 +179,11 @@ public class ModpackCachePlatformApi implements IPlatformApi {
     @Override
     public String getPlatformUri(String packSlug) {
         return innerApi.getPlatformUri(packSlug);
+    }
+
+    @Override
+    public IPlatformInfo getPlatformInfo() throws RestfulAPIException {
+        return innerApi.getPlatformInfo();
     }
 
     @Override

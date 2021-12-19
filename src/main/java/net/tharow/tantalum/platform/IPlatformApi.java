@@ -35,4 +35,6 @@ public interface IPlatformApi {
     NewsData getNews() throws RestfulAPIException;
 
     String getPlatformUri(String slug);
+
+    IPlatformInfo getPlatformInfo() throws RestfulAPIException;
 }

@@ -28,6 +28,8 @@ import java.util.List;
 
 public interface PackInfo {
 
+    String getAuthoritativePackSource();
+
     String getName();
 
     String getDisplayName();

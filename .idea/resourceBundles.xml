@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ResourceBundleManager">
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_cs.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_de.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_en.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_fr.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_hu.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_it.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_nl_NL.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_pl.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_pt_BR.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_pt_PT.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_sk.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_zh_CN.properties" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/lang/UIText_zh_TW.properties" />
+  </component>
+</project>

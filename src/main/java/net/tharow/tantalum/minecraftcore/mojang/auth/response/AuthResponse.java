@@ -17,11 +17,11 @@
  * along with Technic Minecraft Core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.tharow.tantalum.launchercore.auth.response;
+package net.tharow.tantalum.minecraftcore.mojang.auth.response;
 
 import net.tharow.tantalum.launchercore.auth.IAuthResponse;
-import net.tharow.tantalum.launchercore.auth.io.Profile;
-import net.tharow.tantalum.launchercore.auth.io.User;
+import net.tharow.tantalum.minecraftcore.mojang.auth.io.Profile;
+import net.tharow.tantalum.minecraftcore.mojang.auth.io.User;
 
 import java.util.Arrays;
 
@@ -45,7 +45,7 @@ public class AuthResponse extends Response implements IAuthResponse {
         return availableProfiles;
     }
 
-    public Profile getSelectedProfile() {
+    public net.tharow.tantalum.minecraftcore.mojang.auth.io.Profile getSelectedProfile() {
         return selectedProfile;
     }
 

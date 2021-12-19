@@ -22,9 +22,11 @@ package net.tharow.tantalum.solder.http;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.solder.ISolderApi;
+import net.tharow.tantalum.solder.ISolderInfo;
 import net.tharow.tantalum.solder.ISolderPackApi;
 import net.tharow.tantalum.solder.io.FullModpacks;
 import net.tharow.tantalum.solder.io.Solder;
+import net.tharow.tantalum.solder.io.SolderInfo;
 import net.tharow.tantalum.solder.io.SolderPackInfo;
 
 import java.util.Collection;
@@ -38,6 +40,11 @@ public class HttpSolderApi implements ISolderApi {
 
     public HttpSolderApi(String clientId) {
         this.clientId = clientId;
+    }
+
+    @Override
+    public ISolderInfo getSolderInfo(String solderRoot) throws RestfulAPIException {
+        return RestObject.getRestObject(SolderInfo.class, solderRoot);
     }
 
     @Override

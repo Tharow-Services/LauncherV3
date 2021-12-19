@@ -17,13 +17,21 @@
  * along with Technic Minecraft Core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.tharow.tantalum.launchercore.auth.request;
+package net.tharow.tantalum.minecraftcore.mojang.auth.request;
+
+import net.tharow.tantalum.minecraftcore.mojang.auth.response.Response;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
-public class ValidateRequest {
+public class RefreshRequest extends Response {
 	private String accessToken;
+	private String clientToken;
 
-	public ValidateRequest(String accessToken) {
+	public RefreshRequest() {
+
+	}
+
+	public RefreshRequest(String accessToken, String clientToken) {
 		this.accessToken = accessToken;
+		this.clientToken = clientToken;
 	}
 }

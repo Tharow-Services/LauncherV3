@@ -41,4 +41,6 @@ public interface IUserType {
     boolean isOffline();
 
     void login(UserModel userModel) throws AuthenticationException;
+
+    String getServerUrl();
 }

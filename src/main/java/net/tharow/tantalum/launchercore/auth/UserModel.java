@@ -19,9 +19,12 @@
 
 package net.tharow.tantalum.launchercore.auth;
 
+import net.tharow.tantalum.authlib.AuthlibAuthenticator;
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.launchercore.exception.ResponseException;
 import net.tharow.tantalum.launchercore.exception.SessionException;
+import net.tharow.tantalum.minecraftcore.microsoft.auth.MicrosoftAuthenticator;
+import net.tharow.tantalum.minecraftcore.mojang.auth.MojangAuthenticator;
 
 import javax.swing.JOptionPane;
 import java.util.Collection;
@@ -29,15 +32,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class UserModel {
-    private IUserType mCurrentUser = null;
+    private IUserType mCurrentUser;
     private List<IAuthListener> mAuthListeners = new LinkedList<>();
     private IUserStore mUserStore;
-    private TantalumAuthenticator tantalumAuthenticator;
+    private MojangAuthenticator mojangAuthenticator;
+    private MicrosoftAuthenticator microsoftAuthenticator;
+    private AuthlibAuthenticator authlibAuthenticator;
 
-    public UserModel(IUserStore userStore, TantalumAuthenticator tantalumAuthenticator) {
+    public UserModel(IUserStore userStore, MicrosoftAuthenticator microsoftAuthenticator, MojangAuthenticator mojangAuthenticator, AuthlibAuthenticator authlibAuthenticator) {
         this.mCurrentUser = null;
         this.mUserStore = userStore;
-        this.tantalumAuthenticator = tantalumAuthenticator;
+        this.mojangAuthenticator = mojangAuthenticator;
+        this.microsoftAuthenticator = microsoftAuthenticator;
+        this.authlibAuthenticator = authlibAuthenticator;
+
     }
 
     public IUserType getCurrentUser() {
@@ -78,7 +86,7 @@ public class UserModel {
             setCurrentUser(null);
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Login Error", JOptionPane.ERROR_MESSAGE);
         } catch (AuthenticationException ex) {
-            setCurrentUser(tantalumAuthenticator.createOfflineUser(user.getDisplayName()));
+            setCurrentUser(mojangAuthenticator.createOfflineUser(user.getDisplayName()));
         }
     }
 
@@ -106,7 +114,15 @@ public class UserModel {
         mUserStore.setLastUser(user.getUsername());
     }
 
-    public TantalumAuthenticator getMojangAuthenticator() {
-        return tantalumAuthenticator;
+    public AuthlibAuthenticator getAuthlibAuthenticator(){
+        return this.authlibAuthenticator;
+    }
+
+    public MojangAuthenticator getMojangAuthenticator(){
+        return mojangAuthenticator;
+    }
+
+    public MicrosoftAuthenticator getMicrosoftAuthenticator() {
+        return microsoftAuthenticator;
     }
 }
