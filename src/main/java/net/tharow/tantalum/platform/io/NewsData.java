@@ -23,10 +23,11 @@ import net.tharow.tantalum.rest.RestObject;
 
 import java.util.ArrayList;
 
-public class NewsData extends RestObject {
-    private ArrayList<NewsArticle> articles = new ArrayList<NewsArticle>();
-
+public class NewsData extends RestObject implements INewsData{
+    private ArrayList<NewsArticle> articles = new ArrayList<>();
+    @Override
     public ArrayList<NewsArticle> getArticles() {
         return articles;
     }
+
 }

@@ -18,6 +18,9 @@
 
 package net.tharow.tantalum.launcher.ui.components.news;
 
+import net.tharow.tantalum.github.io.RepoReleasesData;
+import net.tharow.tantalum.platform.http.HttpPlatformApi;
+import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
@@ -124,16 +127,13 @@ public class NewsSelector extends JPanel {
             circle.setVisible(false);
         }
 
-        Collections.sort(news.getArticles(), new Comparator<NewsArticle>() {
-            @Override
-            public int compare(NewsArticle o1, NewsArticle o2) {
-                if (o1.getDate().getTime() > o2.getDate().getTime())
-                    return -1;
-                else if (o1.getDate().getTime() < o2.getDate().getTime())
-                    return 1;
-                else
-                    return 0;
-            }
+        Collections.sort(news.getArticles(), (o1, o2) -> {
+            if (o1.getDate().getTime() > o2.getDate().getTime())
+                return -1;
+            else if (o1.getDate().getTime() < o2.getDate().getTime())
+                return 1;
+            else
+                return 0;
         });
 
         widgetHost.removeAll();
@@ -142,12 +142,9 @@ public class NewsSelector extends JPanel {
 
         for (int i = 0; i < news.getArticles().size(); i++) {
             NewsWidget widget = new NewsWidget(resources, news.getArticles().get(i), avatarRepo.startImageJob(news.getArticles().get(i).getAuthorshipInfo()));
-            widget.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (e.getSource() instanceof NewsWidget)
-                        selectNewsItem((NewsWidget)e.getSource());
-                }
+            widget.addActionListener(e -> {
+                if (e.getSource() instanceof NewsWidget)
+                    selectNewsItem((NewsWidget)e.getSource());
             });
             widgetHost.add(widget, constraints);
             constraints.gridy++;
@@ -161,14 +158,13 @@ public class NewsSelector extends JPanel {
     }
 
     private void downloadItems() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    loadNewsItems(platformApi.getNews());
-                } catch (RestfulAPIException ex) {
-                    Utils.getLogger().log(Level.WARNING, "Unable to load news", ex);
-                }
+        Thread thread = new Thread(() -> {
+            try {
+                RestObject.getRestObject(RepoReleasesData.class, "https://api.github.com/repos/Tharow-Services/Tantalum-Launcher/releases");
+                loadNewsItems(HttpPlatformApi.getNews(false));
+            } catch (RestfulAPIException ex) {
+                Utils.getLogger().log(Level.SEVERE, "Unable to load news\n");
+                ex.printStackTrace();
             }
         });
 

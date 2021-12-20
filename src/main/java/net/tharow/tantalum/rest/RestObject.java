@@ -46,6 +46,9 @@ public class RestObject {
         try {
             URLConnection conn = new URL(url).openConnection();
             conn.setRequestProperty("User-Agent", TantalumConstants.getUserAgent());
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            conn.addRequestProperty("accept","application/vnd.github.v3+json");
             conn.setConnectTimeout(15000);
             conn.setReadTimeout(15000);
 

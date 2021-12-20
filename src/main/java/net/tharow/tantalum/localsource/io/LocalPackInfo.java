@@ -17,9 +17,10 @@
  * along with Technic Launcher Core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.tharow.tantalum.platform.io;
+package net.tharow.tantalum.localsource.io;
 
 import net.tharow.tantalum.launchercore.exception.BuildInaccessibleException;
+import net.tharow.tantalum.platform.io.FeedItem;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.io.Modpack;
 import net.tharow.tantalum.rest.io.PackInfo;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings({"unused"})
-public class PlatformPackInfo extends RestObject implements PackInfo {
+public class LocalPackInfo implements PackInfo {
     private String name;
     private String displayName;
     private String url;
@@ -47,13 +48,12 @@ public class PlatformPackInfo extends RestObject implements PackInfo {
     private Integer downloads;
     private boolean isServer;
     private boolean isOfficial;
-    private String discordServerId;
 
     private ArrayList<FeedItem> feed = new ArrayList<FeedItem>();
 
     private transient boolean isLocal = false;
 
-    public PlatformPackInfo() {
+    public LocalPackInfo() {
 
     }
 

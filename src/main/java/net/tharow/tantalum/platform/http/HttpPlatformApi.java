@@ -19,11 +19,12 @@
 
 package net.tharow.tantalum.platform.http;
 
-import net.tharow.tantalum.autoupdate.http.HttpUpdateStream;
 import net.tharow.tantalum.autoupdate.io.StreamVersion;
+import net.tharow.tantalum.github.io.RepoReleasesData;
 import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.platform.IPlatformApi;
 import net.tharow.tantalum.platform.IPlatformInfo;
+import net.tharow.tantalum.platform.io.INewsData;
 import net.tharow.tantalum.platform.io.NewsData;
 import net.tharow.tantalum.platform.io.PlatformInfo;
 import net.tharow.tantalum.platform.io.PlatformPackInfo;
@@ -31,30 +32,45 @@ import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.utilslib.Utils;
 
-import java.util.Locale;
+import javax.annotation.Nullable;
 
 public class HttpPlatformApi implements IPlatformApi {
     private String platformUrl;
     private String buildnumber = TantalumConstants.getBuildNumber().getBuildNumber();
     private boolean isTechnicPlatform; //Pretend We Are a normal Technic Launcher
+    private boolean isGithub;
 
     public HttpPlatformApi(String rootUrl) {
-        this.platformUrl = rootUrl;
-        this.isTechnicPlatform = rootUrl.toLowerCase(Locale.ROOT).contains("technicpack.net");
-        if(this.isTechnicPlatform){
+        this(rootUrl, false, false);
+    }
+
+    public HttpPlatformApi(){
+        this(null, false, true);
+    }
+
+    public HttpPlatformApi(String platformUrl, boolean isGithub, boolean isTechnicPlatform){
+        this.platformUrl = platformUrl;
+        if(isTechnicPlatform){
+            this.platformUrl = "https://api.technicpack.net/";
             try {
-                buildnumber = String.valueOf(RestObject.getRestObject(StreamVersion.class, "https://api.technicpack.net/launcher/version/stable4").getBuild());
+                this.buildnumber = String.valueOf(RestObject.getRestObject(StreamVersion.class, "https://api.technicpack.net/launcher/version/stable4").getBuild());
             } catch (RestfulAPIException e) {
-                Utils.getLogger().warning("Couldn't Contact Technic Platform For Build Number");
+                Utils.getLogger().warning("Couldn't Contact Technic Platform For Build Number setting build to 1024");
+                this.buildnumber = String.valueOf(1024);
             }
         }
+        this.isTechnicPlatform = isTechnicPlatform;
+        this.isGithub = isGithub;
+
     }
 
     public String getPlatformUri(String packSlug) {
         if(isTechnicPlatform){
             return platformUrl + "modpack/" + packSlug + "?build="+ buildnumber;
         }else {
+            Utils.getLogger().warning("Trying to get Modpack with Slug of: " + platformUrl + "modpack.php?slug=" + packSlug);
             return platformUrl + "modpack.php?slug=" + packSlug;
+
         }
     }
 
@@ -90,13 +106,36 @@ public class HttpPlatformApi implements IPlatformApi {
 
     @Override
     public NewsData getNews() throws RestfulAPIException {
-        String url;
-        if(isTechnicPlatform){
-            url = platformUrl + "news?build=" + buildnumber;
-        } else {
-            url = platformUrl + "news.php";
-        }
-        return RestObject.getRestObject(NewsData.class, url);
+        return (NewsData) getNews(isTechnicPlatform, isGithub, Integer.parseInt(buildnumber), this.platformUrl);
+    }
 
+    public static NewsData getNews(String platformUrl) throws RestfulAPIException{
+        INewsData result;
+        if(platformUrl.contains("github")){
+            result = getNews(false, true , 0,null);
+        } else
+        if(platformUrl.contains("technicpack")){
+            result = getNews(true, false, 1024,null);
+        } else {
+            result = getNews(false, false, 0, platformUrl);
+        }
+        return (NewsData) result;
+
+    }
+
+    public static NewsData getNews(boolean isTechnicPlatform) throws RestfulAPIException {
+        return (NewsData) getNews(isTechnicPlatform, !isTechnicPlatform, 1024, null);
+    }
+
+    protected static INewsData getNews(boolean isTechnicPlatform, boolean isGithub, int build, @Nullable String platformUrl) throws RestfulAPIException{
+        if(isGithub){
+            return RestObject.getRestObject(RepoReleasesData.class, "https://api.github.com/repos/Tharow-Services/Tantalum-Launcher/releases");
+        }
+        if(isTechnicPlatform)
+            return RestObject.getRestObject(NewsData.class, "https://api.technicpack.net/news?build=" + build);
+        if(platformUrl != null)
+            return RestObject.getRestObject(NewsData.class, platformUrl);
+        //Rerun With default
+        return getNews(true, false, 1024, null);
     }
 }

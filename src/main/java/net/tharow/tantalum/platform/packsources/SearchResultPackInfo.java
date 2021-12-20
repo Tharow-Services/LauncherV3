@@ -37,10 +37,7 @@ public class SearchResultPackInfo implements PackInfo {
         this.result = result;
     }
 
-    @Override
-    public String getAuthoritativePackSource() {
-        return null;
-    }
+
 
     @Override
     public String getName() {
@@ -52,8 +49,6 @@ public class SearchResultPackInfo implements PackInfo {
         return result.getDisplayName();
     }
 
-    @Override
-    public String getDiscordId() { return null; }
 
     @Override
     public String getWebSite() {

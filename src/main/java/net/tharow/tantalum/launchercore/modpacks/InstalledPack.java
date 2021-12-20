@@ -28,16 +28,18 @@ public class InstalledPack {
     private String name;
     private String build;
     private String directory;
+    private String source;
 
-    public InstalledPack(String name, String build, String directory) {
+    public InstalledPack(String name, String build, String directory, String source) {
         this();
         this.name = name;
         this.build = build;
         this.directory = directory;
+        this.source = source;
     }
 
-    public InstalledPack(String name, String build) {
-        this(name, build, MODPACKS_DIR + name);
+    public InstalledPack(String name, String build, String source) {
+        this(name, build, MODPACKS_DIR + name, source);
     }
 
     public InstalledPack() {

@@ -60,10 +60,6 @@ public class SolderPackInfo extends RestObject implements PackInfo {
         this.solder = solder;
     }
 
-    @Override
-    public String getAuthoritativePackSource() {
-        return null;
-    }
 
     @Override
     public String getName() {
@@ -110,8 +106,6 @@ public class SolderPackInfo extends RestObject implements PackInfo {
         return builds;
     }
 
-    @Override
-    public String getDiscordId() { return null; }
 
     @Override
     public ArrayList<FeedItem> getFeed() {

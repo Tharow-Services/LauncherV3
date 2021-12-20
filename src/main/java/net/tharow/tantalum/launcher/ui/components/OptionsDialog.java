@@ -49,10 +49,10 @@ import net.tharow.tantalum.launchercore.util.LaunchAction;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.utilslib.Memory;
 import net.tharow.tantalum.utilslib.OperatingSystem;
+import net.tharow.tantalum.utilslib.SimpleDocumentListener;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.filechooser.FileFilter;
@@ -63,12 +63,10 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Locale;
+import java.util.Objects;
 
 public class OptionsDialog extends LauncherDialog implements IRelocalizableResource {
 
@@ -83,200 +81,24 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     private final FileJavaSource fileJavaSource;
     private final IBuildNumber buildNumber;
 
-    private final DocumentListener javaArgsListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeJavaArgs();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeJavaArgs();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeJavaArgs();
-        }
-    };
-
-    private final DocumentListener socksProxyHostLisener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeSocksProxyHost();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeSocksProxyHost();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeSocksProxyHost();
-        }
-    };
-
-    private final DocumentListener socksProxyPortListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeSocksProxyPort();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeSocksProxyPort();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeSocksProxyPort();
-        }
-    };
-
-    private final DocumentListener HTTPProxyHostListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeHTTPProxyHost();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeHTTPProxyHost();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeHTTPProxyHost();
-        }
-    };
-
-    private final DocumentListener HTTPProxyPortListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeHTTPProxyPort();      }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeHTTPProxyPort();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeHTTPProxyPort();
-        }
-    };
-
-    private final DocumentListener platformURLListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changePlatformURL();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changePlatformURL();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changePlatformURL();
-        }
-    };
-
-    private final DocumentListener authServerURLListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeAuthlibURL();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeAuthlibURL();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeAuthlibURL();
-        }
-    };
-
-    private final DocumentListener discoverURLListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeDiscoverURL();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeDiscoverURL();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeDiscoverURL();
-        }
-    };
+    private final DocumentListener javaArgsListener = new SimpleDocumentListener(this::changeJavaArgs);
+    private final DocumentListener socksProxyHostListener = new SimpleDocumentListener(this::changeSocksProxyHost);
+    private final DocumentListener socksProxyPortListener = new SimpleDocumentListener(this::changeSocksProxyPort);
+    private final DocumentListener HTTPProxyHostListener = new SimpleDocumentListener(this::changeHTTPProxyHost);
+    private final DocumentListener HTTPProxyPortListener = new SimpleDocumentListener(this::changeHTTPProxyPort);
+    private final DocumentListener platformURLListener = new SimpleDocumentListener(this::changePlatformURL);
+    private final DocumentListener discoverURLListener = new SimpleDocumentListener(this::changeDiscoverURL);
+    private final DocumentListener defaultSolderListener = new SimpleDocumentListener(this::changeSolderURL);
+    private final DocumentListener dimensionListener = new SimpleDocumentListener(this::changeWindowDimensions);
+    private final DocumentListener wrapperCommandListener = new SimpleDocumentListener(this::changeWrapperCommand);
 
 
-    private final DocumentListener defaultSolderListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeSolderURL();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeSolderURL();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeSolderURL();
-        }
-    };
-
-    private final DocumentListener dimensionListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeWindowDimensions();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeWindowDimensions();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeWindowDimensions();
-        }
-    };
-
-    private final DocumentListener wrapperCommandListener = new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            changeWrapperCommand();
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            changeWrapperCommand();
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            changeWrapperCommand();
-        }
-    };
-
-
-    JComboBox versionSelect;
-    JComboBox memSelect;
+    JComboBox<JavaVersionItem> versionSelect;
+    JComboBox<Memory> memSelect;
     JTextArea javaArgs;
-    JComboBox streamSelect;
-    JComboBox launchSelect;
-    JComboBox langSelect;
+    JComboBox<StreamItem> streamSelect;
+    JComboBox<OnLaunchItem> launchSelect;
+    JComboBox<LanguageItem> langSelect;
     JTextField installField;
     JTextField clientId;
     JCheckBox showConsole;
@@ -284,8 +106,8 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     StartupParameters params;
     Component ramWarning;
     JCheckBox askFirstBox;
-    JComboBox useStencil;
-    JComboBox windowSelect;
+    JComboBox<String> useStencil;
+    JComboBox<String> windowSelect;
     JTextField widthInput;
     JTextField heightInput;
     JTextField wrapperCommand;
@@ -298,7 +120,6 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     JTextField socksProxyPort;
     JTextField HTTPProxyHost;
     JTextField HTTPProxyPort;
-    JTextField authServerURL;
     JTextField platformURL;
     JTextField discoverURL;
     JTextField solderURL;
@@ -370,10 +191,6 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         settings.save();
     }
 
-    protected void changeAuthlibURL(){
-        settings.setAuthlibServerURL(discoverURL.getText().trim());
-        settings.save();
-    }
 
     protected void changeSolderURL(){
         settings.setSolderURL(solderURL.getText().trim());
@@ -427,6 +244,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     }
 
     protected void changeJavaVersion() {
+        assert versionSelect.getSelectedItem() != null;
         String version = ((JavaVersionItem)versionSelect.getSelectedItem()).getVersionNumber();
         boolean is64 = ((JavaVersionItem)versionSelect.getSelectedItem()).is64Bit();
         javaVersions.selectVersion(version, is64);
@@ -488,11 +306,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     }
 
     protected void changeMemory() {
-        settings.setMemory(((Memory) memSelect.getSelectedItem()).getSettingsId());
+        settings.setMemory(((Memory) Objects.requireNonNull(memSelect.getSelectedItem())).getSettingsId());
         settings.save();
     }
 
     protected void changeStream() {
+        assert streamSelect.getSelectedItem() != null;
         settings.setBuildStream(((StreamItem) streamSelect.getSelectedItem()).getStream());
         settings.save();
 
@@ -504,29 +323,25 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     }
 
     protected void changeLaunchAction() {
-        settings.setLaunchAction(((OnLaunchItem) launchSelect.getSelectedItem()).getLaunchAction());
+        settings.setLaunchAction(((OnLaunchItem) Objects.requireNonNull(launchSelect.getSelectedItem())).getLaunchAction());
         settings.save();
     }
 
     protected void changeLanguage() {
-        settings.setLanguageCode(((LanguageItem) langSelect.getSelectedItem()).getLangCode());
+        settings.setLanguageCode(((LanguageItem) Objects.requireNonNull(langSelect.getSelectedItem())).getLangCode());
         settings.save();
 
         resources.setLocale(((LanguageItem) langSelect.getSelectedItem()).getLangCode());
     }
 
     protected void changeWindowType() {
-        switch(windowSelect.getSelectedIndex()) {
-            case 0:
-                settings.setLaunchWindowType(WindowType.DEFAULT);
-                break;
-            case 1:
-                settings.setLaunchWindowType(WindowType.FULLSCREEN);
-                break;
-            case 2:
+        switch (windowSelect.getSelectedIndex()) {
+            case 0 -> settings.setLaunchWindowType(WindowType.DEFAULT);
+            case 1 -> settings.setLaunchWindowType(WindowType.FULLSCREEN);
+            case 2 -> {
                 settings.setLaunchWindowType(WindowType.CUSTOM);
                 changeWindowDimensions();
-                break;
+            }
         }
 
         updateDimensionsEnabled();
@@ -576,10 +391,10 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         javaArgs.setText(settings.getJavaArgs());
         javaArgs.getDocument().addDocumentListener(javaArgsListener);
 
-        socksProxyHost.getDocument().removeDocumentListener(socksProxyHostLisener);
+        socksProxyHost.getDocument().removeDocumentListener(socksProxyHostListener);
         socksProxyHost.setText(settings.getSocksProxyHost());
         socksProxyHost.setEnabled(settings.getUseSocksProxy());
-        socksProxyHost.getDocument().addDocumentListener(socksProxyHostLisener);
+        socksProxyHost.getDocument().addDocumentListener(socksProxyHostListener);
 
         socksProxyPort.getDocument().removeDocumentListener(socksProxyPortListener);
         socksProxyPort.setText(String.valueOf(settings.getSocksProxyPort()));
@@ -609,9 +424,6 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         platformURL.setText(settings.getPlatformURL());
         platformURL.getDocument().addDocumentListener(platformURLListener);
 
-        authServerURL.getDocument().removeDocumentListener(authServerURLListener);
-        authServerURL.setText(settings.getAuthlibServerURL());
-        authServerURL.getDocument().addDocumentListener(authServerURLListener);
 
         wrapperCommand.getDocument().removeDocumentListener(wrapperCommandListener);
         wrapperCommand.setText(settings.getWrapperCommand());
@@ -682,7 +494,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             versionSelect.setSelectedIndex(1);
         else {
             for (int i = 2; i < versionSelect.getItemCount(); i++) {
-                if (((JavaVersionItem)versionSelect.getItemAt(i)).getVersionNumber().equals(settingsVersion) && ((JavaVersionItem)versionSelect.getItemAt(i)).is64Bit() == settingsBitness) {
+                if ((versionSelect.getItemAt(i)).getVersionNumber().equals(settingsVersion) && (versionSelect.getItemAt(i)).is64Bit() == settingsBitness) {
                     versionSelect.setSelectedIndex(i);
                     break;
                 }
@@ -710,17 +522,10 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         launchSelect.addItem(new OnLaunchItem(resources.getString("launcheroptions.packlaunch.nothing"), LaunchAction.NOTHING));
 
         switch (settings.getLaunchAction()) {
-            case HIDE:
-                launchSelect.setSelectedIndex(0);
-                break;
-            case CLOSE:
-                launchSelect.setSelectedIndex(1);
-                break;
-            case NOTHING:
-                launchSelect.setSelectedIndex(2);
-                break;
-            default:
-                launchSelect.setSelectedIndex(0);
+            case HIDE -> launchSelect.setSelectedIndex(0);
+            case CLOSE -> launchSelect.setSelectedIndex(1);
+            case NOTHING -> launchSelect.setSelectedIndex(2);
+            default -> launchSelect.setSelectedIndex(0);
         }
         launchSelect.addActionListener(e -> changeLaunchAction());
 
@@ -770,22 +575,11 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         windowSelect.addItem(resources.getString("launcheroptions.video.windowSize.fullscreen"));
         windowSelect.addItem(resources.getString("launcheroptions.video.windowSize.custom"));
         switch (settings.getLaunchWindowType()) {
-            case DEFAULT:
-                windowSelect.setSelectedIndex(0);
-                break;
-            case FULLSCREEN:
-                windowSelect.setSelectedIndex(1);
-                break;
-            case CUSTOM:
-                windowSelect.setSelectedIndex(2);
-                break;
+            case DEFAULT -> windowSelect.setSelectedIndex(0);
+            case FULLSCREEN -> windowSelect.setSelectedIndex(1);
+            case CUSTOM -> windowSelect.setSelectedIndex(2);
         }
-        windowSelect.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeWindowType();
-            }
-        });
+        windowSelect.addActionListener(e -> changeWindowType());
         updateDimensionsEnabled();
 
         for (ActionListener listener : useStencil.getActionListeners()) {
@@ -798,12 +592,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             useStencil.setSelectedIndex(0);
         else
             useStencil.setSelectedIndex(1);
-        useStencil.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeEnableStencil();
-            }
-        });
+        useStencil.addActionListener(e -> changeEnableStencil());
     }
 
     private void rebuildMemoryList() {
@@ -836,12 +625,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
             settings.save();
         }
         memSelect.setSelectedItem(availableMem);
-        memSelect.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeMemory();
-            }
-        });
+        memSelect.addActionListener(e -> changeMemory());
 
         if (parent != null) {
             boolean is64Bit = true;
@@ -863,8 +647,8 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
                 toolTip.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
 
 
-                String text = null;
-                Icon icon = null;
+                String text;
+                Icon icon;
 
                 if (has64Bit) {
                     text = resources.getString("launcheroptions.java.use64bit");
@@ -1151,12 +935,14 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         authServerField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         panel.add(authServerField, new GridBagConstraints(2, 6, 1, 1, 0, 0, 17, 0, new Insets(0, 10, 0, 0), 0, 0));
 
-        authServerURL = new JTextField("");
+
+        JTextField authServerURL = new JTextField("Set by User Profile");
         authServerURL.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         authServerURL.setForeground(LauncherFrame.COLOR_BLUE);
         authServerURL.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
         authServerURL.setHighlighter(null);
-        authServerURL.setEditable(true);
+        authServerURL.setEditable(false);
+        authServerURL.setEnabled(false);
         authServerURL.setCursor(null);
         authServerURL.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
         panel.add(authServerURL, new GridBagConstraints(3, 6, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));
@@ -1192,7 +978,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         panel.add(streamLabel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 40, 0, 0), 0, 0));
 
         // Setup stream select box
-        streamSelect = new JComboBox();
+        streamSelect = new JComboBox<>();
 
         if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("mac")) {
             streamSelect.setUI(new MetalComboBoxUI());
@@ -1208,7 +994,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
 
         Object child = streamSelect.getAccessibleContext().getAccessibleChild(0);
         BasicComboPopup popup = (BasicComboPopup)child;
-        JList list = popup.getList();
+        JList<?> list = popup.getList();
         list.setSelectionForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         list.setSelectionBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
         list.setBackground(LauncherFrame.COLOR_CENTRAL_BACK_OPAQUE);
@@ -1221,7 +1007,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         langLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         panel.add(langLabel, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 40, 0, 0), 0, 0));
 
-        langSelect = new JComboBox();
+        langSelect = new JComboBox<>();
 
         if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("mac")) {
             langSelect.setUI(new MetalComboBoxUI());
@@ -1250,7 +1036,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         launchLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         panel.add(launchLabel, new GridBagConstraints(0, 2, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 40, 0, 0), 0, 0));
 
-        launchSelect = new JComboBox();
+        launchSelect = new JComboBox<>();
 
         if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("mac")) {
             launchSelect.setUI(new MetalComboBoxUI());
@@ -1294,12 +1080,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         reinstallButton.setContentAreaFilled(false);
         reinstallButton.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         reinstallButton.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        reinstallButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                reinstall();
-            }
-        });
+        reinstallButton.addActionListener(e -> reinstall());
         panel.add(reinstallButton, new GridBagConstraints(3, 3, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(8, 0, 8, 0), 0, 0));
 
         //Client ID field
@@ -1323,12 +1104,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         copyButton.setContentAreaFilled(false);
         copyButton.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         copyButton.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        copyButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                copyCid();
-            }
-        });
+        copyButton.addActionListener(e -> copyCid());
         panel.add(copyButton, new GridBagConstraints(3, 4, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(8, 0, 8, 0), 0, 0));
 
         panel.add(Box.createRigidArea(new Dimension(60, 0)), new GridBagConstraints(4, 3, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0,0,0,0), 0,0));
@@ -1374,12 +1150,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         openLogs.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         openLogs.setHoverForeground(LauncherFrame.COLOR_BLUE);
         openLogs.setBorder(BorderFactory.createEmptyBorder(5, 17, 10, 17));
-        openLogs.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openLogs();
-            }
-        });
+        openLogs.addActionListener(e -> openLogs());
         panel.add(openLogs, new GridBagConstraints(0, 8, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 10, 0), 0, 0));
     }
 
@@ -1409,7 +1180,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         streamLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         panel.add(streamLabel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 40, 0, 0), 0, 0));
 
-        windowSelect = new JComboBox();
+        windowSelect = new JComboBox<>();
 
         if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("mac")) {
             windowSelect.setUI(new MetalComboBoxUI());
@@ -1425,7 +1196,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
 
         Object child = windowSelect.getAccessibleContext().getAccessibleChild(0);
         BasicComboPopup popup = (BasicComboPopup)child;
-        JList list = popup.getList();
+        JList<?> list = popup.getList();
         list.setSelectionForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         list.setSelectionBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
         list.setBackground(LauncherFrame.COLOR_CENTRAL_BACK_OPAQUE);
@@ -1466,7 +1237,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         useStencilField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         panel.add(useStencilField, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(10, 40, 0, 0), 0, 0));
 
-        useStencil = new JComboBox();
+        useStencil = new JComboBox<>();
 
         if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("mac")) {
             useStencil.setUI(new MetalComboBoxUI());
@@ -1519,7 +1290,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         versionLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         panel.add(versionLabel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 60, 0, 0), 0, 0));
 
-        versionSelect = new JComboBox();
+        versionSelect = new JComboBox<>();
 
         if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("mac")) {
             versionSelect.setUI(new MetalComboBoxUI());
@@ -1536,7 +1307,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
 
         Object child = versionSelect.getAccessibleContext().getAccessibleChild(0);
         BasicComboPopup popup = (BasicComboPopup)child;
-        JList list = popup.getList();
+        JList<?> list = popup.getList();
         list.setSelectionForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         list.setSelectionBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
         list.setBackground(LauncherFrame.COLOR_CENTRAL_BACK_OPAQUE);
@@ -1548,12 +1319,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         otherVersionButton.setContentAreaFilled(false);
         otherVersionButton.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         otherVersionButton.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        otherVersionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                selectOtherVersion();
-            }
-        });
+        otherVersionButton.addActionListener(e -> selectOtherVersion());
         panel.add(otherVersionButton, new GridBagConstraints(2, 0, 5, 1, 2, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(8, 8, 8, 80), 0, 0));
 
         JLabel memLabel = new JLabel(resources.getString("launcheroptions.java.memory"));
@@ -1561,7 +1327,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         memLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         panel.add(memLabel, new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 60, 0, 0), 0, 0));
 
-        memSelect = new JComboBox();
+        memSelect = new JComboBox<>();
 
         if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("mac")) {
             memSelect.setUI(new MetalComboBoxUI());
@@ -1663,12 +1429,9 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         initComponents();
         initControlValues();
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                invalidate();
-                repaint();
-            }
+        EventQueue.invokeLater(() -> {
+            invalidate();
+            repaint();
         });
     }
 }

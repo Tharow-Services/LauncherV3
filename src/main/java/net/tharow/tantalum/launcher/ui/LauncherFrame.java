@@ -28,6 +28,7 @@ import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.launch.java.source.FileJavaSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.IInstalledPackRepository;
+import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.ui.controls.DraggableFrame;
 import net.tharow.tantalum.ui.controls.RoundedButton;
@@ -61,6 +62,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 public class LauncherFrame extends DraggableFrame implements IRelocalizableResource, IAuthListener {
@@ -139,7 +141,6 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
     private NewsSelector newsSelector;
     private TintablePanel centralPanel;
     private TintablePanel footer;
-    private Boolean LoadNews = false;
     private String currentTabName;
 
     NewsInfoPanel newsInfoPanel;
@@ -184,17 +185,17 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
     /////////////////////////////////////////////////
 
     private boolean TestNews() {
+        AtomicBoolean temp = new AtomicBoolean(false);
         Thread thread = new Thread(() -> {
             try {
-                platformApi.getNews();
-                LoadNews = false;
-            } catch (RestfulAPIException ex) {
-                Utils.getLogger().log(Level.WARNING, "Unable to load news", ex);
-                LoadNews = true;
+                HttpPlatformApi.getNews(true);
+                temp.set(true);
+            } catch (RestfulAPIException e) {
+                Utils.getLogger().log(Level.WARNING, "Unable to load news", e);
             }
         });
         thread.start();
-        return LoadNews;
+        return temp.get();
     }
 
     public void selectTab(String tabName) {
@@ -401,9 +402,8 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         newsTab.setLayout(null);
         newsTab.addActionListener(tabListener);
         newsTab.setActionCommand(TAB_NEWS);
-        if(TestNews()) {
-            header.add(newsTab);
-        }
+        header.add(newsTab);
+        //if(TestNews()) { header.add(newsTab); }
 
         CountCircle newsCircle = new CountCircle();
         newsCircle.setBackground(COLOR_RED);

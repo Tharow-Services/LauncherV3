@@ -35,6 +35,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,6 +55,22 @@ public class Utils {
         // Make sure we're logging everything we want to be logging
         logger.setLevel(Level.ALL);
         logger.config("Doing the Thing");
+    }
+
+    public static Date getDate(String date){
+        return getDateFromPattern("yyyy-MM-dd'T'HH:mm:ssZ",date);
+    }
+
+    public static Date getDateFromPattern(String datePattern, String date){
+        DateFormat dateFormat = new SimpleDateFormat(datePattern);
+        Date result;
+        try {
+            result = dateFormat.parse(date);
+        } catch (ParseException e) {
+            Utils.getLogger().warning("Unable to get date from: " + date + " With Date Pattern: " + datePattern);
+            result = Calendar.getInstance().getTime();
+        }
+        return result;
     }
 
     public static Gson getGson() {

@@ -47,10 +47,20 @@ public class HttpPlatformSearchApi implements IPlatformSearchApi {
         }
     }
 
+    public HttpPlatformSearchApi() {
+        this.rootUrl ="https://api.technicpack.net/";
+        this.isTechnicPlatform = true;
+        try {
+            this.buildnumber = String.valueOf(RestObject.getRestObject(StreamVersion.class, "https://api.technicpack.net/launcher/version/stable4").getBuild());
+        } catch (RestfulAPIException e) {
+            Utils.getLogger().warning("Couldn't Contact Technic Platform For Build Number");
+        }
+    }
+
     @Override
     public SearchResultsData getSearchResults(String searchTerm) throws RestfulAPIException {
         try {
-            String url = rootUrl + "search.php?q=" + URLEncoder.encode(searchTerm.trim(), "UTF-8") + "&build=" + this.buildnumber;
+            String url = rootUrl + "search?q=" + URLEncoder.encode(searchTerm.trim(), "UTF-8") + "&build=" + this.buildnumber;
             return RestObject.getRestObject(SearchResultsData.class, url);
         } catch (UnsupportedEncodingException ex) {
             return new SearchResultsData();

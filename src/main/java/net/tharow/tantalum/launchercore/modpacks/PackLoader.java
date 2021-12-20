@@ -38,6 +38,13 @@ public class PackLoader {
         this.directories = directories;
     }
 
+    public PackLoader(PackLoader packLoader, IAuthoritativePackSource iAuthoritativePackSource){
+        this.packRepository = packLoader.packRepository;
+        this.authoritativeSource = iAuthoritativePackSource;
+        this.directories = packLoader.directories;
+    }
+
+
     public PackLoadJob createRepositoryLoadJob(IModpackContainer container, Collection<IPackSource> packSources, IModpackTagBuilder tagBuilder, boolean doLoadRepository) {
         PackLoadJob job = new PackLoadJob(directories, packRepository, authoritativeSource, packSources, container, tagBuilder, doLoadRepository);
         Thread thread = new Thread(job);

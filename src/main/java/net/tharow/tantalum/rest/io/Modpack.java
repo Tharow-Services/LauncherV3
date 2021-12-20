@@ -19,6 +19,7 @@
 
 package net.tharow.tantalum.rest.io;
 
+import net.tharow.tantalum.localsource.io.LocalPackInfo;
 import net.tharow.tantalum.platform.io.PlatformPackInfo;
 import net.tharow.tantalum.rest.RestObject;
 
@@ -41,6 +42,10 @@ public class Modpack extends RestObject {
         mods = new ArrayList<Mod>();
         Mod mod = new Mod(info.getName(), info.getRecommended(), info.getUrl(), "");
         mods.add(mod);
+    }
+
+    public Modpack(LocalPackInfo localPackInfo) {
+        super();
     }
 
     public String getGameVersion() {

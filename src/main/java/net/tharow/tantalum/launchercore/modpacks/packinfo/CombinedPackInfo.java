@@ -37,10 +37,6 @@ public class CombinedPackInfo implements PackInfo {
         this.platformPackInfo = platformPackInfo;
     }
 
-    @Override
-    public String getAuthoritativePackSource() {
-        return null;
-    }
 
     @Override
     public String getName() {
@@ -72,13 +68,6 @@ public class CombinedPackInfo implements PackInfo {
         return null;
     }
 
-    @Override
-    public String getDiscordId() {
-        if (platformPackInfo != null)
-            return platformPackInfo.getDiscordId();
-
-        return null;
-    }
 
     @Override
     public Resource getIcon() {

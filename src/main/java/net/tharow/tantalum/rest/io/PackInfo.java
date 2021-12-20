@@ -28,7 +28,6 @@ import java.util.List;
 
 public interface PackInfo {
 
-    String getAuthoritativePackSource();
 
     String getName();
 
@@ -69,6 +68,4 @@ public interface PackInfo {
     boolean isOfficial();
 
     boolean hasSolder();
-
-    String getDiscordId();
 }

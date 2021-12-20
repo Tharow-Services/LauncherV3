@@ -22,7 +22,7 @@ package net.tharow.tantalum.platform.io;
 import java.util.Date;
 
 @SuppressWarnings({"unused"})
-public class NewsArticle {
+public class NewsArticle implements INewsArticle{
     private int id;
     private String username;
     private String avatar;
@@ -35,35 +35,64 @@ public class NewsArticle {
 
     }
 
+    public NewsArticle(int id, String username, String avatar, String title, String content, long date, String url) {
+        this.id = id;
+        this.username = username;
+        this.avatar = avatar;
+        this.title = title;
+        this.content = content;
+        this.date = date;
+        this.url = url;
+
+    }
+
+    public NewsArticle(INewsArticle newsArticle){
+        this.id = newsArticle.getId();
+        this.username = newsArticle.getUsername();
+        this.avatar = newsArticle.getAvatar();
+        this.title = newsArticle.getTitle();
+        this.content = newsArticle.getContent();
+        this.date = newsArticle.getDate().getTime();
+        this.url = newsArticle.getUrl();
+    }
+
+    @Override
     public int getId() {
-        return id;
+        return this.id;
     }
 
+    @Override
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
+    @Override
     public String getAvatar() {
-        return avatar;
+        return this.avatar;
     }
 
+    @Override
     public String getTitle() {
-        return title;
+        return this.title;
     }
 
+    @Override
     public String getContent() {
-        return content;
+        return this.content;
     }
 
+    @Override
     public Date getDate() {
-        return new Date(date * 1000);
+        return new Date(this.date * 1000);
     }
 
+    @Override
     public AuthorshipInfo getAuthorshipInfo() {
-        return new AuthorshipInfo(getUsername(), getAvatar(), getDate());
+        return new AuthorshipInfo(this.getUsername(), this.getAvatar(), this.getDate());
     }
 
+    @Override
     public String getUrl() {
-        return url;
+        return this.url;
     }
 }

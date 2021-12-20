@@ -1,0 +1,7 @@
+<root>
+    <item name='javax.swing.JComboBox java.lang.Object getSelectedItem()'>
+        <annotation name='org.jetbrains.annotations.Contract'>
+            <val name="pure" val="true"/>
+        </annotation>
+    </item>
+</root>
