@@ -28,6 +28,7 @@ import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
 import net.tharow.tantalum.launchercore.mirror.download.Download;
 import net.tharow.tantalum.launchercore.util.DownloadListener;
+import net.tharow.tantalum.ui.lang.ResourceLoader;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -43,10 +44,13 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 public class Utils {
     private static final Gson gson;
     private static final Logger logger = Logger.getLogger("net.tharow.tantalum.launcher.Main");
     private static final int DOWNLOAD_RETRIES = 3;
+    @SuppressWarnings("unused")
+    public static volatile Object ignored;
     static {
         GsonBuilder builder = new GsonBuilder();
         builder.setPrettyPrinting();
@@ -56,6 +60,14 @@ public class Utils {
         logger.setLevel(Level.ALL);
         logger.config("Doing the Thing");
     }
+
+    public static void installModpackNow(ResourceLoader resourceLoader, String uri){
+
+
+
+
+    }
+
 
     public static Date getDate(String date){
         return getDateFromPattern("yyyy-MM-dd'T'HH:mm:ssZ",date);

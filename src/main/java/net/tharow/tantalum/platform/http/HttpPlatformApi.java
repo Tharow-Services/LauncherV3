@@ -65,18 +65,13 @@ public class HttpPlatformApi implements IPlatformApi {
     }
 
     public String getPlatformUri(String packSlug) {
-        if(isTechnicPlatform){
             return platformUrl + "modpack/" + packSlug + "?build="+ buildnumber;
-        }else {
-            Utils.getLogger().warning("Trying to get Modpack with Slug of: " + platformUrl + "modpack.php?slug=" + packSlug);
-            return platformUrl + "modpack.php?slug=" + packSlug;
 
-        }
     }
 
     @Override
     public IPlatformInfo getPlatformInfo() throws RestfulAPIException {
-        return RestObject.getRestObject(PlatformInfo.class, platformUrl);
+        return RestObject.getRestObject(PlatformInfo.class, platformUrl + "/ping");
     }
 
     @Override
@@ -92,15 +87,13 @@ public class HttpPlatformApi implements IPlatformApi {
 
     @Override
     public void incrementPackRuns(String packSlug) {
-        if(isTechnicPlatform){return;} //
-        String url = platformUrl + "modpack.php?slug=" + packSlug + "&stat=run";
+        String url = platformUrl + "modpack/" + packSlug + "/runs?build="+buildnumber;
         Utils.pingHttpURL(url);
     }
 
     @Override
     public void incrementPackInstalls(String packSlug) {
-        if(isTechnicPlatform){return;}
-        String url = platformUrl + "modpack.php?slug=" + packSlug + "&stat=install";
+        String url = platformUrl + "modpack/" + packSlug + "/install?build=" + buildnumber;
         Utils.pingHttpURL(url);
     }
 

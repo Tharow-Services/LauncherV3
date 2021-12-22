@@ -56,6 +56,7 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -714,14 +715,10 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
 
     private void newAuthlibLogin(String name, String srvUrl) {
         try {
-            if(srvUrl.startsWith("http://"))
-                showMessageDialog(this, "Authlib Requires Https\n Press Ok to try with Https", "SSL", ERROR_MESSAGE);
-                srvUrl = srvUrl.replace("http://","https://");
-            if(!srvUrl.startsWith("https://")){srvUrl = "https://" + srvUrl;}
-            if(!srvUrl.endsWith("/"))
-                srvUrl = srvUrl +"/";
+            URL url = Utils.getFullUrl(srvUrl);
+
             AuthlibUser newUser;
-            IAuthlibServerInfo serverInfo = AuthlibServer.getAuthlibServerInfo(Utils.getFullUrl(srvUrl).toString());
+            IAuthlibServerInfo serverInfo = AuthlibServer.getAuthlibServerInfo(url.toString());
             newUser = userModel.getAuthlibAuthenticator().loginNewUser(name, new String(this.password2.getPassword()), serverInfo);
             userModel.addUser(newUser);
             userModel.setCurrentUser(newUser);

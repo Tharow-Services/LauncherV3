@@ -81,7 +81,7 @@
         </repository>
 
         <!--<repository>
-            <id>springpugins</id>
+            <id>springiness</id>
             <name>Spring Plugins</name>
             <url>https://repo.spring.io/plugins-release/</url>
         </repository>-->
@@ -200,18 +200,12 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.12</version>
+            <version>1.2.17</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
+            <version>22.0.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

@@ -37,15 +37,15 @@ import java.util.*;
 import java.util.logging.Level;
 
 public class ResourceLoader {
-    private Collection<IRelocalizableResource> resources = new LinkedList<IRelocalizableResource>();
+    private final Collection<IRelocalizableResource> resources = new LinkedList<IRelocalizableResource>();
     private ResourceBundle stringData;
     private Locale currentLocale;
     private String dottedResourcePath;
     private String slashResourcePath;
     private boolean isDefaultLocaleSupported = true;
-    private Locale defaultLocale;
+    private final Locale defaultLocale;
     private File launcherAssets;
-    private Locale[] locales = { Locale.ENGLISH };
+    private Locale[] locales = {Locale.ENGLISH};
 
     public static final String DEFAULT_LOCALE = "default";
 
@@ -87,7 +87,7 @@ public class ResourceLoader {
 
         if (font == null)
             return fallbackFont;
-        
+
         return font;
     }
 
@@ -107,7 +107,7 @@ public class ResourceLoader {
         Locale defaultLocale = Locale.getDefault();
         this.defaultLocale = matchClosestSupportedLocale(defaultLocale);
 
-        if(!this.defaultLocale.getLanguage().equals(defaultLocale.getLanguage()))
+        if (!this.defaultLocale.getLanguage().equals(defaultLocale.getLanguage()))
             isDefaultLocaleSupported = false;
     }
 
@@ -167,7 +167,7 @@ public class ResourceLoader {
         } else if (locale.getCountry().isEmpty()) {
             return locale.getLanguage();
         } else if (locale.getVariant().isEmpty()) {
-            return String.format("%s,%s",locale.getLanguage(),locale.getCountry());
+            return String.format("%s,%s", locale.getLanguage(), locale.getCountry());
         } else {
             return String.format("%s,%s,%s", locale.getLanguage(), locale.getCountry(), locale.getVariant());
         }
@@ -195,7 +195,7 @@ public class ResourceLoader {
             variant = results[2];
         }
 
-        Locale definiteLocale = new Locale(language,country,variant);
+        Locale definiteLocale = new Locale(language, country, variant);
 
         return matchClosestSupportedLocale(definiteLocale);
     }
@@ -233,7 +233,7 @@ public class ResourceLoader {
     }
 
     public boolean hasResource(String name) {
-        return (ResourceLoader.class.getResource(getResourcePath("/"+name)) != null);
+        return (ResourceLoader.class.getResource(getResourcePath("/" + name)) != null);
     }
 
     public ImageIcon getIcon(String iconName) {
@@ -275,13 +275,13 @@ public class ResourceLoader {
     public BufferedImage getCircleClippedImage(BufferedImage contentImage) {
         // copy the picture to an image with transparency capabilities
         BufferedImage outputImage = new BufferedImage(contentImage.getWidth(), contentImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = (Graphics2D)outputImage.getGraphics();
+        Graphics2D g2 = (Graphics2D) outputImage.getGraphics();
         g2.drawImage(contentImage, 0, 0, null);
 
         // Create the area around the circle to cut out
         Area cutOutArea = new Area(new Rectangle(0, 0, outputImage.getWidth(), outputImage.getHeight()));
 
-        int diameter = (outputImage.getWidth() < outputImage.getHeight())?outputImage.getWidth():outputImage.getHeight();
+        int diameter = (outputImage.getWidth() < outputImage.getHeight()) ? outputImage.getWidth() : outputImage.getHeight();
         cutOutArea.subtract(new Area(new Ellipse2D.Float((outputImage.getWidth() - diameter) / 2, (outputImage.getHeight() - diameter) / 2, diameter, diameter)));
 
         // Set the fill color to an opaque color
@@ -300,7 +300,7 @@ public class ResourceLoader {
     }
 
     public Font getFont(String name, float size) {
-        return getFont(name,size,0);
+        return getFont(name, size, 0);
     }
 
     public Font getFont(String name, float size, int style) {
@@ -308,11 +308,11 @@ public class ResourceLoader {
     }
 
     private void relocalizeResources() {
-        for(IRelocalizableResource resource : resources) {
+        for (IRelocalizableResource resource : resources) {
             resource.relocalize(this);
         }
     }
-      
+
     private String getBundlePath(String bundle) {
         return dottedResourcePath + bundle;
     }
@@ -327,7 +327,6 @@ public class ResourceLoader {
     }
 
     public void unregisterResource(IRelocalizableResource resource) {
-        if (resources.contains(resource))
-            resources.remove(resource);
+        resources.remove(resource);
     }
 }

@@ -58,11 +58,9 @@ import net.tharow.tantalum.utilslib.Memory;
 import net.tharow.tantalum.utilslib.OperatingSystem;
 import net.tharow.tantalum.utilslib.Utils;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
@@ -75,7 +73,7 @@ public class Installer {
     protected final PackResourceMapper packIconMapper;
     protected final StartupParameters startupParameters;
     protected final LauncherDirectories directories;
-    protected Object cancelLock = new Object();
+    protected final Object cancelLock = new Object();
     protected boolean isCancelledByUser = false;
 
     private Thread runningThread;
@@ -107,135 +105,120 @@ public class Installer {
     }
 
     protected void internalInstallAndRun(final ResourceLoader resources, final ModpackModel pack, final String build, final boolean doFullInstall, final LauncherFrame frame, final DownloadListener listener, final boolean doLaunch) {
-        runningThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boolean everythingWorked = false;
+        runningThread = new Thread(() -> {
+            boolean everythingWorked = false;
 
-                try {
-                    MojangVersion version = null;
+            try {
+                MojangVersion version;
 
-                    InstallTasksQueue<MojangVersion> tasksQueue = new InstallTasksQueue<MojangVersion>(listener);
-                    MojangVersionBuilder versionBuilder = createVersionBuilder(pack, tasksQueue);
+                InstallTasksQueue<MojangVersion> tasksQueue = new InstallTasksQueue<>(listener);
+                MojangVersionBuilder versionBuilder = createVersionBuilder(pack, tasksQueue);
 
-                    if (!pack.isLocalOnly() && build != null && !build.isEmpty()) {
-                        buildTasksQueue(tasksQueue, resources, pack, build, doFullInstall, versionBuilder);
+                if (!pack.isLocalOnly() && build != null && !build.isEmpty()) {
+                    buildTasksQueue(tasksQueue, resources, pack, build, doFullInstall, versionBuilder);
 
-                        version = installer.installPack(tasksQueue, pack, build);
-                    } else {
-                        version = versionBuilder.buildVersionFromKey(null);
+                    version = installer.installPack(tasksQueue, pack, build);
+                } else {
+                    version = versionBuilder.buildVersionFromKey(null);
 
-                        if (version != null)
-                            pack.initDirectories();
+                    if (version != null)
+                        pack.initDirectories();
+                }
+
+                if (doLaunch) {
+                    if (version == null) {
+                        throw new PackNotAvailableOfflineException(pack.getDisplayName());
                     }
 
-                    if (doLaunch) {
-                        if (version == null) {
-                            throw new PackNotAvailableOfflineException(pack.getDisplayName());
-                        }
+                    boolean usingMojangJava = version.getJavaVersion() != null && settings.shouldUseMojangJava();
 
-                        boolean usingMojangJava = version.getJavaVersion() != null && settings.shouldUseMojangJava();
+                    JavaVersionRepository javaVersions = launcher.getJavaVersions();
+                    Memory memoryObj = Memory.getClosestAvailableMemory(Memory.getMemoryFromId(settings.getMemory()), javaVersions.getSelectedVersion().is64Bit());
+                    long memory = memoryObj.getMemoryMB();
+                    String versionNumber = javaVersions.getSelectedVersion().getVersionNumber();
+                    RunData data = pack.getRunData();
 
-                        JavaVersionRepository javaVersions = launcher.getJavaVersions();
-                        Memory memoryObj = Memory.getClosestAvailableMemory(Memory.getMemoryFromId(settings.getMemory()), javaVersions.getSelectedVersion().is64Bit());
-                        long memory = memoryObj.getMemoryMB();
-                        String versionNumber = javaVersions.getSelectedVersion().getVersionNumber();
-                        RunData data = pack.getRunData();
+                    if (data != null && !data.isRunDataValid(memory, versionNumber, usingMojangJava)) {
+                        FixRunDataDialog dialog = new FixRunDataDialog(frame, resources, data, javaVersions, memoryObj, !settings.shouldAutoAcceptModpackRequirements(), usingMojangJava);
+                        dialog.setVisible(true);
+                        if (dialog.getResult() == FixRunDataDialog.Result.ACCEPT) {
+                            memoryObj = dialog.getRecommendedMemory();
+                            memory = memoryObj.getMemoryMB();
+                            IJavaVersion recommendedJavaVersion = dialog.getRecommendedJavaVersion();
+                            javaVersions.selectVersion(recommendedJavaVersion.getVersionNumber(), recommendedJavaVersion.is64Bit());
 
-                        if (data != null && !data.isRunDataValid(memory, versionNumber, usingMojangJava)) {
-                            FixRunDataDialog dialog = new FixRunDataDialog(frame, resources, data, javaVersions, memoryObj, !settings.shouldAutoAcceptModpackRequirements(), usingMojangJava);
-                            dialog.setVisible(true);
-                            if (dialog.getResult() == FixRunDataDialog.Result.ACCEPT) {
-                                memoryObj = dialog.getRecommendedMemory();
-                                memory = memoryObj.getMemoryMB();
-                                IJavaVersion recommendedJavaVersion = dialog.getRecommendedJavaVersion();
-                                javaVersions.selectVersion(recommendedJavaVersion.getVersionNumber(), recommendedJavaVersion.is64Bit());
-
-                                if (dialog.shouldRemember()) {
-                                    settings.setAutoAcceptModpackRequirements(true);
-                                }
-                            } else
-                                return;
-                        }
-
-                        if (!usingMojangJava && RunData.isJavaVersionAtLeast(versionNumber, "1.9")) {
-                            int result = JOptionPane.showConfirmDialog(frame, resources.getString("launcher.jverwarning", versionNumber), resources.getString("launcher.jverwarning.title"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                            if (result != JOptionPane.YES_OPTION)
-                                return;
-                        }
-
-                        LaunchAction launchAction = settings.getLaunchAction();
-
-                        if (launchAction == null || launchAction == LaunchAction.HIDE) {
-                            launcherUnhider = new LauncherUnhider(settings, frame);
-                        } else
-                            launcherUnhider = null;
-
-                        LaunchOptions options = new LaunchOptions(pack.getDisplayName(), packIconMapper.getImageLocation(pack).getAbsolutePath(), settings);
-                        launcher.launch(pack, memory, options, launcherUnhider, version);
-
-                        if (launchAction == null || launchAction == LaunchAction.HIDE) {
-                            frame.setVisible(false);
-                        } else if (launchAction == LaunchAction.NOTHING) {
-                            EventQueue.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    frame.launchCompleted();
-                                }
-                            });
-                        } else if (launchAction == LaunchAction.CLOSE) {
-                            System.exit(0);
-                        }
-                    }
-
-                    everythingWorked = true;
-                } catch (InterruptedException e) {
-                    boolean cancelledByUser = false;
-                    synchronized (cancelLock) {
-                        if (isCancelledByUser) {
-                            cancelledByUser = true;
-                            isCancelledByUser = false;
-                        }
-                    }
-
-                    //Canceled by user
-                    if (!cancelledByUser) {
-                        if (e.getCause() != null)
-                            Utils.getLogger().info("Cancelled by exception.");
-                        else
-                            Utils.getLogger().info("Cancelled by code.");
-                        e.printStackTrace();
-                    } else
-                        Utils.getLogger().info("Cancelled by user.");
-                } catch (PackNotAvailableOfflineException e) {
-                    JOptionPane.showMessageDialog(frame, e.getMessage(), resources.getString("launcher.installerror.unavailable"), JOptionPane.WARNING_MESSAGE);
-                } catch (DownloadException e) {
-                    JOptionPane.showMessageDialog(frame, resources.getString("launcher.installerror.download", pack.getDisplayName(), e.getMessage()), resources.getString("launcher.installerror.title"), JOptionPane.WARNING_MESSAGE);
-                } catch (ZipException e) {
-                    JOptionPane.showMessageDialog(frame, resources.getString("launcher.installerror.unzip", pack.getDisplayName(), e.getMessage()), resources.getString("launcher.installerror.title"), JOptionPane.WARNING_MESSAGE);
-                } catch (CacheDeleteException e) {
-                    JOptionPane.showMessageDialog(frame, resources.getString("launcher.installerror.cache", pack.getDisplayName(), e.getMessage()), resources.getString("launcher.installerror.title"), JOptionPane.WARNING_MESSAGE);
-                } catch (BuildInaccessibleException e) {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, e.getMessage(), resources.getString("launcher.installerror.title"), JOptionPane.WARNING_MESSAGE);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    if (!everythingWorked || !doLaunch) {
-                        EventQueue.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                frame.launchCompleted();
+                            if (dialog.shouldRemember()) {
+                                settings.setAutoAcceptModpackRequirements(true);
                             }
-                        });
+                        } else
+                            return;
                     }
+
+                    if (!usingMojangJava && RunData.isJavaVersionAtLeast(versionNumber, "1.9")) {
+                        int result = JOptionPane.showConfirmDialog(frame, resources.getString("launcher.jverwarning", versionNumber), resources.getString("launcher.jverwarning.title"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                        if (result != JOptionPane.YES_OPTION)
+                            return;
+                    }
+
+                    LaunchAction launchAction = settings.getLaunchAction();
+
+                    if (launchAction == null || launchAction == LaunchAction.HIDE) {
+                        launcherUnhider = new LauncherUnhider(settings, frame);
+                    } else
+                        launcherUnhider = null;
+
+                    LaunchOptions options = new LaunchOptions(pack.getDisplayName(), packIconMapper.getImageLocation(pack).getAbsolutePath(), settings);
+                    launcher.launch(pack, memory, options, launcherUnhider, version);
+
+                    if (launchAction == null || launchAction == LaunchAction.HIDE) {
+                        frame.setVisible(false);
+                    } else if (launchAction == LaunchAction.NOTHING) {
+                        EventQueue.invokeLater(frame::launchCompleted);
+                    } else if (launchAction == LaunchAction.CLOSE) {
+                        System.exit(0);
+                    }
+                }
+
+                everythingWorked = true;
+            } catch (InterruptedException e) {
+                boolean cancelledByUser = false;
+                synchronized (cancelLock) {
+                    if (isCancelledByUser) {
+                        cancelledByUser = true;
+                        isCancelledByUser = false;
+                    }
+                }
+
+                //Canceled by user
+                if (!cancelledByUser) {
+                    if (e.getCause() != null)
+                        Utils.getLogger().info("Cancelled by exception.");
+                    else
+                        Utils.getLogger().info("Cancelled by code.");
+                    e.printStackTrace();
+                } else
+                    Utils.getLogger().info("Cancelled by user.");
+            } catch (PackNotAvailableOfflineException e) {
+                JOptionPane.showMessageDialog(frame, e.getMessage(), resources.getString("launcher.installerror.unavailable"), JOptionPane.WARNING_MESSAGE);
+            } catch (DownloadException e) {
+                JOptionPane.showMessageDialog(frame, resources.getString("launcher.installerror.download", pack.getDisplayName(), e.getMessage()), resources.getString("launcher.installerror.title"), JOptionPane.WARNING_MESSAGE);
+            } catch (ZipException e) {
+                JOptionPane.showMessageDialog(frame, resources.getString("launcher.installerror.unzip", pack.getDisplayName(), e.getMessage()), resources.getString("launcher.installerror.title"), JOptionPane.WARNING_MESSAGE);
+            } catch (CacheDeleteException e) {
+                JOptionPane.showMessageDialog(frame, resources.getString("launcher.installerror.cache", pack.getDisplayName(), e.getMessage()), resources.getString("launcher.installerror.title"), JOptionPane.WARNING_MESSAGE);
+            } catch (BuildInaccessibleException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(frame, e.getMessage(), resources.getString("launcher.installerror.title"), JOptionPane.WARNING_MESSAGE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (!everythingWorked || !doLaunch) {
+                    EventQueue.invokeLater(frame::launchCompleted);
                 }
             }
         }) {
             ///Interrupt is being called from a mysterious source, so unless this is a user-initiated cancel
-            ///Let's print the stack trace of the interruptor.
+            ///Let's print the stack trace of the interrupter.
             @Override
             public void interrupt() {
                 boolean userCancelled = false;
@@ -262,12 +245,10 @@ public class Installer {
     public boolean isCurrentlyRunning() {
         if (runningThread != null && runningThread.isAlive())
             return true;
-        if (launcherUnhider != null && !launcherUnhider.hasExited())
-            return true;
-        return false;
+        return launcherUnhider != null && !launcherUnhider.hasExited();
     }
 
-    public void buildTasksQueue(InstallTasksQueue queue, ResourceLoader resources, ModpackModel modpack, String build, boolean doFullInstall, MojangVersionBuilder versionBuilder) throws CacheDeleteException, BuildInaccessibleException {
+    public void buildTasksQueue(InstallTasksQueue<? extends MojangVersion> queue, ResourceLoader resources, ModpackModel modpack, String build, boolean doFullInstall, MojangVersionBuilder versionBuilder) throws CacheDeleteException, BuildInaccessibleException {
         PackInfo packInfo = modpack.getPackInfo();
         Modpack modpackData = packInfo.getModpack(build);
 
@@ -321,34 +302,24 @@ public class Installer {
         HashMap<String, String> fmlLibs = new HashMap<>();
 
         switch (minecraft) {
-            case "1.4":
-            case "1.4.1":
-            case "1.4.2":
-            case "1.4.3":
-            case "1.4.4":
-            case "1.4.5":
-            case "1.4.6":
-            case "1.4.7":
-                fmlLibsZip = "fml_libs.zip";
-                break;
-            case "1.5":
+            case "1.4", "1.4.1", "1.4.2", "1.4.3", "1.4.4", "1.4.5", "1.4.6", "1.4.7" -> fmlLibsZip = "fml_libs.zip";
+            case "1.5" -> {
                 fmlLibsZip = "fml_libs15.zip";
                 fmlLibs.put("deobfuscation_data_1.5.zip", "dba6d410a91a855f3b84457c86a8132a");
-                break;
-            case "1.5.1":
+            }
+            case "1.5.1" -> {
                 fmlLibsZip = "fml_libs15.zip";
                 fmlLibs.put("deobfuscation_data_1.5.1.zip", "c4fc2fedba60d920e4c7f9a095b2b883");
-                break;
-            case "1.5.2":
+            }
+            case "1.5.2" -> {
                 fmlLibsZip = "fml_libs15.zip";
                 fmlLibs.put("deobfuscation_data_1.5.2.zip", "270d9775872cc9fa773389812cab91fe");
-                break;
-            default:
-                fmlLibsZip = "";
+            }
+            default -> fmlLibsZip = "";
         }
 
         if (!fmlLibsZip.isEmpty()) {
-            verifyingFiles.addTask(new EnsureFileTask(new File(directories.getCacheDirectory(), fmlLibsZip), new ValidZipFileVerifier(), modpackFmlLibDir, TantalumConstants.technicFmlLibRepo + fmlLibsZip, installingLibs, installingLibs));
+            verifyingFiles.addTask(new EnsureFileTask<>(new File(directories.getCacheDirectory(), fmlLibsZip), new ValidZipFileVerifier(), modpackFmlLibDir, TantalumConstants.technicFmlLibRepo + fmlLibsZip, installingLibs, installingLibs));
         }
 
         if (!fmlLibs.isEmpty()) {
@@ -362,7 +333,7 @@ public class Installer {
                 File target = new File(modpackFmlLibDir, name);
 
                 if (!target.exists() || (verifier != null && !verifier.isFileValid(target)) ) {
-                    verifyingFiles.addTask(new EnsureFileTask(cached, verifier, null, TantalumConstants.technicFmlLibRepo + name, installingLibs, installingLibs));
+                    verifyingFiles.addTask(new EnsureFileTask<>(cached, verifier, null, TantalumConstants.technicFmlLibRepo + name, installingLibs, installingLibs));
                     installingLibs.addTask(new CopyFileTask(cached, target));
                 }
             });
@@ -426,12 +397,12 @@ public class Installer {
             installingMinecraft.addTask(new InstallMinecraftIfNecessaryTask(modpack, minecraft, directories.getCacheDirectory()));
     }
 
-    private MojangVersionBuilder createVersionBuilder(ModpackModel modpack, InstallTasksQueue tasksQueue) {
+    private MojangVersionBuilder createVersionBuilder(ModpackModel modpack, InstallTasksQueue<? extends MojangVersion> tasksQueue) {
 
         ZipFileRetriever zipVersionRetriever = new ZipFileRetriever(new File(modpack.getBinDir(), "modpack.jar"));
         HttpFileRetriever fallbackVersionRetriever = new HttpFileRetriever(TantalumConstants.technicVersions, tasksQueue.getDownloadListener());
 
-        ArrayList<MojangVersionRetriever> fallbackRetrievers = new ArrayList<MojangVersionRetriever>(1);
+        ArrayList<MojangVersionRetriever> fallbackRetrievers = new ArrayList<>(1);
         fallbackRetrievers.add(fallbackVersionRetriever);
 
         File versionJson = new File(modpack.getBinDir(), "version.json");

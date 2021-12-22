@@ -23,8 +23,6 @@ import com.msopentech.thali.java.toronionproxy.JavaOnionProxyContext;
 import com.msopentech.thali.java.toronionproxy.JavaTorInstaller;
 import com.msopentech.thali.toronionproxy.*;
 import net.tharow.tantalum.authlib.AuthlibAuthenticator;
-import net.tharow.tantalum.authlib.AuthlibServer;
-import net.tharow.tantalum.authlib.IAuthlibServerInfo;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.autoupdate.Relauncher;
 import net.tharow.tantalum.autoupdate.http.HttpUpdateStream;
@@ -50,13 +48,13 @@ import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
 import net.tharow.tantalum.launchercore.image.face.MinotarFaceImageStore;
 import net.tharow.tantalum.launchercore.image.face.WebAvatarImageStore;
-import net.tharow.tantalum.launchercore.install.LauncherDirectories;
-import net.tharow.tantalum.launchercore.install.ModpackInstaller;
+import net.tharow.tantalum.launchercore.install.*;
 import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.launch.java.source.FileJavaSource;
 import net.tharow.tantalum.launchercore.launch.java.source.InstalledJavaSource;
 import net.tharow.tantalum.launchercore.logging.BuildLogFormatter;
 import net.tharow.tantalum.launchercore.logging.RotatingFileHandler;
+import net.tharow.tantalum.launchercore.modpacks.InstalledPack;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.launchercore.modpacks.PackLoader;
 import net.tharow.tantalum.launchercore.modpacks.resources.PackImageStore;
@@ -67,6 +65,7 @@ import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.IconReso
 import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.LogoResourceType;
 import net.tharow.tantalum.launchercore.modpacks.sources.IAuthoritativePackSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.IInstalledPackRepository;
+import net.tharow.tantalum.launchercore.util.DownloadListener;
 import net.tharow.tantalum.minecraftcore.launch.MinecraftLauncher;
 import net.tharow.tantalum.minecraftcore.microsoft.auth.MicrosoftAuthenticator;
 import net.tharow.tantalum.minecraftcore.mojang.auth.MojangAuthenticator;
@@ -88,6 +87,7 @@ import net.tharow.tantalum.ui.components.Console;
 import net.tharow.tantalum.ui.components.ConsoleFrame;
 import net.tharow.tantalum.ui.components.ConsoleHandler;
 import net.tharow.tantalum.ui.components.LoggerOutputStream;
+import net.tharow.tantalum.ui.controls.installation.ProgressBar;
 import net.tharow.tantalum.ui.controls.installation.SplashScreen;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.utilslib.JavaUtils;
@@ -95,6 +95,7 @@ import net.tharow.tantalum.utilslib.OperatingSystem;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
+import org.xhtmlrenderer.event.DocumentListener;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -215,14 +216,14 @@ public class LauncherMain {
         if(params.getPlatformUrl() != null){platformUrl = params.getPlatformUrl();}
         else if(settings.getPlatformURL().toLowerCase(Locale.ROOT).contains("technicpack.net")){
             platformUrl = "https://api.technicpack.net/";
-        } else {platformUrl = settings.getPlatformURL() + "platform/";}
+        } else {platformUrl = settings.getPlatformURL();}
         //runProxySetup(settings);
 
         runStartupDebug(settings, params);
         //injectNewRootCerts();
         injectNewRootCerts(settings.getForceOverrideRootCerts() || params.isOverrideRoots());
         //startLauncher(settings, params, directories, resources);
-        Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream("https://tantalum-auth.azurewebsites.net/platform/"), settings.getBuildStream()+"4", build, directories, resources, params);
+        Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream(platformUrl), settings.getBuildStream()+"4", build, directories, resources, params);
         try {
             if (launcher.runAutoUpdater())
                 startLauncher(settings, params, directories, resources);
@@ -304,19 +305,7 @@ public class LauncherMain {
         System.out.println("Setting up logging");
         final Logger logger = Utils.getLogger();
         File logDirectory = new File(directories.getLauncherDirectory(), "logs");
-        if (!logDirectory.exists()) {
-            try{
-                if(logDirectory.mkdir()){
-                    System.out.println("Logging dir made");
-                } else {
-                    System.out.println("Logging dir Couldn't be made");
-                }
-
-            } catch (SecurityException e){
-                throw new SecurityException("Security manager is Active and prevented log dir from being made" + e);
-            }
-
-        }
+        if (!logDirectory.exists()) {Utils.ignored=logDirectory.mkdir();}
         File logs = new File(logDirectory, "tantalumLauncher_%D.log");
         RotatingFileHandler fileHandler = new RotatingFileHandler(logs.getPath());
 
@@ -350,7 +339,6 @@ public class LauncherMain {
         //Try and Get default Platform and Solder Info//
         String platformUri = settings.getPlatformURL();
         String solderUri = settings.getSolderURL();
-        String authlibUri = "https://tantalum-auth.azurewebsites.net/";
         if(parameters.getSolderUrl() != null) {
             solderUri = parameters.getSolderUrl();
         }
@@ -365,7 +353,6 @@ public class LauncherMain {
 
         IPlatformInfo platformInfo= null;
         ISolderInfo solderInfo=null;
-        IAuthlibServerInfo serverInfo=null;
         try {
             platformInfo = new HttpPlatformApi(platformUri).getPlatformInfo();
             solderInfo = new HttpSolderApi(UUID.randomUUID().toString()).getSolderInfo(solderUri);
@@ -379,7 +366,13 @@ public class LauncherMain {
         Utils.getLogger().info("Identified as "+ OperatingSystem.getOperatingSystem().getName());
         Utils.getLogger().info("Java: " + System.getProperty("java.version") + " " + JavaUtils.getJavaBitness() + "-bit (" + System.getProperty("os.arch") + ")");
         Utils.getLogger().info("Launcher Build: " + TantalumConstants.getBuildNumber().getBuildNumber());
-        Utils.getLogger().info("Tor Status: N/a");
+        Utils.getLogger().log(Level.SEVERE,"This is Severe Level");
+        Utils.getLogger().log(Level.WARNING,"This is Warning Level");
+        Utils.getLogger().log(Level.INFO, "This is info Level");
+        Utils.getLogger().log(Level.CONFIG, "This is Config Level");
+        Utils.getLogger().log(Level.FINE, "This is Fine Level");
+        Utils.getLogger().log(Level.FINER, "This is Finer Level");
+        Utils.getLogger().log(Level.FINEST, "This is Finest Level");
         Utils.getLogger().info("Platform Uri: " + platformUri);
         Utils.getLogger().info("Platform Solder Uri: " + solderUri);
         if (platformInfo != null)
@@ -388,9 +381,7 @@ public class LauncherMain {
         if (solderInfo != null)
             Utils.getLogger().info("Platform Solder Api: " + solderInfo.getApi() + " Version: " + solderInfo.getVersion() + " Stream: " + solderInfo.getStream());
         else {Utils.getLogger().warning("Platform Solder: Error Platform Solder Couldn't Be Contacted");}
-        if (serverInfo != null)
-            Utils.getLogger().info(serverInfo.toReadable());
-        else {Utils.getLogger().warning("Platform Auth Server: Error Platform Auth Server Couldn't Be Contacted");}
+        Utils.getLogger().warning("Platform Auth Server: Error Platform Auth Server Couldn't Be Contacted");
 
         final String[] domains = {"tantalum.tharow.net","tantalum-auth.azurewebsites.net","minecraft.net", "session.minecraft.net", "textures.minecraft.net", "libraries.minecraft.net", "authserver.mojang.com", "account.mojang.com", "technicpack.net", "launcher.technicpack.net", "api.technicpack.net", "mirror.technicpack.net", "solder.technicpack.net", "files.minecraftforge.net"};
         for (String domain : domains) {
@@ -489,7 +480,7 @@ public class LauncherMain {
         UIManager.put( "ComboBox.disabledForeground", LauncherFrame.COLOR_GREY_TEXT );
         System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
 
-        runProxySetup(settings, directories.getTorRelayDirectory()); //Check and run proxy and custom dns settings
+       // runProxySetup(settings, directories.getTorRelayDirectory()); //Check and run proxy and custom dns settings
 
         //Remove all log files older than a week
         new Thread(() -> {
@@ -557,10 +548,11 @@ public class LauncherMain {
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
         PackLoader packList = new PackLoader(directories, packStore, packInfoRepository);
+
         String solderUrl;
         if(startupParameters.getSolderUrl() != null){solderUrl = startupParameters.getSolderUrl();}
         else{solderUrl = settings.getSolderURL();}
-        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(solderUrl, solder), solder, platform, platformSearch, iconRepo);
+        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(solderUrl, solder), solder, platform, platformSearch, iconRepo, settings);
         selector.setBorder(BorderFactory.createEmptyBorder());
         userModel.addAuthListener(selector);
 
@@ -574,6 +566,10 @@ public class LauncherMain {
         Installer installer = new Installer(startupParameters, directories, modpackInstaller, launcher, settings, iconMapper);
 
         final LauncherFrame frame = new LauncherFrame(resources, skinRepo, userModel, settings, selector, iconRepo, logoRepo, backgroundRepo, installer, avatarRepo, platform, directories, packStore, startupParameters, discoverInfoPanel, javaVersions, javaVersionFile, buildNumber);
+
+        //final LauncherFrame frame2 = new LauncherFrame(resources, skinRepo, userModel, settings, selector, iconRepo, logoRepo, backgroundRepo, installer, avatarRepo, platform, directories, packStore, startupParameters, discoverInfoPanel, javaVersions, javaVersionFile, buildNumber);
+
+
         userModel.addAuthListener(frame);
 
         ActionListener listener = e -> {

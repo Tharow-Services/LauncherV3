@@ -28,14 +28,12 @@ import java.awt.*;
 
 public class LanguageCellRenderer  extends JLabel implements ListCellRenderer {
 
-    private ResourceLoader resources;
     private ImageIcon globe;
 
-    private Color background;
-    private Color foreground;
+    private final Color background;
+    private final Color foreground;
 
     public LanguageCellRenderer(ResourceLoader resourceLoader, String langIcon, Color background, Color foreground) {
-        resources = resourceLoader;
 
         if (langIcon != null)
             globe = resourceLoader.getIcon(langIcon);
@@ -44,7 +42,7 @@ public class LanguageCellRenderer  extends JLabel implements ListCellRenderer {
 
         setForeground(foreground);
         setBackground(background);
-        setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
+        setFont(resourceLoader.getFont(ResourceLoader.FONT_OPENSANS, 14));
         setOpaque(true);
     }
 

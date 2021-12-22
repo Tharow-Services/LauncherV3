@@ -18,9 +18,13 @@
 
 package net.tharow.tantalum.launcher.ui.components.modpacks;
 
+import net.tharow.tantalum.launcher.settings.TantalumSettings;
+import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.launcher.ui.controls.modpacks.FindMoreWidget;
+import net.tharow.tantalum.launcher.ui.controls.modpacks.ModpackWidget;
 import net.tharow.tantalum.launchercore.auth.IAuthListener;
 import net.tharow.tantalum.launchercore.auth.IUserType;
+import net.tharow.tantalum.launchercore.image.ImageRepository;
 import net.tharow.tantalum.launchercore.modpacks.*;
 import net.tharow.tantalum.launchercore.modpacks.packinfo.CombinedPackInfo;
 import net.tharow.tantalum.launchercore.modpacks.sources.IAuthoritativePackSource;
@@ -38,81 +42,92 @@ import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.rest.io.PackInfo;
 import net.tharow.tantalum.solder.ISolderApi;
 import net.tharow.tantalum.solder.ISolderPackApi;
-import net.tharow.tantalum.solder.http.HttpSolderApi;
 import net.tharow.tantalum.ui.controls.TintablePanel;
 import net.tharow.tantalum.ui.controls.WatermarkTextField;
 import net.tharow.tantalum.ui.controls.borders.RoundBorder;
+import net.tharow.tantalum.ui.controls.list.SimpleScrollbarUI;
 import net.tharow.tantalum.ui.lang.IRelocalizableResource;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
-import net.tharow.tantalum.launcher.ui.LauncherFrame;
-import net.tharow.tantalum.ui.controls.list.SimpleScrollbarUI;
-import net.tharow.tantalum.launcher.ui.controls.modpacks.ModpackWidget;
-import net.tharow.tantalum.launchercore.image.ImageRepository;
 import net.tharow.tantalum.utilslib.DesktopUtils;
+import net.tharow.tantalum.ui.controls.SimpleDocumentListener;
 import net.tharow.tantalum.utilslib.Utils;
-import org.jboss.logging.Logger;
 
 import javax.swing.*;
-import javax.swing.Timer;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.*;
-import java.util.logging.Level;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ModpackSelector extends TintablePanel implements IModpackContainer, IAuthListener, IRelocalizableResource {
     private ResourceLoader resources;
-    private PackLoader packLoader;
-    private IPackSource technicSolder;
-    private ImageRepository<ModpackModel> iconRepo;
+    private final PackLoader packLoader;
+    private final IPackSource technicSolder;
+    private final ImageRepository<ModpackModel> iconRepo;
     private final IPlatformApi platformApi;
     private final IPlatformSearchApi platformSearchApi;
     private final ISolderApi solderApi;
 
     private JPanel widgetList;
-    private JScrollPane scrollPane;
     private ModpackInfoPanel modpackInfoPanel;
     private LauncherFrame launcherFrame;
-    private JComboBox<String> source;
     private JTextField filterContents;
-    private FindMoreWidget findMoreWidget;
+    private final FindMoreWidget findMoreWidget;
 
-    private MemoryModpackContainer defaultPacks = new MemoryModpackContainer();
-    private Map<String, ModpackWidget> allModpacks = new HashMap<String, ModpackWidget>();
+    private final MemoryModpackContainer defaultPacks = new MemoryModpackContainer();
+    private final Map<String, ModpackWidget> allModpacks = new HashMap<>();
     private ModpackWidget selectedWidget;
     private PackLoadJob currentLoadJob;
     private Timer currentSearchTimer;
 
-    private Pattern slugRegex;
-    private Pattern siteRegex;
+    private final Pattern slugRegex;
+    private final Pattern siteRegex;
 
     private String lastFilterContents = "";
 
     private String findMoreUrl;
 
     private static final int MAX_SEARCH_STRING = 90;
+    private final TantalumSettings settings;
 
-    public ModpackSelector(ResourceLoader resources, PackLoader packLoader, IPackSource techicSolder, ISolderApi solderApi, IPlatformApi platformApi, IPlatformSearchApi platformSearchApi, ImageRepository<ModpackModel> iconRepo) {
+
+    public ModpackSelector(ResourceLoader resources, PackLoader packLoader, IPackSource technicSolder, ISolderApi solderApi, IPlatformApi platformApi, IPlatformSearchApi platformSearchApi, ImageRepository<ModpackModel> iconRepo, TantalumSettings settings) {
         this.resources = resources;
         this.packLoader = packLoader;
         this.iconRepo = iconRepo;
-        this.technicSolder = techicSolder;
+        this.technicSolder = technicSolder;
         this.platformApi = platformApi;
         this.solderApi = solderApi;
         this.platformSearchApi = platformSearchApi;
+        this.settings = settings;
+
+        slugRegex = Pattern.compile("^[a-zA-Z0-9-]+$");
+        siteRegex = Pattern.compile("^([a-zA-Z0-9-]+)\\.\\d+$");
+
+        findMoreWidget = new FindMoreWidget(resources);
+        findMoreWidget.addActionListener(e -> DesktopUtils.browseUrl(findMoreUrl));
+
+        relocalize(resources);
+    }
+    public ModpackSelector(ModpackSelector modpackSelector, IPlatformApi platformApi){
+        this.resources = modpackSelector.resources;
+        this.packLoader = modpackSelector.packLoader;
+        this.iconRepo = modpackSelector.iconRepo;
+        this.technicSolder = modpackSelector.technicSolder;
+        this.platformApi = platformApi;
+        this.solderApi = modpackSelector.solderApi;
+        this.platformSearchApi = modpackSelector.platformSearchApi;
+        this.settings = modpackSelector.settings;
 
         slugRegex = Pattern.compile("^[a-zA-Z0-9-]+$");
         siteRegex = Pattern.compile("^([a-zA-Z0-9-]+)\\.\\d+$");
@@ -138,6 +153,15 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         return selectedWidget.getModpack();
     }
 
+    public ModpackModel getModel(String model) {
+        return allModpacks.get(model).getModpack();
+    }
+
+    private void changeWarning(){
+        settings.setAcceptedWarnings(true);
+        settings.save();
+    }
+
     private void initComponents() {
         setLayout(new BorderLayout());
         setBackground(LauncherFrame.COLOR_SELECTOR_BACK);
@@ -153,14 +177,22 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         filterContents.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
         filterContents.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
         filterContents.setForeground(LauncherFrame.COLOR_BLUE);
-        filterContents.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+
+        if(settings.isAcceptedWarnings()){
+            filterContents.setBackground(LauncherFrame.COLOR_REQUIREMENT_FAIL);
+        } else {
+            filterContents.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        }
+
+
+        //filterContents.setBackground(LauncherFrame.COLOR_REQUIREMENT_FAIL);
         filterContents.setSelectedTextColor(Color.black);
         filterContents.setSelectionColor(LauncherFrame.COLOR_BUTTON_BLUE);
         filterContents.setCaretColor(LauncherFrame.COLOR_BUTTON_BLUE);
         filterContents.setColumns(20);
         ((AbstractDocument)filterContents.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override
-            public void insertString(DocumentFilter.FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException
             {
                 if(fb.getDocument().getLength() + string.length() <= MAX_SEARCH_STRING)
                 {
@@ -169,13 +201,13 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             }
 
             @Override
-            public void remove(DocumentFilter.FilterBypass fb, int offset, int length) throws BadLocationException
+            public void remove(FilterBypass fb, int offset, int length) throws BadLocationException
             {
                 fb.remove(offset, length);
             }
 
             @Override
-            public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs)throws BadLocationException
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)throws BadLocationException
             {
                 int finalTextLength = (fb.getDocument().getLength() - length) + text.length();
                 if (finalTextLength > MAX_SEARCH_STRING)
@@ -183,29 +215,23 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
                 fb.replace(offset, length, text, attrs);
             }
         });
-        filterContents.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                detectFilterChanges();
-            }
+        filterContents.getDocument().addDocumentListener(new SimpleDocumentListener(this::detectFilterChanges));
+        JLabel warning = new JLabel("Technic Packs From Search");
+        warning.setLabelFor(filterContents);
+        warning.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14).deriveFont(Font.BOLD));
+        //jLabel.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
+        warning.setForeground(LauncherFrame.COLOR_BLUE);
+        warning.setBackground(LauncherFrame.COLOR_BLUE_DARKER);
+        warning.setVisible(false);
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                detectFilterChanges();
-            }
+        //header.add(warning, new GridBagConstraints(1,1,1,2,1,0,17,1,new Insets(10,10,10,10),0,0));
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                detectFilterChanges();
-            }
-        });
         header.add(filterContents, new GridBagConstraints(1,0,1,1,1,0,GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(3,0,3,0), 0, 12));
-
         widgetList = new JPanel();
         widgetList.setOpaque(false);
         widgetList.setLayout(new GridBagLayout());
 
-        scrollPane = new JScrollPane(widgetList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane scrollPane = new JScrollPane(widgetList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setOpaque(false);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getViewport().setOpaque(false);
@@ -272,6 +298,9 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
     public void refreshComplete() {
         setTintActive(false);
 
+
+
+
         if (findMoreWidget.getWidgetData().equals(resources.getString("launcher.packselector.api"))) {
             if (allModpacks.size() == 0) {
                 findMoreWidget.setWidgetData(resources.getString("launcher.packselector.badapi"));
@@ -285,10 +314,9 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         }
 
         if (selectedWidget == null || selectedWidget.getModpack() == null || !allModpacks.containsKey(selectedWidget.getModpack().getName())) {
-            java.util.List<ModpackWidget> sortedPacks = new LinkedList<ModpackWidget>();
-            sortedPacks.addAll(allModpacks.values());
-            Collections.sort(sortedPacks, (o1, o2) -> {
-                int priorityCompare = (new Integer(o2.getModpack().getPriority())).compareTo(new Integer(o1.getModpack().getPriority()));
+            java.util.List<ModpackWidget> sortedPacks = new LinkedList<>(allModpacks.values());
+            sortedPacks.sort((o1, o2) -> {
+                int priorityCompare = Integer.compare(o2.getModpack().getPriority(), o1.getModpack().getPriority());
                 if (priorityCompare != 0)
                     return priorityCompare;
                 else if (o1.getModpack().getDisplayName() == null && o2.getModpack().getDisplayName() == null)
@@ -329,7 +357,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
                             try {
                                 ISolderPackApi solderPack = solderApi.getSolderPack(updatedInfo.getSolder(), updatedInfo.getName(), solderApi.getMirrorUrl(updatedInfo.getSolder()));
                                 infoToUse = new CombinedPackInfo(solderPack.getPackInfo(), updatedInfo);
-                            } catch (RestfulAPIException ex) {
+                            } catch (RestfulAPIException ignored) {
                             }
                         }
 
@@ -357,7 +385,6 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
 
                     } catch (RestfulAPIException ex) {
                         ex.printStackTrace();
-                        return;
                     }
                 }
             };
@@ -366,16 +393,15 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
 
     protected void rebuildUI() {
         if (!EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(() -> rebuildUI());
+            EventQueue.invokeLater(this::rebuildUI);
             return;
         }
 
         GridBagConstraints constraints = new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0,0,0,0), 0,0);
 
-        java.util.List<ModpackWidget> sortedPacks = new LinkedList<ModpackWidget>();
-        sortedPacks.addAll(allModpacks.values());
-        Collections.sort(sortedPacks, (o1, o2) -> {
-            int priorityCompare = (new Integer(o2.getModpack().getPriority())).compareTo(new Integer(o1.getModpack().getPriority()));
+        java.util.List<ModpackWidget> sortedPacks = new LinkedList<>(allModpacks.values());
+        sortedPacks.sort((o1, o2) -> {
+            int priorityCompare = Integer.compare(o2.getModpack().getPriority(), o1.getModpack().getPriority());
             if (priorityCompare != 0)
                 return priorityCompare;
             else if (o1.getModpack().getDisplayName() == null && o2.getModpack().getDisplayName() == null)
@@ -419,7 +445,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             detectFilterChanges();
 
         if (user != null) {
-            ArrayList<IPackSource> sources = new ArrayList<IPackSource>(1);
+            ArrayList<IPackSource> sources = new ArrayList<>(1);
             sources.add(technicSolder);
             defaultPacks.addPassthroughContainer(this);
             packLoader.createRepositoryLoadJob(defaultPacks, sources, null, true);
@@ -430,7 +456,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         lastFilterContents = "THIS IS A TERRIBLE HACK I'M BASICALLY FORCING A REFRESH BUT WITHOUT DOING ANY WORK";
         defaultPacks.clear();
         detectFilterChanges();
-        ArrayList<IPackSource> sources = new ArrayList<IPackSource>(1);
+        ArrayList<IPackSource> sources = new ArrayList<>(1);
         sources.add(technicSolder);
         packLoader.createRepositoryLoadJob(defaultPacks, sources, null, true);
     }
@@ -460,20 +486,11 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         lastFilterContents = filterContents.getText();
     }
 
-    protected boolean isEncodedSlug(String slug) {
-        try {
-            URLEncoder.encode(URLDecoder.decode(slug, "UTF-8"), "UTF-8").equals(slug);
-            return true;
-        } catch (UnsupportedEncodingException ex) {
-            return false;
-        } catch (RuntimeException ex) {
-            //Apparently the encoder/decoder indicate bad input by THROWING RUNTIME EXCEPTIONS
-            //<3 java
-            return false;
-        }
+    private void InternalLoadNewJob(final String searchText){
+        Utils.ignored = loadNewJob(searchText);
     }
 
-    private void loadNewJob(final String searchText) {
+    public PackLoadJob loadNewJob(final String searchText) {
         setTintActive(true);
         defaultPacks.removePassthroughContainer(this);
 
@@ -510,7 +527,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
                             IPlatformApi tempPlatform = new HttpPlatformApi(scheme + "://" + host + "/");
                             findMoreUrl = localSearchUrl;
                             findMoreWidget.setWidgetData(resources.getString("launcher.packselector.api"));
-                            ArrayList<IPackSource> source = new ArrayList<IPackSource>(1);
+                            ArrayList<IPackSource> source = new ArrayList<>(1);
                             source.add(new SinglePlatformSource(tempPlatform, solderApi, slug));
                             currentLoadJob = packLoader.createRepositoryLoadJob(ModpackSelector.this, source, null, false);
                             return;
@@ -525,33 +542,46 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             ArrayList<IPackSource> sources = new ArrayList<>(2);
             IPlatformSearchApi tempSearchapi = platformSearchApi;
             PackLoader temploader = packLoader;
-            Utils.getLogger().warning(localSearchTag);
-            Utils.getLogger().log(Level.SEVERE, "Hell " + String.valueOf(localSearchTag.charAt(0)));
-            Utils.getLogger().config("hell2: " + (localSearchTag.charAt(0) == '`'));
+            boolean doNormal= true;
             if(localSearchTag.charAt(0) == '`'){
+                if(!settings.isAcceptedWarnings()){
+                if(optionWarning()){
+                    doNormal=false;
+                    changeWarning();
+                } else {
+                    filterContents.setText("");
+                    return;
+                }
+
+                }else {doNormal=false;}
+            }
+
+            if(doNormal)  {
+                Utils.getLogger().config("Using Normal Search ");
+                //findMoreWidget.setWidgetData("Mother Fucker");
+                sources.add(new NameFilterPackSource(defaultPacks, localSearchTag));
+                encodedSearch  = filterContents.getText();
+            } else {
+                //findMoreWidget.setWidgetData("Warning Using The Technic Platform\n Search Mode WILL cause issues with modpacks");
                 IPlatformApi tempPlatform = new HttpPlatformApi();
                 IAuthoritativePackSource tempauth = new PlatformPackInfoRepository(tempPlatform, solderApi);
                 tempSearchapi = new HttpPlatformSearchApi();
 
                 temploader = new PackLoader(temploader, tempauth);
                 localSearchTag = localSearchTag.substring(1);
-                Utils.getLogger().config("Hello3 " +localSearchTag);
+                Utils.getLogger().warning("Using Technic Platform For Search May Cause Issues");
                 encodedSearch  = filterContents.getText().substring(1);
-            } else {
-                sources.add(new NameFilterPackSource(defaultPacks, localSearchTag));
-                encodedSearch  = filterContents.getText();
             }
-            try {
-                encodedSearch = URLEncoder.encode(encodedSearch, "UTF-8");
-            } catch (UnsupportedEncodingException ignored) {}
+            encodedSearch = URLEncoder.encode(encodedSearch, StandardCharsets.UTF_8);
             findMoreUrl = "https://www.technicpack.net/modpacks?q="+encodedSearch;
             findMoreWidget.setWidgetData(resources.getString("launcher.packselector.more"));
 
             sources.add(new SearchResultPackSource(tempSearchapi, localSearchTag));
-            currentLoadJob = temploader.createRepositoryLoadJob(ModpackSelector.this, sources, null, false);
+            currentLoadJob= temploader.createRepositoryLoadJob(ModpackSelector.this, sources, null, false);
         });
         currentSearchTimer.setRepeats(false);
         currentSearchTimer.start();
+        return currentLoadJob;
     }
 
     private void cancelJob() {
@@ -577,12 +607,24 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
 
         initComponents();
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                invalidate();
-                repaint();
-            }
+
+
+        EventQueue.invokeLater(() -> {
+            invalidate();
+            repaint();
         });
+    }
+
+
+    protected boolean optionWarning(){
+        int tempint = JOptionPane.showOptionDialog(this.launcherFrame,  "Warning Adding Technic Packs Using Search\nIs known to cause issues use at your own risk\nif Accepted This will not come up again", "Warning Technic Packs", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, UIManager.getIcon("OptionPane.warningIcon"), new String[]{"I Understand","Cancel"}, "Cancel");
+        switch (tempint){
+            case JOptionPane.OK_OPTION -> Utils.getLogger().warning("Ok Option");
+            case JOptionPane.NO_OPTION -> Utils.getLogger().warning("No Option");
+            case JOptionPane.CANCEL_OPTION -> Utils.getLogger().warning("Cancel Option");
+            case JOptionPane.CLOSED_OPTION -> Utils.getLogger().warning("Closed option");
+            default -> throw new IllegalStateException("Unexpected value: " + tempint);
+        }
+        return tempint == JOptionPane.OK_OPTION;
     }
 }

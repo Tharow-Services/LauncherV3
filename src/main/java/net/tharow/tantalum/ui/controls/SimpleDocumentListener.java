@@ -1,15 +1,15 @@
-package net.tharow.tantalum.utilslib;
+package net.tharow.tantalum.ui.controls;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class SimpleDocumentListener implements DocumentListener {
-    private Runnable runnable;
+    private final Runnable runnable;
 
     /**
      * A Simple Document Listener
      *
-     * @param runnable what to run durring Doc events
+     * @param runnable what to run during Doc events
      */
     public SimpleDocumentListener(Runnable runnable){
         this.runnable = runnable;

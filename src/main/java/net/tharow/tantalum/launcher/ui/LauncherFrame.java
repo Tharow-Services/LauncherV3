@@ -57,6 +57,7 @@ import net.tharow.tantalum.platform.IPlatformApi;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.utilslib.Utils;
+import org.xhtmlrenderer.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -173,13 +174,25 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         //Handles rebuilding the frame, so use it to build the frame in the first place
         relocalize(resources);
 
+
         selectTab("discover");
 
         EventQueue.invokeLater(() -> LauncherMain.consoleFrame.setVisible(settings.getShowConsole()));
-
+        EventQueue.invokeLater(this::installmodpack);
+        EventQueue.invokeLater(this::launchModpack);
         setLocationRelativeTo(null);
+
+
     }
 
+    protected void installmodpack(){
+        if (params.getModpackUri() != null) {
+            //IPlatformApi platformApi = new HttpPlatformApi("https://api.technicpack.net/");
+            modpackSelector.setFilter(params.getModpackUri());
+            launchModpack();
+
+        }
+    }
     /////////////////////////////////////////////////
     // Action responses
     /////////////////////////////////////////////////
@@ -202,16 +215,13 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         discoverTab.setIsActive(false);
         modpacksTab.setIsActive(false);
         newsTab.setIsActive(false);
-        switch (tabName.toLowerCase(Locale.ROOT)){
-            case TAB_DISCOVER:
-                discoverTab.setIsActive(true);
-                break;
-            case TAB_MODPACKS:
-                modpacksTab.setIsActive(true);
-                break;
-            case TAB_NEWS:
+        switch (tabName.toLowerCase(Locale.ROOT)) {
+            case TAB_DISCOVER -> discoverTab.setIsActive(true);
+            case TAB_MODPACKS -> modpacksTab.setIsActive(true);
+            case TAB_NEWS -> {
                 newsTab.setIsActive(true);
                 newsSelector.ping();
+            }
         }
 
         /*if (tabName.equalsIgnoreCase(TAB_DISCOVER))
@@ -323,6 +333,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         userModel.setCurrentUser(userModel.getCurrentUser());
 
         invalidate();
+
     }
 
     protected void openModpackOptions(ModpackModel model) {
@@ -403,7 +414,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         newsTab.addActionListener(tabListener);
         newsTab.setActionCommand(TAB_NEWS);
         header.add(newsTab);
-        //if(TestNews()) { header.add(newsTab); }
+        if(TestNews()) { header.add(newsTab); }
 
         CountCircle newsCircle = new CountCircle();
         newsCircle.setBackground(COLOR_RED);

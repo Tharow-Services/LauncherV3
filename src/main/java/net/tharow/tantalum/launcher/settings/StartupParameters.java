@@ -24,9 +24,8 @@ import com.beust.jcommander.internal.Lists;
 
 import java.io.File;
 import java.util.List;
-
+@SuppressWarnings("ALL")
 public final class StartupParameters {
-    @SuppressWarnings("unused")
     private final String[] args;
     @Parameter
     private List<String> parameters = Lists.newArrayList();
@@ -56,7 +55,7 @@ public final class StartupParameters {
     private String modpackUri = null;
     @Parameter(names = {"-blockReboot"}, description = "Prevent rebooting the launcher due to bad java properties.")
     private boolean blockReboot = false;
-    @Parameter(names = {"-buildNumber"}, description = "Force build number to this value for debugging.")
+    @Parameter(names = {"-buildNumber","-b"}, description = "Force build number to this value for debugging.")
     private String buildNumber = "";
     @Parameter(names = {"-offline"}, description = "Force offline mode")
     private boolean offline = false;
@@ -95,7 +94,7 @@ public final class StartupParameters {
 
     public String getSolderUrl() {
         if(isTechnic){
-            return "https://solder.technicpack.net/api";
+            return "https://solder.technicpack.net/api/";
         }else
             return solder;
     }

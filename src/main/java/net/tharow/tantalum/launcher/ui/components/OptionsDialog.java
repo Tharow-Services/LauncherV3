@@ -49,7 +49,7 @@ import net.tharow.tantalum.launchercore.util.LaunchAction;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.utilslib.Memory;
 import net.tharow.tantalum.utilslib.OperatingSystem;
-import net.tharow.tantalum.utilslib.SimpleDocumentListener;
+import net.tharow.tantalum.ui.controls.SimpleDocumentListener;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -522,7 +522,6 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         launchSelect.addItem(new OnLaunchItem(resources.getString("launcheroptions.packlaunch.nothing"), LaunchAction.NOTHING));
 
         switch (settings.getLaunchAction()) {
-            case HIDE -> launchSelect.setSelectedIndex(0);
             case CLOSE -> launchSelect.setSelectedIndex(1);
             case NOTHING -> launchSelect.setSelectedIndex(2);
             default -> launchSelect.setSelectedIndex(0);

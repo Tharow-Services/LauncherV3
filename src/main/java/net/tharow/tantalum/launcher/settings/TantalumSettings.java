@@ -68,6 +68,7 @@ public class TantalumSettings implements ILaunchOptions {
     private String socksProxyHost = "localhost";
     private int socksProxyPort = 9150;
     private boolean useSocksProxyFive = true; //If false
+    private boolean acceptedWarnings = false;
     private String HTTPProxyHost = "localhost";
     private int HTTPProxyPort = 3652;
     private String HTTPProxyBypassDomains = "";
@@ -289,5 +290,13 @@ public class TantalumSettings implements ILaunchOptions {
 
         if (!technicRoot.exists())
             technicRoot.mkdirs();
+    }
+
+    public boolean isAcceptedWarnings() {
+        return acceptedWarnings;
+    }
+
+    public void setAcceptedWarnings(boolean acceptedWarnings) {
+        this.acceptedWarnings = acceptedWarnings;
     }
 }

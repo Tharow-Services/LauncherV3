@@ -31,21 +31,19 @@ import java.awt.*;
 
 public class LanguageCellUI extends BasicComboBoxUI {
 
-    private ResourceLoader resources;
+    private final Color trackColor;
+    private final Color thumbColor;
 
-    private Color trackColor;
-    private Color thumbColor;
-
-    private IPopupFormatter popupFormatter;
+    private final IPopupFormatter popupFormatter;
 
     public LanguageCellUI(ResourceLoader loader, IPopupFormatter popupFormatter, Color trackColor, Color thumbColor) {
-        this.resources = loader;
         this.popupFormatter = popupFormatter;
         this.trackColor = trackColor;
         this.thumbColor = thumbColor;
     }
 
-    @Override protected JButton createArrowButton() {
+    @Override
+    protected JButton createArrowButton() {
         JButton button = new JButton();
         button.setOpaque(false);
         button.setContentAreaFilled(false);

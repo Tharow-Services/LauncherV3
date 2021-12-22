@@ -28,7 +28,7 @@ import javax.swing.text.BadLocationException;
 import java.util.logging.Level;
 
 public class Console {
-    private ConsoleFrame frame = null;
+    private final ConsoleFrame frame = null;
     private RotatingFileHandler handler = null;
     private final ConsoleFrame consoleFrame;
     private final String build;

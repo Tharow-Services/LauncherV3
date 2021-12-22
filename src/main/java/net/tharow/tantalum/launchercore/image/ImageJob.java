@@ -19,6 +19,8 @@
 
 package net.tharow.tantalum.launchercore.image;
 
+import net.tharow.tantalum.utilslib.Utils;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -35,16 +37,16 @@ public class ImageJob<T> {
     private T lastJobData;
 
     protected boolean canRetry = true;
-    private AtomicReference<BufferedImage> imageReference;
+    private final AtomicReference<BufferedImage> imageReference;
 
-    private Collection<IImageJobListener<T>> jobListeners = new LinkedList<IImageJobListener<T>>();
+    private final Collection<IImageJobListener<T>> jobListeners = new LinkedList<>();
     private Thread imageThread;
 
     public ImageJob(IImageMapper<T> mapper, IImageStore<T> store) {
         this.mapper = mapper;
         this.store = store;
 
-        imageReference = new AtomicReference<BufferedImage>();
+        imageReference = new AtomicReference<>();
         imageReference.set(mapper.getDefaultImage());
     }
 
@@ -86,17 +88,12 @@ public class ImageJob<T> {
     protected void notifyComplete() {
         if (EventQueue.isDispatchThread()) {
             synchronized (jobListeners) {
-                for (IImageJobListener listener : jobListeners) {
-                    listener.jobComplete(this);
+                for (IImageJobListener<T> listener : jobListeners) {
+                    listener.jobComplete(ImageJob.this);
                 }
             }
         } else {
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    notifyComplete();
-                }
-            });
+            EventQueue.invokeLater(this::notifyComplete);
         }
     }
 
@@ -127,11 +124,12 @@ public class ImageJob<T> {
 
                     if (store.canDownloadImage(jobData, imageLocation) && (existingImage == null || mapper.shouldDownloadImage(jobData))) {
                         if (imageLocation != null && !imageLocation.getParentFile().exists())
-                            imageLocation.getParentFile().mkdirs();
+                            Utils.ignored = imageLocation.getParentFile().mkdirs();
 
                         store.downloadImage(jobData, imageLocation);
 
                         try {
+                            assert imageLocation != null;
                             BufferedImage newImage = ImageIO.read(imageLocation);
 
                             if (newImage != null)
