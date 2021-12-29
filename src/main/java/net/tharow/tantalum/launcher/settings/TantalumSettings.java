@@ -41,7 +41,7 @@ public class TantalumSettings implements ILaunchOptions {
     private String buildStream = STABLE;
     private boolean showConsole = false;
     private String languageCode = "default";
-    private String clientId = UUID.randomUUID().toString();
+    private final String clientId = UUID.randomUUID().toString();
     private String directory;
     private String javaArgs;
     private String wrapperCommand;
@@ -219,7 +219,7 @@ public class TantalumSettings implements ILaunchOptions {
         save();
     }
 
-    public boolean shouldAutoAcceptModpackRequirements() { return autoAcceptRequirements; }
+    public boolean shouldAutoAcceptModpackRequirements() { return !autoAcceptRequirements; }
     public void setAutoAcceptModpackRequirements(boolean value) {
         this.autoAcceptRequirements = value;
         save();

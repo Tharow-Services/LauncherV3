@@ -23,7 +23,7 @@ import net.tharow.tantalum.minecraftcore.mojang.version.io.ExtractRules;
 import net.tharow.tantalum.utilslib.IZipFileFilter;
 
 public class ExtractRulesFileFilter implements IZipFileFilter {
-    private ExtractRules rules;
+    private final ExtractRules rules;
 
     public ExtractRulesFileFilter(ExtractRules rules) {
         this.rules = rules;

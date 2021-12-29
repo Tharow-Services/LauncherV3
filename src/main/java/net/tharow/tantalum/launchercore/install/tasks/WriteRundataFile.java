@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class WriteRundataFile implements IInstallTask {
-    private ModpackModel modpackModel;
-    private Modpack modpack;
+    private final ModpackModel modpackModel;
+    private final Modpack modpack;
 
     public WriteRundataFile(ModpackModel modpackModel, Modpack modpack) {
         this.modpackModel = modpackModel;
@@ -34,7 +34,7 @@ public class WriteRundataFile implements IInstallTask {
     }
 
     @Override
-    public void runTask(InstallTasksQueue queue) throws IOException, InterruptedException {
+    public void runTask(InstallTasksQueue queue) throws IOException {
         if ((modpack.getJava() == null || modpack.getJava().isEmpty()) && (modpack.getMemory() == null || modpack.getMemory().isEmpty()))
             return;
 

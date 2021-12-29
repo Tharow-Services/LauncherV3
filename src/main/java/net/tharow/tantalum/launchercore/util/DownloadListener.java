@@ -20,5 +20,5 @@
 package net.tharow.tantalum.launchercore.util;
 
 public interface DownloadListener {
-    public void stateChanged(String fileName, float progress);
+    void stateChanged(String fileName, float progress);
 }

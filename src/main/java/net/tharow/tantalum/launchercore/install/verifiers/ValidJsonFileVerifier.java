@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 
 public class ValidJsonFileVerifier implements IFileVerifier {
-    private Gson validatingGson;
+    private final Gson validatingGson;
 
     public ValidJsonFileVerifier(Gson validatingGson) {
         this.validatingGson = validatingGson;

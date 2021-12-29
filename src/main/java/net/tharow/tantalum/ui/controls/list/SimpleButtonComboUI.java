@@ -30,12 +30,12 @@ import java.awt.*;
 
 public class SimpleButtonComboUI extends BasicComboBoxUI {
 
-    private ResourceLoader resources;
+    private final ResourceLoader resources;
 
-    private Color trackColor;
-    private Color thumbColor;
+    private final Color trackColor;
+    private final Color thumbColor;
 
-    private IPopupFormatter popupFormatter;
+    private final IPopupFormatter popupFormatter;
 
     public SimpleButtonComboUI(IPopupFormatter popupFormatter, ResourceLoader loader, Color trackColor, Color thumbColor) {
         this.resources = loader;

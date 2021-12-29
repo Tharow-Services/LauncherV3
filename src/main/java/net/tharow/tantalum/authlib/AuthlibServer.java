@@ -10,7 +10,7 @@ public class AuthlibServer implements IAuthlibServerApi{
 
     private final IAuthlibServerInfo serverInfo;
 
-    public AuthlibServer(String srvUrl, String clientToken) throws RestfulAPIException{
+    public AuthlibServer(String srvUrl) throws RestfulAPIException{
         this.serverInfo = RestObject.getRestObject(ServerInfo.class, srvUrl);
         this.authenticator = null; //new AuthlibAuthenticator();
         this.getServerInfo().setServerUrl(srvUrl);

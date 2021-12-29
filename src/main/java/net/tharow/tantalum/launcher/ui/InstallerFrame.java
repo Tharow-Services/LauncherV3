@@ -43,8 +43,6 @@ import org.apache.commons.io.FileUtils;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -67,14 +65,14 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
     private RoundedButton standardSelectButton;
     private JTextField portableInstallDir;
     private RoundedButton portableInstallButton;
-    private StartupParameters params;
+    private final StartupParameters params;
 
     private JComboBox standardLanguages;
     private JComboBox portableLanguages;
 
-    private TantalumSettings settings;
+    private final TantalumSettings settings;
 
-    private JPanel glassPane = new JPanel() {
+    private final JPanel glassPane = new JPanel() {
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -196,10 +194,10 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
             settings.setLanguageCode(((LanguageItem)standardLanguages.getSelectedItem()).getLangCode());
             settings.save();
 
-            //VersionFileBuildNumber buildNumber = new VersionFileBuildNumber(resources);
-            //Utils.sendTracking("installLauncher", "standard", buildNumber.getBuildNumber(), settings.getClientId());
+            VersionFileBuildNumber buildNumber = new VersionFileBuildNumber(resources);
+            Utils.sendTracking("installLauncher", "standard", buildNumber.getBuildNumber(), settings.getClientId());
 
-            Relauncher relauncher = new TechnicRelauncher(null, settings.getBuildStream(), 0, new TechnicLauncherDirectories(settings.getTechnicRoot()), resources, params);
+            Relauncher relauncher = new TechnicRelauncher(null, 0, new TechnicLauncherDirectories(settings.getTechnicRoot()), resources, params);
             try {
                 String currentPath = relauncher.getRunningPath();
                 relauncher.launch(currentPath, params.getArgs());
@@ -214,7 +212,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
 
     protected void portableInstall() {
         String targetPath = null;
-        final Relauncher relauncher = new TechnicRelauncher(null, settings.getBuildStream(), 0, new TechnicLauncherDirectories(settings.getTechnicRoot()), resources, params);
+        final Relauncher relauncher = new TechnicRelauncher(null, 0, new TechnicLauncherDirectories(settings.getTechnicRoot()), resources, params);
         try {
             String currentPath = relauncher.getRunningPath();
             String launcher = (currentPath.endsWith(".exe"))?"TantalumLauncher.exe":"TantalumLauncher.jar";
@@ -233,7 +231,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
             }
 
 
-        } catch (InterruptedException | IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
             return;
         }
@@ -273,7 +271,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
             settings.save();
 
             VersionFileBuildNumber buildNumber = new VersionFileBuildNumber(resources);
-            //Utils.sendTracking("installLauncher", "portable", buildNumber.getBuildNumber(), settings.getClientId());
+            Utils.sendTracking("installLauncher", "portable", buildNumber.getBuildNumber(), settings.getClientId());
 
             relauncher.launch(threadTargetPath, params.getArgs());
             System.exit(0);
@@ -451,13 +449,15 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
         panel.add(Box.createGlue(), new GridBagConstraints(0, 4, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0),0,0));
 
         String defaultLocaleText = resources.getString("launcheroptions.language.default");
-        if (!resources.isDefaultLocaleSupported()) {
+        if (resources.isDefaultLocaleSupported()) {
             defaultLocaleText = defaultLocaleText.concat(" (" + resources.getString("launcheroptions.language.unavailable") + ")");
         }
 
         standardLanguages = new JComboBox();
+        //noinspection unchecked
         standardLanguages.addItem(new LanguageItem(ResourceLoader.DEFAULT_LOCALE, defaultLocaleText, resources));
         for (int i = 0; i < LauncherMain.supportedLanguages.length; i++) {
+            //noinspection unchecked
             standardLanguages.addItem(new LanguageItem(resources.getCodeFromLocale(LauncherMain.supportedLanguages[i]), LauncherMain.supportedLanguages[i].getDisplayName(LauncherMain.supportedLanguages[i]), resources.getVariant(LauncherMain.supportedLanguages[i])));
         }
         if (!settings.getLanguageCode().equalsIgnoreCase(ResourceLoader.DEFAULT_LOCALE)) {
@@ -475,6 +475,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
         standardLanguages.setUI(new LanguageCellUI(resources, new RoundedBorderFormatter(new LineBorder(Color.black, 1)), LauncherFrame.COLOR_SCROLL_TRACK, LauncherFrame.COLOR_SCROLL_THUMB));
         standardLanguages.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         standardLanguages.setBackground(LauncherFrame.COLOR_SELECTOR_BACK);
+        //noinspection unchecked
         standardLanguages.setRenderer(new LanguageCellRenderer(resources, "globe.png", LauncherFrame.COLOR_SELECTOR_BACK, LauncherFrame.COLOR_WHITE_TEXT));
         standardLanguages.setEditable(false);
         standardLanguages.setFocusable(false);
@@ -533,13 +534,15 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
         panel.add(Box.createGlue(), new GridBagConstraints(0, 3, 3, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0),0,0));
 
         String defaultLocaleText = resources.getString("launcheroptions.language.default");
-        if (!resources.isDefaultLocaleSupported()) {
+        if (resources.isDefaultLocaleSupported()) {
             defaultLocaleText = defaultLocaleText.concat(" (" + resources.getString("launcheroptions.language.unavailable") + ")");
         }
 
         portableLanguages = new JComboBox();
+        //noinspection unchecked
         portableLanguages.addItem(new LanguageItem(ResourceLoader.DEFAULT_LOCALE, defaultLocaleText, resources));
         for (int i = 0; i < LauncherMain.supportedLanguages.length; i++) {
+            //noinspection unchecked
             portableLanguages.addItem(new LanguageItem(resources.getCodeFromLocale(LauncherMain.supportedLanguages[i]), LauncherMain.supportedLanguages[i].getDisplayName(LauncherMain.supportedLanguages[i]), resources.getVariant(LauncherMain.supportedLanguages[i])));
         }
         if (!settings.getLanguageCode().equalsIgnoreCase(ResourceLoader.DEFAULT_LOCALE)) {
@@ -557,6 +560,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
         portableLanguages.setUI(new LanguageCellUI(resources, new RoundedBorderFormatter(new LineBorder(Color.black, 1)), LauncherFrame.COLOR_SCROLL_TRACK, LauncherFrame.COLOR_SCROLL_THUMB));
         portableLanguages.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         portableLanguages.setBackground(LauncherFrame.COLOR_SELECTOR_BACK);
+        //noinspection unchecked
         portableLanguages.setRenderer(new LanguageCellRenderer(resources, "globe.png", LauncherFrame.COLOR_SELECTOR_BACK, LauncherFrame.COLOR_WHITE_TEXT));
         portableLanguages.setEditable(false);
         portableLanguages.setFocusable(false);

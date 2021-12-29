@@ -36,14 +36,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class AuthlibAuthenticator {
-    private final String clientToken;
+public record AuthlibAuthenticator(String clientToken) {
     //TODO Implement non email login
-
-
-    public AuthlibAuthenticator(String clientToken){
-        this.clientToken = clientToken;
-    }
 
 
     public AuthlibUser loginNewUser(String username, String password, IAuthlibServerInfo authlibServerInfo) throws AuthenticationException {
@@ -62,7 +56,7 @@ public class AuthlibAuthenticator {
             }
         } catch (ResponseException e) {
             throw e;
-        }  catch (IOException e) {
+        } catch (IOException e) {
             throw new AuthenticationException(
                     "An error was raised while attempting to communicate with " + authServer + ".", e);
         }
@@ -127,7 +121,8 @@ public class AuthlibAuthenticator {
             try {
                 if (stream != null)
                     stream.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
 
         return returnable;

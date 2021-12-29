@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ImageRepository<T> {
-    private IImageMapper<T> mapper;
-    private IImageStore<T> store;
-    private Map<String, ImageJob> allJobs = new HashMap<String, ImageJob>();
+    private final IImageMapper<T> mapper;
+    private final IImageStore<T> store;
+    private final Map<String, ImageJob> allJobs = new HashMap<>();
 
     public ImageRepository(IImageMapper<T> mapper, IImageStore<T> store) {
         this.mapper = mapper;
@@ -37,9 +37,10 @@ public class ImageRepository<T> {
 
         ImageJob<T> job = null;
         if (allJobs.containsKey(jobKey))
+            //noinspection unchecked
             job = allJobs.get(jobKey);
         else {
-            job = new ImageJob<T>(mapper, store);
+            job = new ImageJob<>(mapper, store);
             allJobs.put(jobKey, job);
         }
 

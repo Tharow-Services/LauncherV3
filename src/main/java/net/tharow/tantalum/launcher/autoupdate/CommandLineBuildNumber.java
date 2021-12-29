@@ -22,7 +22,7 @@ import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.launcher.settings.StartupParameters;
 
 public class CommandLineBuildNumber implements IBuildNumber {
-    private StartupParameters commandLineParams;
+    private final StartupParameters commandLineParams;
 
     public CommandLineBuildNumber(StartupParameters commandLineParams) {
         this.commandLineParams = commandLineParams;

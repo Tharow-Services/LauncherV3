@@ -24,8 +24,8 @@ import net.tharow.tantalum.ui.lang.ResourceLoader;
 
 public class JavaVersionItem {
 
-    private IJavaVersion javaVersion;
-    private ResourceLoader resourceLoader;
+    private final IJavaVersion javaVersion;
+    private final ResourceLoader resourceLoader;
 
     public JavaVersionItem(IJavaVersion javaVersion, ResourceLoader resourceLoader) {
         this.javaVersion = javaVersion;

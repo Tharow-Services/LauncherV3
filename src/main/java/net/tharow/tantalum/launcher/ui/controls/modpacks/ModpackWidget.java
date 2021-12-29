@@ -31,9 +31,9 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class ModpackWidget extends SelectorWidget implements IImageJobListener<ModpackModel> {
-    private ModpackModel modpack;
-    private ImageJob<ModpackModel> imageJob;
-    private ResourceLoader resources;
+    private final ModpackModel modpack;
+    private final ImageJob<ModpackModel> imageJob;
+    private final ResourceLoader resources;
 
     private JLabel icon;
     private JLabel displayName;

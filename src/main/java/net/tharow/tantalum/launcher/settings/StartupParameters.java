@@ -29,9 +29,11 @@ public final class StartupParameters {
     private final String[] args;
     @Parameter
     private List<String> parameters = Lists.newArrayList();
-    @Parameter(names = {"-console"}, description = "Shows the console window")
+    @Parameter(names = {"-console","-c"}, description = "Shows the console window")
     private boolean console = false;
-    @Parameter(names = {"-launcheronly"}, description = "Starts in launcher mode (rather than update/mover)")
+    @Parameter(names = {"-logLevel","-ll"}, description = "Sets Log Level")
+    private int logLevel = 8;
+    @Parameter(names = {"-launcheronly","-lo"}, description = "Starts in launcher mode (rather than update/mover)")
     private boolean launcher = false;
     @Parameter(names = {"-launcher"}, description = "Legacy launcher mode (indicates we should do a full update)")
     private boolean oldLauncher = false;
@@ -45,8 +47,8 @@ public final class StartupParameters {
     private String moveTarget = null;
     @Parameter(names = {"-solder","-s"}, description = "An override param for the discover URL")
     private String solder = null;
-    @Parameter(names = {"-platform","-p"}, description = "An override param for the platform URL")
-    private String platform = null;
+    @Parameter(names = {"-platform","-p"}, description = "Add A Platform To the list")
+    private List<String> platform = List.of(new String[]{"https://api.technicpack.net/"});
     @Parameter(names = {"-overrideRoots"}, description = "Force the override of root ca Certificates")
     private boolean overrideRoots = false;
     @Parameter(names = {"-modpackFile","-mf"}, description = "Install a modpack from file", converter = FileConverter.class)
@@ -101,11 +103,8 @@ public final class StartupParameters {
 
     public String getBuildNumber() { return buildNumber; }
 
-    public String getPlatformUrl() {
-        if(isTechnic){
-            return "https://api.technicpack.net/";
-        } else
-            return platform;
+    public List<String> getPlatformUrl() {
+        return platform;
     }
 
     public boolean isOverrideRoots() {return overrideRoots;}
@@ -113,4 +112,8 @@ public final class StartupParameters {
     public File getModpackFile() {return modpackFile;}
 
     public String getModpackUri() {return modpackUri;}
+
+    public int getLogLevel() {
+        return logLevel;
+    }
 }

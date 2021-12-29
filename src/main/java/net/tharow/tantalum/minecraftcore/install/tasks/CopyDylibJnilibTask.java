@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class CopyDylibJnilibTask implements IInstallTask {
-    private ModpackModel modpack;
+    private final ModpackModel modpack;
 
     public CopyDylibJnilibTask(ModpackModel modpack) {
         this.modpack = modpack;
@@ -46,7 +46,7 @@ public class CopyDylibJnilibTask implements IInstallTask {
     }
 
     @Override
-    public void runTask(InstallTasksQueue queue) throws IOException, InterruptedException {
+    public void runTask(InstallTasksQueue queue) throws IOException {
         File dylib = new File(new File(modpack.getBinDir(), "natives"), "liblwjgl.dylib");
         File jnilib = new File(new File(modpack.getBinDir(), "natives"), "liblwjgl.jnilib");
 

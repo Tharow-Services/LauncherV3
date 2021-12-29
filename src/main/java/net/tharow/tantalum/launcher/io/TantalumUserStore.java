@@ -19,12 +19,14 @@
 package net.tharow.tantalum.launcher.io;
 
 import com.google.gson.JsonSyntaxException;
+import net.tharow.tantalum.authlib.AuthlibUser;
 import net.tharow.tantalum.launchercore.auth.IUserStore;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
 import net.tharow.tantalum.minecraftcore.mojang.auth.MojangUser;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,9 +37,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class TantalumUserStore implements IUserStore {
-    private String clientToken = UUID.randomUUID().toString();
-    private Map<String, IUserType> savedUsers = new HashMap<>();
+public class TantalumUserStore implements IUserStore, IStore {
+    private final String clientToken = UUID.randomUUID().toString();
+    private final Map<String, IUserType> savedUsers = new HashMap<>();
     private String lastUser;
     private transient File usersFile;
 
@@ -48,7 +50,7 @@ public class TantalumUserStore implements IUserStore {
         this.usersFile = userFile;
     }
 
-    public static TantalumUserStore load(File userFile) {
+    public static @NotNull TantalumUserStore load(@NotNull File userFile) {
         if (!userFile.exists()) {
             Utils.getLogger().log(Level.WARNING, "Unable to load users from " + userFile + " because it does not exist.");
             return new TantalumUserStore(userFile);
@@ -83,11 +85,14 @@ public class TantalumUserStore implements IUserStore {
         }
     }
 
-    public void addUser(IUserType user) {
+    public void addUser(@NotNull IUserType user) {
         if (savedUsers.containsKey(user.getUsername())) {
             IUserType oldUser = savedUsers.get(user.getUsername());
             if (oldUser instanceof MojangUser && user instanceof MojangUser) {
                 ((MojangUser) user).mergeUserProperties((MojangUser) oldUser);
+            }
+            if (oldUser instanceof AuthlibUser && user instanceof AuthlibUser) {
+                ((AuthlibUser) user).mergeUserProperties((AuthlibUser) oldUser);
             }
         }
         savedUsers.put(user.getUsername(), user);

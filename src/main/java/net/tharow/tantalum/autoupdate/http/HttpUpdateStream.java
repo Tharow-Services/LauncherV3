@@ -24,15 +24,22 @@ import net.tharow.tantalum.autoupdate.io.StreamVersion;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.RestfulAPIException;
 
-public class HttpUpdateStream implements IUpdateStream {
-    private String baseUrl;
+import java.net.URL;
 
-    public HttpUpdateStream(String baseUrl) {
+public class HttpUpdateStream implements IUpdateStream {
+    private final URL baseUrl;
+
+    public HttpUpdateStream(URL baseUrl) {
         this.baseUrl = baseUrl;
     }
 
     @Override
     public StreamVersion getStreamVersion(String stream) throws RestfulAPIException {
-        return RestObject.getRestObject(StreamVersion.class, baseUrl + "version.php?stream=" + stream);
+        return getStreamVersion();
+    }
+
+    @Override
+    public StreamVersion getStreamVersion() throws RestfulAPIException {
+        return RestObject.getRestObject(StreamVersion.class, baseUrl.toString());
     }
 }

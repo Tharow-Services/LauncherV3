@@ -27,8 +27,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class TantalumAvatarMapper implements IImageMapper<AuthorshipInfo> {
-    private LauncherDirectories directories;
-    private BufferedImage defaultImage;
+    private final LauncherDirectories directories;
+    private final BufferedImage defaultImage;
 
     public TantalumAvatarMapper(LauncherDirectories directories, ResourceLoader resources) {
         this.directories = directories;

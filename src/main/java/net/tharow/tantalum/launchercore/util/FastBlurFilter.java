@@ -95,13 +95,13 @@ public class FastBlurFilter extends AbstractFilter {
         int[] srcPixels = new int[width * height];
         int[] dstPixels = new int[width * height];
 
-        getPixels(src, 0, 0, width, height, srcPixels);
+        getPixels(src, width, height, srcPixels);
         // horizontal pass
         blur(srcPixels, dstPixels, width, height, radius);
         // vertical pass
         blur(dstPixels, srcPixels, height, width, radius);
         // the result is now stored in srcPixels due to the 2nd pass
-        setPixels(dst, 0, 0, width, height, srcPixels);
+        setPixels(dst, width, height, srcPixels);
 
         return dst;
     }

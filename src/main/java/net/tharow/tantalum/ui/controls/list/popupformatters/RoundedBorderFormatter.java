@@ -25,7 +25,7 @@ import javax.swing.plaf.basic.BasicComboPopup;
 import java.awt.*;
 
 public class RoundedBorderFormatter implements IPopupFormatter {
-    private Border border;
+    private final Border border;
 
     public RoundedBorderFormatter(Border border) {
         this.border = border;

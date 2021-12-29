@@ -37,25 +37,24 @@ public class ProcessMonitorThread extends Thread {
         BufferedReader buf = new BufferedReader(reader);
         String line = null;
 
-        while (true) {
+        {
             try {
                 while ((line = buf.readLine()) != null) {
                     System.out.println(" " + line);
                 }
             } catch (IOException ex) {
-//				Logger.getLogger(ProcessMonitorThread.class.getName()).log(Level.SEVERE, null, ex);
+    //				Logger.getLogger(ProcessMonitorThread.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 try {
                     buf.close();
                 } catch (IOException ex) {
-//					Logger.getLogger(ProcessMonitorThread.class.getName()).log(Level.SEVERE, null, ex);
+    //					Logger.getLogger(ProcessMonitorThread.class.getName()).log(Level.SEVERE, null, ex);
                 } finally {
                     try {
                         process.getProcess().waitFor();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    break;
                 }
             }
         }

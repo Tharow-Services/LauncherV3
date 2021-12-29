@@ -41,12 +41,12 @@ public class LowerCaseEnumTypeAdapterFactory implements TypeAdapterFactory {
             return null;
         }
 
-        final Map<String, T> lowercaseToConstant = new HashMap<String, T>();
+        final Map<String, T> lowercaseToConstant = new HashMap<>();
         for (Object constant : rawType.getEnumConstants()) {
             lowercaseToConstant.put(toLowercase(constant), (T) constant);
         }
 
-        return new TypeAdapter<T>() {
+        return new TypeAdapter<>() {
             public void write(JsonWriter out, T value) throws IOException {
                 if (value == null)
                     out.nullValue();

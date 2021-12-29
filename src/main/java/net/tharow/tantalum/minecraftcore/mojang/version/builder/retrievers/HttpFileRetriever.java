@@ -30,8 +30,8 @@ import java.io.IOException;
 
 public class HttpFileRetriever implements MojangVersionRetriever {
 
-    private String baseUrl;
-    private DownloadListener listener;
+    private final String baseUrl;
+    private final DownloadListener listener;
 
     public HttpFileRetriever(String baseUrl, DownloadListener listener) {
         this.baseUrl = baseUrl;

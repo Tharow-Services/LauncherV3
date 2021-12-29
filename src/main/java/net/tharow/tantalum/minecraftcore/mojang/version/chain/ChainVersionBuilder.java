@@ -28,8 +28,8 @@ import java.util.regex.Pattern;
 public class ChainVersionBuilder implements MojangVersionBuilder {
     private static final Pattern MINECRAFT_VERSION_PATTERN = Pattern.compile("^[0-9]+(\\.[0-9]+)+$");
 
-    private MojangVersionBuilder primaryVersionBuilder;
-    private MojangVersionBuilder chainedVersionBuilder;
+    private final MojangVersionBuilder primaryVersionBuilder;
+    private final MojangVersionBuilder chainedVersionBuilder;
 
     public ChainVersionBuilder(MojangVersionBuilder primaryVersionBuilder, MojangVersionBuilder chainedVersionBuilder) {
         this.primaryVersionBuilder = primaryVersionBuilder;

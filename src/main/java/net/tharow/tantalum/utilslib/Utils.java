@@ -18,23 +18,18 @@
 
 package net.tharow.tantalum.utilslib;
 
-import com.beust.jcommander.IStringConverter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.msopentech.thali.toronionproxy.Utilities;
-import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
 import net.tharow.tantalum.launchercore.mirror.download.Download;
 import net.tharow.tantalum.launchercore.util.DownloadListener;
-import net.tharow.tantalum.ui.lang.ResourceLoader;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.Socket;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -47,7 +42,7 @@ import java.util.logging.Logger;
 
 public class Utils {
     private static final Gson gson;
-    private static final Logger logger = Logger.getLogger("net.tharow.tantalum.launcher.Main");
+    private static final TantalumLogger logger = TantalumLogger.getLogger("net.tharow.tantalum.launcher.LauncherMain");
     private static final int DOWNLOAD_RETRIES = 3;
     @SuppressWarnings("unused")
     public static volatile Object ignored;
@@ -57,15 +52,6 @@ public class Utils {
         gson = builder.create();
 
         // Make sure we're logging everything we want to be logging
-        logger.setLevel(Level.ALL);
-        logger.config("Doing the Thing");
-    }
-
-    public static void installModpackNow(ResourceLoader resourceLoader, String uri){
-
-
-
-
     }
 
 
@@ -89,8 +75,28 @@ public class Utils {
         return gson;
     }
 
-    public static Logger getLogger() {
+    public static TantalumLogger getLogger() {
         return logger;
+    }
+
+    public static void logDebug(String msg){
+        getLogger().log(LogLevel.DEBUG,msg);
+    }
+    public static void entering(Class scr, String method, Object[] prams){
+        getLogger().entering(scr.getName(), method, prams);
+    }
+    public static void exiting(Class src, String method, Object result){
+        getLogger().exiting(src.getName(), method, result);
+    }
+
+    /**
+     * If We Are Running in Debug mode this do this
+     * @param runnable what to run in debug
+     */
+    public static void doDebug(Runnable runnable){
+        if(TantalumConstants.isIsDebug()){
+            runnable.run();
+        }
     }
 
     /**
@@ -154,40 +160,10 @@ public class Utils {
         }
     }
 
-    /*public static void sendTracking(String category, String action, String label, String clientId) {
-        String url = "https://www.google-analytics.com/collect";
-        try {
-            URL urlObj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) urlObj.openConnection();
-            con.setRequestMethod("POST");
-
-            String urlParameters = "v=1&tid=UA-30896795-3&cid=" + clientId + "&t=event&ec=" + category + "&ea=" + action + "&el=" + label;
-
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-
-            int responseCode = con.getResponseCode();
-            Utils.getLogger().info("Analytics Response [" + category + "]: " + responseCode);
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }*/
+    public static boolean sendTracking(String category, String action, String label, String clientId) {
+        logDebug("Block Tracking Command. Category: "+category+" Action: "+action+" Label: "+label+" Client ID: "+clientId);
+        return false;
+    }
 
     /**
      *
@@ -222,15 +198,22 @@ public class Utils {
                 out = response.toString().trim();
             }
         }
-        catch (IOException e) {
+        catch (IOException | InterruptedException e) {
             //Some kind of problem running java -version or getting output, just assume the version is bad
             return null;
-        } catch (InterruptedException ex) {
-            //Something booted us while we were waiting on java -version to complete, just assume
-            //this version is bad
-            return null;
-        }
+        } //Something booted us while we were waiting on java -version to complete, just assume
+        //this version is bad
+
         return out;
+    }
+
+    public static URL getUrl(String url){
+        try {
+            return getFullUrl(url);
+        } catch (DownloadException e) {
+            getLogger().severe("Invalid Url: " + url);
+        }
+        return null;
     }
 
     public static URL getFullUrl(String url) throws DownloadException {

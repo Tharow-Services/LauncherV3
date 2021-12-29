@@ -33,8 +33,8 @@ import java.text.DateFormat;
 import java.util.Calendar;
 
 public class NewsWidget extends SelectorWidget implements IImageJobListener<AuthorshipInfo> {
-    private NewsArticle article;
-    private ImageJob<AuthorshipInfo> avatar;
+    private final NewsArticle article;
+    private final ImageJob<AuthorshipInfo> avatar;
     private JLabel avatarView;
 
     public NewsWidget(ResourceLoader resources, NewsArticle article, ImageJob<AuthorshipInfo> avatar) {

@@ -18,6 +18,7 @@
 
 package net.tharow.tantalum.launcher.ui.components.modpacks;
 
+import net.tharow.tantalum.ui.controls.SimpleMouseListener;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.ui.controls.list.SimpleScrollbarUI;
@@ -28,6 +29,8 @@ import net.tharow.tantalum.launchercore.image.ImageRepository;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.utilslib.ImageUtils;
+import net.tharow.tantalum.utilslib.Utils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.text.MutableAttributeSet;
@@ -35,11 +38,10 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 
 public class ModpackDataDisplay extends JPanel implements IImageJobListener<ModpackModel> {
-    private ResourceLoader resources;
-    private ImageRepository<ModpackModel> logoRepo;
+    private final ResourceLoader resources;
+    private final ImageRepository<ModpackModel> logoRepo;
 
     private JPanel statBoxes;
 
@@ -51,10 +53,6 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
     private StatBox runs;
     private StatBox downloads;
 
-    //private JPanel discordPanel;
-    //private JButton discordLabel;
-    //private JButton countLabel;
-    //private java.util.List<JButton> discordButtons = new ArrayList<JButton>(3);
 
     private String packSiteUrl;
 
@@ -73,14 +71,20 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
         return new Dimension(size.width, 225);
     }
 
-    public void setModpack(ModpackModel modpack) {
+    public void setModpack(@NotNull ModpackModel modpack) {
         this.currentModpack = modpack;
         this.packSiteUrl = modpack.getWebSite();
 
         if (this.packSiteUrl == null)
             this.packSiteUrl = "https://www.tantalum.tharow.net/discover.html";
 
-        titleLabel.setText(resources.getString("launcher.packstats.title", modpack.getDisplayName()));
+        Utils.logDebug("Set modpack: "+this.currentModpack.getDisplayName());
+        if (this.currentModpack.getDisplayName() == null) {
+            titleLabel.setText("Error");
+        } else{
+            titleLabel.setText(resources.getString("launcher.packstats.title", this.currentModpack.getDisplayName()));
+        }
+
         description.setText(modpack.getDescription());
 
         boolean wasVisible = ratings.isVisible();
@@ -97,13 +101,14 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
         downloads.setValue(modpack.getDownloads());
         runs.setValue(modpack.getRuns());
 
-        ImageJob<ModpackModel> job = logoRepo.startImageJob(modpack);
+        @SuppressWarnings("unchecked") ImageJob<ModpackModel> job = logoRepo.startImageJob(modpack);
         job.addJobListener(this);
         packImage.setIcon(new ImageIcon(ImageUtils.scaleImage(job.getImage(), 370, 220)));
 
         EventQueue.invokeLater(() -> {
             description.scrollRectToVisible(new Rectangle(new Dimension(1, 1)));
             repaint();
+
         });
     }
 
@@ -168,41 +173,6 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
 
         packInfoPanel.add(Box.createHorizontalGlue(), new GridBagConstraints(2, 2, 1, 1, 1.0, 0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
-    /*    discordPanel = new JPanel();
-        discordPanel.setOpaque(false);
-        discordPanel.setLayout(new GridBagLayout());
-
-        JButton discordImage = new JButton(resources.getIcon("discord.png"));
-        discordImage.setContentAreaFilled(false);
-        discordImage.setFocusPainted(false);
-        discordImage.setBorder(BorderFactory.createEmptyBorder());
-        discordImage.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        discordPanel.add(discordImage, new GridBagConstraints(0, 0, 1, 2, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 0, 0, 3), 0, 0));
-        discordButtons.add(discordImage);
-
-        discordLabel = new JButton(resources.getString("launcher.discord.join"));
-        discordLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        discordLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 20));
-        discordLabel.setContentAreaFilled(false);
-        discordLabel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-        discordLabel.setFocusPainted(false);
-        discordLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        discordPanel.add(discordLabel, new GridBagConstraints(1, 0, 1, 1, 1, 0.5, GridBagConstraints.SOUTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-        discordButtons.add(discordLabel);
-
-        countLabel = new JButton(resources.getString("launcher.discord.count", Integer.toString(0)));
-        countLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
-        countLabel.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
-        countLabel.setContentAreaFilled(false);
-        countLabel.setBorder(BorderFactory.createEmptyBorder());
-        countLabel.setFocusPainted(false);
-        countLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        discordPanel.add(countLabel, new GridBagConstraints(1, 1, 1, 1, 1, 0.5, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-        discordButtons.add(countLabel);
-
-        packInfoPanel.add(discordPanel, new GridBagConstraints(3, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 4), 0, 0));
-        discordPanel.setVisible(false);
-*/
         titleLabel = new JLabel(resources.getString("launcher.packstats.title", "Modpack"));
         titleLabel.setFont(resources.getFont(ResourceLoader.FONT_RALEWAY, 24, Font.BOLD));
         titleLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
@@ -210,32 +180,7 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
         titleLabel.setHorizontalTextPosition(SwingConstants.LEFT);
         titleLabel.setAlignmentX(LEFT_ALIGNMENT);
         titleLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        titleLabel.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                DesktopUtils.browseUrl(packSiteUrl+"/about");
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
+        titleLabel.addMouseListener(new SimpleMouseListener(()->DesktopUtils.browseUrl(packSiteUrl+"/about")));
         packInfoPanel.add(titleLabel, new GridBagConstraints(0,0,4,1,1.0,0.0,GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0,0,0,0),0,0));
 
         description = new JTextPane();
@@ -249,33 +194,7 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
         MutableAttributeSet attributes = new SimpleAttributeSet(description.getParagraphAttributes());
         StyleConstants.setLineSpacing(attributes, StyleConstants.getLineSpacing(attributes)*1.3f);
         description.setParagraphAttributes(attributes, true);
-
-        description.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                DesktopUtils.browseUrl(packSiteUrl+"/about");
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
+        description.addMouseListener(new SimpleMouseListener(()->DesktopUtils.browseUrl(packSiteUrl+"/about")));
         description.setBorder(BorderFactory.createEmptyBorder(8,8,8,8));
 
         JScrollPane scrollPane = new JScrollPane(description, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -290,12 +209,7 @@ public class ModpackDataDisplay extends JPanel implements IImageJobListener<Modp
         scrollHostPanel.setLayout(new BorderLayout());
         scrollHostPanel.add(scrollPane, BorderLayout.CENTER);
 
-        scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
-            @Override
-            public void adjustmentValueChanged(final AdjustmentEvent e) {
-                ModpackDataDisplay.this.repaint();
-            }
-        });
+        scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> ModpackDataDisplay.this.repaint());
 
         packInfoPanel.add(scrollHostPanel, new GridBagConstraints(0,1,4,1,1.0,1.0,GridBagConstraints.NORTH,GridBagConstraints.BOTH, new Insets(5,0,0,0),0,0));
     }

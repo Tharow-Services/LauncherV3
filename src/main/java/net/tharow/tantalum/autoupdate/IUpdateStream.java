@@ -23,5 +23,7 @@ import net.tharow.tantalum.autoupdate.io.StreamVersion;
 import net.tharow.tantalum.rest.RestfulAPIException;
 
 public interface IUpdateStream {
-    public StreamVersion getStreamVersion(String stream) throws RestfulAPIException;
+    StreamVersion getStreamVersion(String stream) throws RestfulAPIException;
+
+    StreamVersion getStreamVersion() throws RestfulAPIException;
 }

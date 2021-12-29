@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DisplayClaims {
     @Key(value = "xui")
-    public List<XuiObject> xuiObjects = new ArrayList<>();
+    public final List<XuiObject> xuiObjects = new ArrayList<>();
 
     public String getUserhash() throws MicrosoftAuthException {
         if (xuiObjects == null || xuiObjects.isEmpty()) {

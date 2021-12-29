@@ -26,7 +26,7 @@ public interface IGameAuthService<UserData> {
 
     UserData createOfflineUser(String displayName);
 
-    IAuthResponse requestRefresh(UserData user) throws AuthenticationException;
+    IAuthResponse requestRefresh(UserData user);
 
-    IAuthResponse requestLogin(String username, String password, String data) throws AuthenticationException;
+    IAuthResponse requestLogin(String username, String password, String data);
 }

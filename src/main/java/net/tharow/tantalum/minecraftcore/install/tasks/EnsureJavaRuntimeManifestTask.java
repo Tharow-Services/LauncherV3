@@ -37,19 +37,10 @@ import net.tharow.tantalum.minecraftcore.mojang.version.io.JavaVersion;
 import java.io.File;
 import java.io.IOException;
 
-public class EnsureJavaRuntimeManifestTask implements IInstallTask {
-
-    private final File runtimesDirectory;
-    private final ModpackModel modpack;
-    private final ITasksQueue examineJavaQueue;
-    private final ITasksQueue downloadJavaQueue;
-
-    public EnsureJavaRuntimeManifestTask(File runtimesDirectory, ModpackModel modpack, ITasksQueue examineJavaQueue, ITasksQueue downloadJavaQueue) {
-        this.runtimesDirectory = runtimesDirectory;
-        this.modpack = modpack;
-        this.examineJavaQueue = examineJavaQueue;
-        this.downloadJavaQueue = downloadJavaQueue;
-    }
+public record EnsureJavaRuntimeManifestTask(File runtimesDirectory,
+                                            ModpackModel modpack,
+                                            ITasksQueue examineJavaQueue,
+                                            ITasksQueue downloadJavaQueue) implements IInstallTask {
 
     @Override
     public String getTaskDescription() {
@@ -63,7 +54,7 @@ public class EnsureJavaRuntimeManifestTask implements IInstallTask {
 
     @Override
     public void runTask(InstallTasksQueue queue) throws IOException {
-        MojangVersion version = ((InstallTasksQueue<MojangVersion>)queue).getMetadata();
+        @SuppressWarnings("unchecked") MojangVersion version = ((InstallTasksQueue<MojangVersion>) queue).getMetadata();
 
         JavaVersion wantedRuntime = version.getJavaVersion();
 

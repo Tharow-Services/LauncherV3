@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.util.zip.ZipException;
 
 public class UnzipFileTask extends ListenerTask {
-    private File zipFile;
-    private File destination;
-    private IZipFileFilter filter;
+    private final File zipFile;
+    private final File destination;
+    private final IZipFileFilter filter;
 
     public UnzipFileTask(File zipFile, File destination, IZipFileFilter filter) {
         this.zipFile = zipFile;

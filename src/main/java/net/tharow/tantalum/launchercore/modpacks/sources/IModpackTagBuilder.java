@@ -22,5 +22,5 @@ package net.tharow.tantalum.launchercore.modpacks.sources;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 
 public interface IModpackTagBuilder {
-    public Iterable<String> getModpackTags(ModpackModel modpack);
+    Iterable<String> getModpackTags(ModpackModel modpack);
 }

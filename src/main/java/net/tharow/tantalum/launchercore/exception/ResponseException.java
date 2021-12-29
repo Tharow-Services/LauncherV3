@@ -5,7 +5,7 @@ package net.tharow.tantalum.launchercore.exception;
  */
 public class ResponseException extends AuthenticationException {
     private static final long serialVersionUID = 5887385045789344444L;
-    private String error;
+    private final String error;
 
     public ResponseException(String error, String errorMessage) {
         super(errorMessage);

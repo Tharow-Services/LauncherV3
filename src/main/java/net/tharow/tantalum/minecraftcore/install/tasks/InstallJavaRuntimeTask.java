@@ -38,22 +38,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class InstallJavaRuntimeTask implements IInstallTask {
-    private final ModpackModel modpack;
-    private final File runtimesDirectory;
-    private final File runtimeManifestFile;
-    private final String runtimeName;
-    private final ITasksQueue examineJavaQueue;
-    private final ITasksQueue downloadJavaQueue;
-
-    public InstallJavaRuntimeTask(ModpackModel modpack, File runtimesDirectory, File runtimeManifestFile, String runtimeName, ITasksQueue examineJavaQueue, ITasksQueue downloadJavaQueue) {
-        this.modpack = modpack;
-        this.runtimesDirectory = runtimesDirectory;
-        this.runtimeManifestFile = runtimeManifestFile;
-        this.runtimeName = runtimeName;
-        this.examineJavaQueue = examineJavaQueue;
-        this.downloadJavaQueue = downloadJavaQueue;
-    }
+public record InstallJavaRuntimeTask(ModpackModel modpack,
+                                     File runtimesDirectory, File runtimeManifestFile,
+                                     String runtimeName,
+                                     ITasksQueue examineJavaQueue,
+                                     ITasksQueue downloadJavaQueue) implements IInstallTask {
 
     @Override
     public String getTaskDescription() {
@@ -102,7 +91,7 @@ public class InstallJavaRuntimeTask implements IInstallTask {
 
                 IFileVerifier verifier = new SHA1FileVerifier(download.getSha1());
 
-                EnsureFileTask ensureFileTask = new EnsureFileTask(target, verifier, null, download.getUrl(), downloadJavaQueue, null);
+                @SuppressWarnings("unchecked") EnsureFileTask ensureFileTask = new EnsureFileTask(target, verifier, null, download.getUrl(), downloadJavaQueue, null);
                 ensureFileTask.setExecutable(runtimeFile.isExecutable());
 
                 examineJavaQueue.addTask(ensureFileTask);

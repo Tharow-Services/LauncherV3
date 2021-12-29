@@ -66,9 +66,9 @@ import static javax.swing.JOptionPane.showMessageDialog;
 
 public class LoginFrame extends DraggableFrame implements IRelocalizableResource, KeyListener, IAuthListener {
     private ResourceLoader resources;
-    private ImageRepository<IUserType> skinRepository;
-    private UserModel userModel;
-    private TantalumSettings settings;
+    private final ImageRepository<IUserType> skinRepository;
+    private final UserModel userModel;
+    private final TantalumSettings settings;
 
     private RoundedButton addMojang;
     private RoundedButton addMicrosoft;
@@ -230,12 +230,12 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         selectLabel.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         add(selectLabel, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10,20,0,20), 0,0));
 
-        addAccounts = new JLabel(resources.getString("login.instructions"));
+        addAccounts = new JLabel("ERROR DEBUG LOGIN ADD ACCOUNTS INSTRUCTIONS LABEL");
         addAccounts.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         addAccounts.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         //add(addAccounts, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
-        visitBrowser = new JLabel(resources.getString("login.checkbrowser"));
+        visitBrowser = new JLabel("ERROR DEBUG LOGIN VISIT BROWSER LABEL");
         visitBrowser.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         visitBrowser.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         //add(visitBrowser,  new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
@@ -430,9 +430,10 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
 
         linkPane.add(Box.createHorizontalStrut(8));
 
+        //noinspection unchecked
         languages = new JComboBox();
         String defaultLocaleText = resources.getString("launcheroptions.language.default");
-        if (!resources.isDefaultLocaleSupported()) {
+        if (resources.isDefaultLocaleSupported()) {
             defaultLocaleText = defaultLocaleText.concat(" (" + resources.getString("launcheroptions.language.unavailable") + ")");
         }
 
@@ -455,6 +456,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         languages.setUI(new LanguageCellUI(resources, new RoundedBorderFormatter(new LineBorder(Color.black, 1)), LauncherFrame.COLOR_SCROLL_TRACK, LauncherFrame.COLOR_SCROLL_THUMB));
         languages.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         languages.setBackground(LauncherFrame.COLOR_SELECTOR_BACK);
+        //noinspection unchecked
         languages.setRenderer(new LanguageCellRenderer(resources, "globe.png", LauncherFrame.COLOR_SELECTOR_BACK, LauncherFrame.COLOR_WHITE_TEXT));
         languages.setEditable(false);
         languages.setFocusable(false);
@@ -658,6 +660,10 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         }
     }
 
+    protected void showMessage(String key){
+        showMessageDialog(this,resources.getString("login."+key+".title"),resources.getString("login."+key+".message"), JOptionPane.ERROR_MESSAGE);
+    }
+
 
     private void newMicrosoftLogin() {
         setAccountSelectVisibility(false);
@@ -671,25 +677,16 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
             setCurrentUser(microsoftUser);
         } catch (MicrosoftAuthException e) {
             switch (e.getType()) {
-                case UNDERAGE:
-                    showMessageDialog(this,
-                            "Your Xbox account is underage and will need to be added to a Family to play this game.",
-                            "Underage Error", ERROR_MESSAGE);
-                    break;
-                case NO_XBOX_ACCOUNT:
-                    showMessageDialog(this,
-                            "You don't have an Xbox account associated with this Microsoft account.\n" +
-                                    "Please login at minecraft.net and set up an Xbox account, then try to login here again.",
-                            "No Xbox Account", ERROR_MESSAGE);
+                case UNDERAGE -> showMessage("microsoft.underage");
+                case NO_XBOX_ACCOUNT -> {
+                    showMessage("microsoft.noxbox");
                     DesktopUtils.browseUrl("https://www.minecraft.net/login");
-                    break;
-                case NO_MINECRAFT:
-                    showMessageDialog(this,
-                            "This account has not purchased Minecraft Java Edition.", "No Minecraft", ERROR_MESSAGE);
-                    break;
-                default:
+                }
+                case NO_MINECRAFT -> showMessage("microsoft.nomc");
+                default -> {
                     e.printStackTrace();
-                    showMessageDialog(this, e.getMessage(), "Add Microsoft Account Failed", ERROR_MESSAGE);
+                    showMessageDialog(this, e.getMessage(), resources.getString("login.microsoft.default.title"), ERROR_MESSAGE);
+                }
             }
         } finally {
             setAccountSelectVisibility(!userModel.getUsers().isEmpty());

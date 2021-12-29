@@ -28,10 +28,10 @@ import java.io.File;
 import java.io.IOException;
 
 public class DownloadFileTask extends ListenerTask {
-    private String url;
-    private File destination;
-    private String taskDescription;
-    private IFileVerifier fileVerifier;
+    private final String url;
+    private final File destination;
+    private final String taskDescription;
+    private final IFileVerifier fileVerifier;
     private final boolean executable;
 
     protected File getDestination() { return destination; }

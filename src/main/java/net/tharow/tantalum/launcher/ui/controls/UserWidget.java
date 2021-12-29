@@ -33,7 +33,7 @@ import java.awt.image.BufferedImage;
 
 public class UserWidget extends JPanel implements IImageJobListener<AuthlibUser> {
 
-    private ImageRepository<IUserType> skinRepository;
+    private final ImageRepository<IUserType> skinRepository;
 
     private JLabel userName;
     private JLabel avatar;
@@ -100,7 +100,7 @@ public class UserWidget extends JPanel implements IImageJobListener<AuthlibUser>
         currentMojangUser = mojangUser;
         userName.setText(mojangUser.getDisplayName());
 
-        ImageJob<IUserType> job = skinRepository.startImageJob(currentMojangUser);
+        @SuppressWarnings("unchecked") ImageJob<IUserType> job = skinRepository.startImageJob(currentMojangUser);
         job.addJobListener(this);
         refreshFace(job.getImage());
     }

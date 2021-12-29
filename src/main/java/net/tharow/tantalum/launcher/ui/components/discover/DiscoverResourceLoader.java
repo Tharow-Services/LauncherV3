@@ -23,11 +23,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 public class DiscoverResourceLoader extends ImageResourceLoader {
-    public static final RepaintListener NO_OP_REPAINT_LISTENER = new RepaintListener() {
-        public void repaintRequested(boolean doLayout) {
-            XRLog.general(Level.FINE, "No-op repaint requested");
-        }
-    };
+    public static final RepaintListener NO_OP_REPAINT_LISTENER = doLayout -> XRLog.general(Level.FINE, "No-op repaint requested");
     private final Map _imageCache;
 
     private final ImageLoadQueue _loadQueue;
@@ -162,6 +158,7 @@ public class DiscoverResourceLoader extends ImageResourceLoader {
                         _loadQueue.addToQueue(this, uri, mfsi, width, height);
                     }
 
+                    //noinspection unchecked
                     _imageCache.put(key, ir);
                 } else {
                     // loaded at base size, need to scale
@@ -185,6 +182,7 @@ public class DiscoverResourceLoader extends ImageResourceLoader {
     public synchronized void loaded(final ImageResource ir, final int width, final int height) {
         String imageUri = ir.getImageUri();
         if (imageUri != null) {
+            //noinspection unchecked
             _imageCache.put(new CacheKey(imageUri, width, height), ir);
         }
     }
@@ -208,28 +206,15 @@ public class DiscoverResourceLoader extends ImageResourceLoader {
         }
     }
 
-    private static class CacheKey {
-        final String uri;
-        final int width;
-        final int height;
-
-        public CacheKey(final String uri, final int width, final int height) {
-            this.uri = uri;
-            this.width = width;
-            this.height = height;
-        }
+    private record CacheKey(String uri, int width, int height) {
 
         public boolean equals(final Object o) {
             if (this == o) return true;
-            if (!(o instanceof CacheKey)) return false;
-
-            final CacheKey cacheKey = (CacheKey) o;
+            if (!(o instanceof final CacheKey cacheKey)) return false;
 
             if (height != cacheKey.height) return false;
             if (width != cacheKey.width) return false;
-            if (!uri.equals(cacheKey.uri)) return false;
-
-            return true;
+            return uri.equals(cacheKey.uri);
         }
 
         public int hashCode() {

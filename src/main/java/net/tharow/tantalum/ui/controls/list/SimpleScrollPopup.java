@@ -26,6 +26,7 @@ import java.awt.*;
 public class SimpleScrollPopup extends BasicComboPopup {
 
     public SimpleScrollPopup(JComboBox combo, Color trackColor, Color thumbColor) {
+        //noinspection unchecked
         super(combo);
         scroller.getVerticalScrollBar().setUI(new SimpleScrollbarUI(trackColor, thumbColor));
         invalidate();

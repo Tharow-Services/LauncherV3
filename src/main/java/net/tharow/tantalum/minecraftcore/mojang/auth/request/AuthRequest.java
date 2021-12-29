@@ -34,7 +34,7 @@ public class AuthRequest {
         this.clientToken = clientToken;
     }
 
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    @SuppressWarnings({"unused"})
     public static class Agent {
         private final String name = "Minecraft";
         private final int version = 1;

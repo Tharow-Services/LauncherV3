@@ -20,12 +20,12 @@ public class FixRunDataDialog extends LauncherDialog {
 
     private static final int DIALOG_WIDTH = 620;
 
-    private ResourceLoader resourceLoader;
+    private final ResourceLoader resourceLoader;
 
-    private RunData runData;
-    private JavaVersionRepository javaVersionRepository;
-    private Memory attemptedMemory;
-    private boolean shouldAskFirst;
+    private final RunData runData;
+    private final JavaVersionRepository javaVersionRepository;
+    private final Memory attemptedMemory;
+    private final boolean shouldAskFirst;
     private final boolean usingMojangJava;
 
     private IJavaVersion recommendedVersion;
@@ -55,7 +55,7 @@ public class FixRunDataDialog extends LauncherDialog {
 
     @Override
     public void setVisible(boolean visible) {
-        if ((recommendedVersion != null && recommendedMemory != null && javaVersionRepository.getSelectedVersion().equals(recommendedVersion) && attemptedMemory.getMemoryMB() == recommendedMemory.getMemoryMB()) ||
+        if ((recommendedMemory != null && javaVersionRepository.getSelectedVersion().equals(recommendedVersion) && attemptedMemory.getMemoryMB() == recommendedMemory.getMemoryMB()) ||
                 (!shouldAskFirst && recommendedMemory != null && recommendedVersion != null)) {
             result = Result.ACCEPT;
             dispose();
@@ -195,12 +195,7 @@ public class FixRunDataDialog extends LauncherDialog {
         closeButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         closeButton.setContentAreaFilled(false);
         closeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        closeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                closeDialog();
-            }
-        });
+        closeButton.addActionListener(e -> closeDialog());
         closeButton.setFocusPainted(false);
         header.add(closeButton);
     }
@@ -336,12 +331,9 @@ public class FixRunDataDialog extends LauncherDialog {
         okButton.setBorder(BorderFactory.createEmptyBorder(5, 25, 5, 25));
         okButton.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         okButton.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                result = Result.OK;
-                dispose();
-            }
+        okButton.addActionListener(e -> {
+            result = Result.OK;
+            dispose();
         });
         buttonPanel.add(okButton);
     }
@@ -374,12 +366,9 @@ public class FixRunDataDialog extends LauncherDialog {
         cancelButton.setContentAreaFilled(false);
         cancelButton.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         cancelButton.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                result = Result.CANCEL;
-                dispose();
-            }
+        cancelButton.addActionListener(e -> {
+            result = Result.CANCEL;
+            dispose();
         });
         buttonPanel.add(cancelButton);
 
@@ -390,12 +379,9 @@ public class FixRunDataDialog extends LauncherDialog {
         okButton.setContentAreaFilled(false);
         okButton.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         okButton.setHoverForeground(LauncherFrame.COLOR_BLUE);
-        okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                result = Result.ACCEPT;
-                dispose();
-            }
+        okButton.addActionListener(e -> {
+            result = Result.ACCEPT;
+            dispose();
         });
         buttonPanel.add(okButton);
     }
@@ -410,7 +396,7 @@ public class FixRunDataDialog extends LauncherDialog {
 
     /**Returns the preferred size to set a component at in order to render
      * an html string.  You can specify the size of one dimension.*/
-    private static JLabel resizer = new JLabel();
+    private static final JLabel resizer = new JLabel();
     private java.awt.Dimension getPreferredSize(String html, int width) {
         resizer.setText(html);
 

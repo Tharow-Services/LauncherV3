@@ -25,7 +25,7 @@ import javax.swing.*;
 
 public class SelectorWidget extends JButton {
 
-    private ResourceLoader resources;
+    private final ResourceLoader resources;
 
     private boolean isSelected;
 

@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CombinedPackInfo implements PackInfo {
-    private PackInfo solderPackInfo;
-    private PackInfo platformPackInfo;
+    private final PackInfo solderPackInfo;
+    private final PackInfo platformPackInfo;
 
     public CombinedPackInfo(PackInfo solderPackInfo, PackInfo platformPackInfo) {
         this.solderPackInfo = solderPackInfo;
@@ -119,7 +119,7 @@ public class CombinedPackInfo implements PackInfo {
         if (platformPackInfo != null)
             return platformPackInfo.getBuilds();
 
-        return new ArrayList<String>(0);
+        return new ArrayList<>(0);
     }
 
     @Override

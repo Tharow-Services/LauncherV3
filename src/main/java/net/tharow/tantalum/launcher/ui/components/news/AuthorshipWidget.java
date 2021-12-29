@@ -24,6 +24,7 @@ import net.tharow.tantalum.launchercore.image.IImageJobListener;
 import net.tharow.tantalum.launchercore.image.ImageJob;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
 import net.tharow.tantalum.utilslib.ImageUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.*;
 
 import javax.swing.*;
@@ -32,7 +33,7 @@ import java.util.Date;
 
 public class AuthorshipWidget extends JPanel implements IImageJobListener<AuthorshipInfo> {
     private JLabel avatarView;
-    private ResourceLoader resources;
+    private final ResourceLoader resources;
     private JLabel authorName;
     private JLabel postTime;
 
@@ -73,15 +74,15 @@ public class AuthorshipWidget extends JPanel implements IImageJobListener<Author
         add(Box.createHorizontalStrut(4));
     }
 
-    private String getDateText(Date date) {
+    private String getDateText(@NotNull Date date) {
         LocalDate posted = new LocalDate(date.getTime());
         LocalDate now = new LocalDate();
 
         Years yearsSince = Years.yearsBetween(posted, now);
         Months monthsSince = Months.monthsBetween(posted, now);
         Days daysSince = Days.daysBetween(posted, now);
-        Hours hoursSince = Hours.hoursBetween(posted, now);
-        Minutes minutesSince = Minutes.minutesBetween(posted, now);
+        //Hours hoursSince = Hours.hoursBetween(posted, now);
+        //Minutes minutesSince = Minutes.minutesBetween(posted, now);
 
         if (yearsSince.getYears() > 1)
             return resources.getString("time.years", Integer.toString(yearsSince.getYears()));
@@ -95,12 +96,12 @@ public class AuthorshipWidget extends JPanel implements IImageJobListener<Author
             return resources.getString("time.days", Integer.toString(daysSince.getDays()));
         else if (daysSince.getDays() == 1)
             return resources.getString("time.day");
-        else if (hoursSince.getHours() > 1)
-            return resources.getString("time.hours", Integer.toString(hoursSince.getHours()));
-        else if (hoursSince.getHours() == 1)
-            return resources.getString("time.hour");
-        else if (minutesSince.getMinutes() > 1)
-            return resources.getString("time.minutes", Integer.toString(minutesSince.getMinutes()));
+        //else if (hoursSince.getHours() > 1)
+        //    return resources.getString("time.hours", Integer.toString(hoursSince.getHours()));
+        //else if (hoursSince.getHours() == 1)
+        //    return resources.getString("time.hour");
+        //else if (minutesSince.getMinutes() > 1)
+        //    return resources.getString("time.minutes", Integer.toString(minutesSince.getMinutes()));
         else
             return resources.getString("time.minute");
     }

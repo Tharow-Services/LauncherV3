@@ -239,7 +239,7 @@ public class MicrosoftAuthenticator {
     }
 
     private MinecraftProfile getMinecraftProfile(XboxMinecraftResponse xboxMinecraftResponse) throws MicrosoftAuthException {
-        HttpRequest request = buildGetRequest(MINECRAFT_PROFILE_URL);
+        HttpRequest request = buildGetRequest();
         String authorization = xboxMinecraftResponse.getAuthorization();
         request.setHeaders(request.getHeaders().setAuthorization(authorization));
 
@@ -304,9 +304,9 @@ public class MicrosoftAuthenticator {
         }
     }
 
-    private HttpRequest buildGetRequest(String url) throws MicrosoftAuthException {
+    private HttpRequest buildGetRequest() throws MicrosoftAuthException {
         try {
-            return REQUEST_FACTORY.buildGetRequest(new GenericUrl(url));
+            return REQUEST_FACTORY.buildGetRequest(new GenericUrl(MicrosoftAuthenticator.MINECRAFT_PROFILE_URL));
         } catch (IOException e) {
             throw new MicrosoftAuthException(REQUEST, "Failed to build get request.", e);
         }

@@ -31,9 +31,9 @@ import java.io.File;
 
 public class PackResourceMapper implements IImageMapper<ModpackModel> {
 
-    private LauncherDirectories directories;
-    private BufferedImage defaultImage;
-    private IModpackResourceType resourceType;
+    private final LauncherDirectories directories;
+    private final BufferedImage defaultImage;
+    private final IModpackResourceType resourceType;
 
     public PackResourceMapper(LauncherDirectories directories, BufferedImage defaultImage, IModpackResourceType resourceType) {
         this.directories = directories;

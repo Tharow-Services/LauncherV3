@@ -39,10 +39,10 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class ModpackInfoPanel extends JPanel implements IImageJobListener<ModpackModel> {
-    private ResourceLoader resources;
-    private ImageRepository<ModpackModel> backgroundRepo;
-    private ImageRepository<AuthorshipInfo> avatarRepo;
-    private ActionListener modpackRefreshListener;
+    private final ResourceLoader resources;
+    private final ImageRepository<ModpackModel> backgroundRepo;
+    private final ImageRepository<AuthorshipInfo> avatarRepo;
+    private final ActionListener modpackRefreshListener;
 
     private TiledBackground background;
     private HorizontalGallery feedGallery;
@@ -77,7 +77,7 @@ public class ModpackInfoPanel extends JPanel implements IImageJobListener<Modpac
         dataDisplay.setModpack(modpack);
         deleteButton.setVisible(modpack.getInstalledPack() != null);
 
-        ImageJob<ModpackModel> job = backgroundRepo.startImageJob(modpack);
+        @SuppressWarnings("unchecked") ImageJob<ModpackModel> job = backgroundRepo.startImageJob(modpack);
         job.addJobListener(this);
         background.setImage(job.getImage());
 
@@ -86,25 +86,14 @@ public class ModpackInfoPanel extends JPanel implements IImageJobListener<Modpac
         ArrayList<FeedItem> feed = modpack.getFeed();
 
         if (feed != null) {
-            for (int i = 0; i < feed.size(); i++) {
-                FeedItem item = feed.get(i);
-                FeedItemView itemView = new FeedItemView(resources, item, avatarRepo.startImageJob(item.getAuthorship()));
-                itemView.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        clickFeedItem((FeedItemView) e.getSource(), e.getActionCommand());
-                    }
-                });
+            for (FeedItem item : feed) {
+                @SuppressWarnings("unchecked") FeedItemView itemView = new FeedItemView(resources, item, avatarRepo.startImageJob(item.getAuthorship()));
+                itemView.addActionListener(e -> clickFeedItem((FeedItemView) e.getSource(), e.getActionCommand()));
                 feedGallery.add(itemView);
             }
         }
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                repaint();
-            }
-        });
+        EventQueue.invokeLater(() -> repaint());
     }
 
     public RoundedButton getPlayButton() {
@@ -191,23 +180,13 @@ public class ModpackInfoPanel extends JPanel implements IImageJobListener<Modpac
         JButton leftButton = new JButton(resources.getIcon("status_left.png"));
         leftButton.setBorder(BorderFactory.createEmptyBorder());
         leftButton.setContentAreaFilled(false);
-        leftButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clickLeftFeedButton();
-            }
-        });
+        leftButton.addActionListener(e -> clickLeftFeedButton());
         topline.add(leftButton);
 
         JButton rightButton = new JButton(resources.getIcon("status_right.png"));
         rightButton.setBorder(BorderFactory.createEmptyBorder());
         rightButton.setContentAreaFilled(false);
-        rightButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clickRightFeedButton();
-            }
-        });
+        rightButton.addActionListener(e -> clickRightFeedButton());
         topline.add(rightButton);
 
         JLabel label = new JLabel(resources.getString("launcher.packfeed.noupdates"));
@@ -293,12 +272,7 @@ public class ModpackInfoPanel extends JPanel implements IImageJobListener<Modpac
         if (job.getJobData() == modpack) {
             background.setImage(job.getImage());
 
-            EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    repaint();
-                }
-            });
+            EventQueue.invokeLater(() -> repaint());
         }
     }
 }

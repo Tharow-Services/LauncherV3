@@ -25,7 +25,7 @@ import net.tharow.tantalum.utilslib.Utils;
 import java.io.File;
 
 public class SHA1FileVerifier implements IFileVerifier {
-    private String sha1Hash;
+    private final String sha1Hash;
 
     public SHA1FileVerifier(String sha1Hash) {
         this.sha1Hash = sha1Hash;

@@ -30,7 +30,7 @@ import net.tharow.tantalum.ui.lang.ResourceLoader;
 
 public class HeaderTab extends JLabel implements MouseListener {
     private boolean isActive;
-    private DefaultButtonModel model;
+    private final DefaultButtonModel model;
 
     public HeaderTab(String text, ResourceLoader resources) {
         super(text);
@@ -51,12 +51,7 @@ public class HeaderTab extends JLabel implements MouseListener {
         this.isActive = isActive;
         this.setOpaque(isActive);
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                repaint();
-            }
-        });
+        EventQueue.invokeLater(() -> repaint());
     }
 
     public void addActionListener(ActionListener listener) {

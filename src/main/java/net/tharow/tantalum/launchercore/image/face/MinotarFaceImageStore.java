@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 public class MinotarFaceImageStore implements IImageStore<IUserType> {
-    private String mBaseUrl;
+    private final String mBaseUrl;
 
     public MinotarFaceImageStore(String baseUrl) {
         mBaseUrl = baseUrl;

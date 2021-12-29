@@ -31,9 +31,9 @@ import java.util.List;
 
 public class FileVersionBuilder implements MojangVersionBuilder {
 
-    private File version;
-    private MojangVersionRetriever retriever;
-    private List<MojangVersionRetriever> fallbackRetrievers;
+    private final File version;
+    private final MojangVersionRetriever retriever;
+    private final List<MojangVersionRetriever> fallbackRetrievers;
 
     public FileVersionBuilder(File version, MojangVersionRetriever retriever, List<MojangVersionRetriever> fallbackRetrievers) {
         this.version = version;

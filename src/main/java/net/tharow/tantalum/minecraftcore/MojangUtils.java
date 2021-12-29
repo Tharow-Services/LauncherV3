@@ -99,7 +99,7 @@ public class MojangUtils {
         builder.setPrettyPrinting();
         gson = builder.create();
 
-        versionJsonVersions = new TreeMap<Integer, Class<? extends MojangVersion>>();
+        versionJsonVersions = new TreeMap<>();
         versionJsonVersions.put(0, CompleteVersion.class);
         versionJsonVersions.put(21, CompleteVersionV21.class);
 
@@ -121,8 +121,7 @@ public class MojangUtils {
                 "MOJANG_C.SF",
                 "CODESIGN.RSA",
                 "CODESIGN.SF" };
-        JarFile jarFile = new JarFile(minecraft);
-        try {
+        try (JarFile jarFile = new JarFile(minecraft)) {
             String fileName = jarFile.getName();
             String fileNameLastPart = fileName.substring(fileName.lastIndexOf(File.separator));
 
@@ -149,8 +148,6 @@ public class MojangUtils {
                 jos.closeEntry();
             }
             jos.close();
-        } finally {
-            jarFile.close();
         }
 
     }
@@ -225,10 +222,7 @@ public class MojangUtils {
         if (mcVersion.compareTo(new ComparableVersion("1.13")) >= 0)
             return true;
 
-        if (mcVersionString.equals("1.12.2") && forgeVersion.compareTo(new ComparableVersion("14.23.5.2847")) > 0)
-            return true;
-
-        return false;
+        return mcVersionString.equals("1.12.2") && forgeVersion.compareTo(new ComparableVersion("14.23.5.2847")) > 0;
     }
 
     public static String getMinecraftVersion(MojangVersion version) {

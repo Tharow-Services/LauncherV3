@@ -69,6 +69,7 @@ class ImageLoadQueue {
      */
     public synchronized void addToQueue(final ImageResourceLoader imageResourceLoader, final String uri, final MutableFSImage mfsi, final int width, final int height) {
         XRLog.general(Level.FINE, "Queueing load for image uri " + uri);
+        //noinspection unchecked
         _loadQueue.addLast(new ImageLoadItem(imageResourceLoader, uri, mfsi, width, height));
         notifyAll();
     }
@@ -109,6 +110,7 @@ class ImageLoadQueue {
      * and that worker threads polling this queue should shut down.
      */
     public synchronized void kill() {
+        //noinspection unchecked
         _loadQueue.addLast(KILL_SWITCH);
         notifyAll();
     }

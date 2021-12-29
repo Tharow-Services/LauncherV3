@@ -24,37 +24,33 @@ import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.rest.io.PackInfo;
 import net.tharow.tantalum.solder.io.SolderPackInfo;
 import net.tharow.tantalum.utilslib.Utils;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.logging.Level;
 
-public class SolderPackSource implements IPackSource {
-    private String baseUrl;
-    private ISolderApi solder;
+public record SolderPackSource(String baseUrl, ISolderApi solder) implements IPackSource
+{
 
-    public SolderPackSource(String baseUrl, ISolderApi solder) {
-        this.baseUrl = baseUrl;
-        this.solder = solder;
-    }
-
+    @Contract(pure = true)
     @Override
-    public String getSourceName() {
+    public @NotNull String getSourceName() {
         return "Public packs for solder " + baseUrl;
     }
 
     @Override
-    public Collection<PackInfo> getPublicPacks() {
-        LinkedList<PackInfo> returnValue = new LinkedList<PackInfo>();
+    public @NotNull Collection<PackInfo> getPublicPacks() {
+        LinkedList<PackInfo> returnValue = new LinkedList<>();
 
         try {
             Collection<SolderPackInfo> packs = solder.getPublicSolderPacks(baseUrl);
 
-            for (SolderPackInfo info : packs) {
-                returnValue.add(info);
-            }
+            returnValue.addAll(packs);
         } catch (RestfulAPIException ex) {
-            Utils.getLogger().log(Level.WARNING, "Unable to load technic modpacks", ex);
+            Utils.getLogger().log(Level.WARNING, "Unable to load public solder modpacks from: " + baseUrl, ex);
+            ex.printStackTrace();
         }
 
         return returnValue;

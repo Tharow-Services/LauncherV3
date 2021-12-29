@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class SearchResultPackInfo implements PackInfo {
-    private SearchResult result;
+    private final SearchResult result;
 
     public SearchResultPackInfo(SearchResult result) {
         this.result = result;
@@ -87,7 +87,7 @@ public class SearchResultPackInfo implements PackInfo {
 
     @Override
     public ArrayList<FeedItem> getFeed() {
-        return new ArrayList<FeedItem>();
+        return new ArrayList<>();
     }
 
     @Override

@@ -38,28 +38,16 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class InstallMinecraftAssetsTask implements IInstallTask {
-    private final ModpackModel modpack;
-    private final String assetsDirectory;
-    private final File assetsIndex;
-    private final ITasksQueue checkAssetsQueue;
-    private final ITasksQueue downloadAssetsQueue;
-    private final ITasksQueue copyAssetsQueue;
-
+public record InstallMinecraftAssetsTask(ModpackModel modpack,
+                                         String assetsDirectory, File assetsIndex,
+                                         ITasksQueue checkAssetsQueue,
+                                         ITasksQueue downloadAssetsQueue,
+                                         ITasksQueue copyAssetsQueue) implements IInstallTask {
     private final static String virtualField = "virtual";
     private final static String mapToResourcesField = "map_to_resources";
     private final static String objectsField = "objects";
     private final static String sizeField = "size";
     private final static String hashField = "hash";
-
-    public InstallMinecraftAssetsTask(ModpackModel modpack, String assetsDirectory, File assetsIndex, ITasksQueue checkAssetsQueue, ITasksQueue downloadAssetsQueue, ITasksQueue copyAssetsQueue) {
-        this.modpack = modpack;
-        this.assetsDirectory = assetsDirectory;
-        this.assetsIndex = assetsIndex;
-        this.checkAssetsQueue = checkAssetsQueue;
-        this.downloadAssetsQueue = downloadAssetsQueue;
-        this.copyAssetsQueue = copyAssetsQueue;
-    }
 
     @Override
     public String getTaskDescription() {
@@ -90,8 +78,10 @@ public class InstallMinecraftAssetsTask implements IInstallTask {
         if (obj.get(mapToResourcesField) != null)
             mapToResources = obj.get(mapToResourcesField).getAsBoolean();
 
-        ((InstallTasksQueue<MojangVersion>)queue).getMetadata().setAreAssetsVirtual(isVirtual);
-        ((InstallTasksQueue<MojangVersion>)queue).getMetadata().setAssetsMapToResources(mapToResources);
+        //noinspection unchecked
+        ((InstallTasksQueue<MojangVersion>) queue).getMetadata().setAreAssetsVirtual(isVirtual);
+        //noinspection unchecked
+        ((InstallTasksQueue<MojangVersion>) queue).getMetadata().setAssetsMapToResources(mapToResources);
 
         JsonObject allObjects = obj.get(objectsField).getAsJsonObject();
 
@@ -99,11 +89,11 @@ public class InstallMinecraftAssetsTask implements IInstallTask {
             throw new DownloadException("The assets json file was invalid.");
         }
 
-        String assetsKey = ((InstallTasksQueue<MojangVersion>)queue).getMetadata().getAssetsKey();
+        @SuppressWarnings("unchecked") String assetsKey = ((InstallTasksQueue<MojangVersion>) queue).getMetadata().getAssetsKey();
         if (assetsKey == null || assetsKey.isEmpty())
             assetsKey = "legacy";
 
-        for(Map.Entry<String, JsonElement> field : allObjects.entrySet()) {
+        for (Map.Entry<String, JsonElement> field : allObjects.entrySet()) {
             String friendlyName = field.getKey();
             JsonObject file = field.getValue().getAsJsonObject();
             String hash = file.get(hashField).getAsString();
@@ -117,10 +107,11 @@ public class InstallMinecraftAssetsTask implements IInstallTask {
             File target = null;
 
             if (isVirtual)
-                target = new File(assetsDirectory + "/virtual/"  + assetsKey + '/' + friendlyName);
+                target = new File(assetsDirectory + "/virtual/" + assetsKey + '/' + friendlyName);
             else if (mapToResources)
                 target = new File(modpack.getResourcesDir(), friendlyName);
 
+            //noinspection unchecked
             checkAssetsQueue.addTask(new EnsureFileTask(location, new FileSizeVerifier(size), null, url, hash, downloadAssetsQueue, copyAssetsQueue));
 
             if (target != null && !target.exists()) {

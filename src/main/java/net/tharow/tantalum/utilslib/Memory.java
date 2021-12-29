@@ -86,9 +86,9 @@ public class Memory {
         return bestMemory;
     }
 
-    long memory;
-    String text;
-    int option;
+    final long memory;
+    final String text;
+    final int option;
 
     private Memory(int memory, String text, int option) {
         this.memory = memory;

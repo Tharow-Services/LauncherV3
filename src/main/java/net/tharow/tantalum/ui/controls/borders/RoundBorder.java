@@ -25,13 +25,13 @@ import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
 
 public class RoundBorder extends AbstractBorder {
-        private Color color;
+        private final Color color;
         private int thickness = 1;
         private int radii = 8;
         private Insets insets = null;
         private BasicStroke stroke = null;
-        private int strokePad;
-        RenderingHints hints;
+        private final int strokePad;
+        final RenderingHints hints;
 
         public RoundBorder(
                 Color color) {

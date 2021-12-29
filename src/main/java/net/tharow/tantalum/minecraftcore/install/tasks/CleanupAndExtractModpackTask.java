@@ -36,20 +36,11 @@ import net.tharow.tantalum.utilslib.IZipFileFilter;
 import java.io.File;
 import java.io.IOException;
 
-public class CleanupAndExtractModpackTask implements IInstallTask {
-	private final ModpackModel pack;
-	private final Modpack modpack;
-    private final ITasksQueue checkModQueue;
-    private final ITasksQueue downloadModQueue;
-    private final ITasksQueue copyModQueue;
-
-	public CleanupAndExtractModpackTask(ModpackModel pack, Modpack modpack, ITasksQueue checkModQueue, ITasksQueue downloadModQueue, ITasksQueue copyModQueue) {
-		this.pack = pack;
-		this.modpack = modpack;
-        this.checkModQueue = checkModQueue;
-        this.downloadModQueue = downloadModQueue;
-        this.copyModQueue = copyModQueue;
-	}
+public record CleanupAndExtractModpackTask(ModpackModel pack,
+										   Modpack modpack,
+										   ITasksQueue checkModQueue,
+										   ITasksQueue downloadModQueue,
+										   ITasksQueue copyModQueue) implements IInstallTask {
 
 	@Override
 	public String getTaskDescription() {
@@ -108,6 +99,7 @@ public class CleanupAndExtractModpackTask implements IInstallTask {
             else
                 verifier = new ValidZipFileVerifier();
 
+			//noinspection unchecked
 			checkModQueue.addTask(new EnsureFileTask(cache, verifier, packOutput, url, downloadModQueue, copyModQueue, zipFilter));
 		}
 

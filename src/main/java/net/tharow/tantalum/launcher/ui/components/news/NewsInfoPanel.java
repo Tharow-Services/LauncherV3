@@ -18,6 +18,7 @@
 
 package net.tharow.tantalum.launcher.ui.components.news;
 
+import net.tharow.tantalum.ui.controls.SimpleMouseListener;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.ui.controls.RoundedButton;
@@ -29,15 +30,14 @@ import net.tharow.tantalum.utilslib.DesktopUtils;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class NewsInfoPanel extends JPanel implements PropertyChangeListener {
-    private ResourceLoader resources;
-    private ImageRepository<AuthorshipInfo> avatarRepo;
+    private final ResourceLoader resources;
+    private final ImageRepository<AuthorshipInfo> avatarRepo;
 
     JTextPane newsText;
     JScrollPane newsScroller;
@@ -67,14 +67,10 @@ public class NewsInfoPanel extends JPanel implements PropertyChangeListener {
             article.getContent() +
             "</body></html>");
 
+        //noinspection unchecked
         authorshipInfo.setAuthorshipInfo(article.getAuthorshipInfo(), avatarRepo.startImageJob(article.getAuthorshipInfo()));
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                newsText.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
-            }
-        });
+        EventQueue.invokeLater(() -> newsText.scrollRectToVisible(new Rectangle(0, 0, 1, 1)));
     }
 
     protected void visitCurrentItem() {
@@ -93,32 +89,7 @@ public class NewsInfoPanel extends JPanel implements PropertyChangeListener {
         title.setFont(resources.getFont(ResourceLoader.FONT_RALEWAY, 26));
         title.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        title.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                visitCurrentItem();
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
+        title.addMouseListener(new SimpleMouseListener(this::visitCurrentItem));
 
         add(title, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
@@ -134,13 +105,10 @@ public class NewsInfoPanel extends JPanel implements PropertyChangeListener {
         newsText.setHighlighter(null);
         newsText.setAlignmentX(LEFT_ALIGNMENT);
         newsText.setContentType("text/html");
-        newsText.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    if (e.getURL() != null)
-                        DesktopUtils.browseUrl(e.getURL().toString());
-                }
+        newsText.addHyperlinkListener(e -> {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                if (e.getURL() != null)
+                    DesktopUtils.browseUrl(e.getURL().toString());
             }
         });
         newsText.addComponentListener(new ComponentListener() {
@@ -190,12 +158,7 @@ public class NewsInfoPanel extends JPanel implements PropertyChangeListener {
         discussButton.setHoverForeground(LauncherFrame.COLOR_BLUE);
         discussButton.setAlignmentX(RIGHT_ALIGNMENT);
         discussButton.setContentAreaFilled(false);
-        discussButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                visitCurrentItem();
-            }
-        });
+        discussButton.addActionListener(e -> visitCurrentItem());
         add(discussButton, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.SOUTHEAST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
     }
 

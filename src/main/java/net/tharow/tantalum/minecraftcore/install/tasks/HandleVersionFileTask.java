@@ -172,6 +172,7 @@ public class HandleVersionFileTask implements IInstallTask {
             checkLibraryQueue.addTask(new InstallVersionLibTask(library, checkNonMavenLibsQueue, downloadLibraryQueue, copyLibraryQueue, pack, directories));
         }
 
+        //noinspection unchecked
         queue.setMetadata(version);
     }
 }

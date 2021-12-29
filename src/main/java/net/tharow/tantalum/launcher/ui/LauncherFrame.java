@@ -57,7 +57,6 @@ import net.tharow.tantalum.platform.IPlatformApi;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.utilslib.Utils;
-import org.xhtmlrenderer.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -138,7 +137,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
     private ProgressBar installProgress;
     private Component installProgressPlaceholder;
     private RoundedButton playButton;
-    private ModpackSelector modpackSelector;
+    private final ModpackSelector modpackSelector;
     private NewsSelector newsSelector;
     private TintablePanel centralPanel;
     private TintablePanel footer;
@@ -146,7 +145,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
 
     NewsInfoPanel newsInfoPanel;
     ModpackInfoPanel modpackPanel;
-    DiscoverInfoPanel discoverInfoPanel;
+    final DiscoverInfoPanel discoverInfoPanel;
 
     public LauncherFrame(final ResourceLoader resources, final ImageRepository<IUserType> skinRepository, final UserModel userModel, final TantalumSettings settings, final ModpackSelector modpackSelector, final ImageRepository<ModpackModel> iconRepo, final ImageRepository<ModpackModel> logoRepo, final ImageRepository<ModpackModel> backgroundRepo, final Installer installer, final ImageRepository<AuthorshipInfo> avatarRepo, final IPlatformApi platformApi, final LauncherDirectories directories, final IInstalledPackRepository packRepository, final StartupParameters params, final DiscoverInfoPanel discoverInfoPanel, final JavaVersionRepository javaVersions, final FileJavaSource fileJavaSource, final IBuildNumber buildNumber) {
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
@@ -178,8 +177,8 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         selectTab("discover");
 
         EventQueue.invokeLater(() -> LauncherMain.consoleFrame.setVisible(settings.getShowConsole()));
-        EventQueue.invokeLater(this::installmodpack);
-        EventQueue.invokeLater(this::launchModpack);
+        //EventQueue.invokeLater(this::installmodpack);
+        //EventQueue.invokeLater(this::launchModpack);
         setLocationRelativeTo(null);
 
 
@@ -201,7 +200,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         AtomicBoolean temp = new AtomicBoolean(false);
         Thread thread = new Thread(() -> {
             try {
-                HttpPlatformApi.getNews(true);
+                HttpPlatformApi.getNews();
                 temp.set(true);
             } catch (RestfulAPIException e) {
                 Utils.getLogger().log(Level.WARNING, "Unable to load news", e);

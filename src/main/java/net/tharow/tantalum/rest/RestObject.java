@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import net.tharow.tantalum.launchercore.TantalumConstants;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,18 +43,16 @@ public class RestObject {
         return error;
     }
 
-    public static <T extends RestObject> T getRestObject(Class<T> restObject, String url) throws RestfulAPIException {
+    public static <T extends RestObject> @NotNull T getRestObject(Class<T> restObject, String url) throws RestfulAPIException {
         try {
             URLConnection conn = new URL(url).openConnection();
             conn.setRequestProperty("User-Agent", TantalumConstants.getUserAgent());
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            conn.addRequestProperty("accept","application/vnd.github.v3+json");
             conn.setConnectTimeout(15000);
             conn.setReadTimeout(15000);
 
             try (InputStream stream = conn.getInputStream()) {
                 String data = IOUtils.toString(stream, StandardCharsets.UTF_8);
+
                 T result = gson.fromJson(data, restObject);
 
                 if (result == null) {

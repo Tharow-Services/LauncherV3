@@ -25,7 +25,7 @@ import java.awt.*;
 
 public class TooltipWarning extends JLabel {
 
-    private JToolTip toolTip;
+    private final JToolTip toolTip;
 
     public TooltipWarning(Icon icon, JToolTip toolTip) {
         super(icon);
@@ -118,8 +118,7 @@ public class TooltipWarning extends JLabel {
         private void drawTextUgly(String text, Graphics2D g2)
         {
             // Ugly code to wrap text
-            String textToDraw = text;
-            String[] arr = textToDraw.split(" ");
+            String[] arr = text.split(" ");
             int nIndex = 0;
             int startX = 4;
             int startY = 3;

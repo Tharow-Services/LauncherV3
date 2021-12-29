@@ -25,6 +25,7 @@ import net.tharow.tantalum.launchercore.modpacks.InstalledPack;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.launchercore.modpacks.sources.IInstalledPackRepository;
 import net.tharow.tantalum.platform.IPlatformApi;
+import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.NewsArticle;
 import net.tharow.tantalum.rest.RestfulAPIException;
 
@@ -32,7 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class InitialV3Migrator implements IMigrator {
-    private IPlatformApi platformApi;
+    private final IPlatformApi platformApi;
 
     public InitialV3Migrator(IPlatformApi platformApi) {
         this.platformApi = platformApi;
@@ -54,7 +55,7 @@ public class InitialV3Migrator implements IMigrator {
         int maxNewsId = 0;
 
         try {
-            for (NewsArticle article : platformApi.getNews().getArticles()) {
+            for (NewsArticle article : HttpPlatformApi.getNews().getArticles()) {
                 int newsId = article.getId();
 
                 if (newsId > maxNewsId)
@@ -66,7 +67,7 @@ public class InitialV3Migrator implements IMigrator {
             //Just kill the exception & go with ID 0
         }
 
-        List<ModpackModel> deletePacks = new LinkedList<ModpackModel>();
+        List<ModpackModel> deletePacks = new LinkedList<>();
         for (String packName : packStore.getPackNames()) {
             InstalledPack pack = packStore.getInstalledPacks().get(packName);
             ModpackModel model = new ModpackModel(pack, null, packStore, directories);

@@ -9,11 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ArgumentList {
+public record ArgumentList(List<Argument> args) {
 
-	private final List<Argument> args;
-
-	private ArgumentList(List<Argument> args) {
+	public ArgumentList(List<Argument> args) {
 		this.args = Collections.unmodifiableList(args);
 	}
 

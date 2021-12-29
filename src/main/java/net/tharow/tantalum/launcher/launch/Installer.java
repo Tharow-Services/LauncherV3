@@ -80,6 +80,7 @@ public class Installer {
     private LauncherUnhider launcherUnhider;
 
     public Installer(StartupParameters startupParameters, LauncherDirectories directories, ModpackInstaller installer, MinecraftLauncher launcher, TantalumSettings settings, PackResourceMapper packIconMapper) {
+        //noinspection unchecked
         this.installer = installer;
         this.launcher = launcher;
         this.settings = settings;
@@ -139,7 +140,7 @@ public class Installer {
                     RunData data = pack.getRunData();
 
                     if (data != null && !data.isRunDataValid(memory, versionNumber, usingMojangJava)) {
-                        FixRunDataDialog dialog = new FixRunDataDialog(frame, resources, data, javaVersions, memoryObj, !settings.shouldAutoAcceptModpackRequirements(), usingMojangJava);
+                        FixRunDataDialog dialog = new FixRunDataDialog(frame, resources, data, javaVersions, memoryObj, settings.shouldAutoAcceptModpackRequirements(), usingMojangJava);
                         dialog.setVisible(true);
                         if (dialog.getResult() == FixRunDataDialog.Result.ACCEPT) {
                             memoryObj = dialog.getRecommendedMemory();

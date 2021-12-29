@@ -72,7 +72,7 @@ public class EnsureFileTask<TaskQueue extends ITasksQueue> implements IInstallTa
     }
 
     @Override
-    public void runTask(InstallTasksQueue queue) throws IOException {
+    public void runTask(InstallTasksQueue queue) {
         if (this.zipExtractLocation != null)
             unzipFile(this.copyTaskQueue, this.cacheLocation, this.zipExtractLocation, this.filter);
 

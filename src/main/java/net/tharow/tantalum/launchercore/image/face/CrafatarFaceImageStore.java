@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 public class CrafatarFaceImageStore implements IImageStore<IUserType> {
-    private String mBaseUrl;
+    private final String mBaseUrl;
 
     public CrafatarFaceImageStore(String baseUrl) {
         mBaseUrl = baseUrl;

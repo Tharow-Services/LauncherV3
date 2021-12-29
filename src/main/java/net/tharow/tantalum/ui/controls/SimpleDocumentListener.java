@@ -3,17 +3,13 @@ package net.tharow.tantalum.ui.controls;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class SimpleDocumentListener implements DocumentListener {
-    private final Runnable runnable;
-
+public record SimpleDocumentListener(Runnable runnable) implements DocumentListener {
     /**
      * A Simple Document Listener
      *
      * @param runnable what to run during Doc events
      */
-    public SimpleDocumentListener(Runnable runnable){
-        this.runnable = runnable;
-    }
+    public SimpleDocumentListener {}
 
     /**
      * Gives notification that there was an insert into the document.  The

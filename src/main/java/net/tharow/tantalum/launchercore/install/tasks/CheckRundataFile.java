@@ -8,9 +8,9 @@ import java.io.File;
 import java.io.IOException;
 
 public class CheckRundataFile implements IInstallTask {
-    private ModpackModel modpackModel;
-    private Modpack modpack;
-    private TaskGroup writeRunDataGroup;
+    private final ModpackModel modpackModel;
+    private final Modpack modpack;
+    private final TaskGroup writeRunDataGroup;
 
     public CheckRundataFile(ModpackModel modpackModel, Modpack modpack, TaskGroup writeRunDataGroup) {
         this.modpackModel = modpackModel;
@@ -29,7 +29,7 @@ public class CheckRundataFile implements IInstallTask {
     }
 
     @Override
-    public void runTask(InstallTasksQueue queue) throws IOException, InterruptedException {
+    public void runTask(InstallTasksQueue queue) {
         File file = modpackModel.getBinDir();
         File runDataFile = new File(file, "runData");
 

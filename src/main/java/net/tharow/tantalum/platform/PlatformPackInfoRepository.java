@@ -33,8 +33,8 @@ import net.tharow.tantalum.utilslib.Utils;
 import java.util.logging.Level;
 
 public class PlatformPackInfoRepository implements IAuthoritativePackSource {
-    private IPlatformApi platform;
-    private ISolderApi solder;
+    private final IPlatformApi platform;
+    private final ISolderApi solder;
 
     public PlatformPackInfoRepository(IPlatformApi platform, ISolderApi solder) {
         this.platform = platform;
@@ -66,7 +66,7 @@ public class PlatformPackInfoRepository implements IAuthoritativePackSource {
         }
     }
 
-    protected PackInfo getInfoFromPlatformInfo(PlatformPackInfo platformInfo) throws RestfulAPIException {
+    protected PackInfo getInfoFromPlatformInfo(PlatformPackInfo platformInfo) {
         if (platformInfo != null && platformInfo.hasSolder()) {
             try {
                 ISolderPackApi solderPack = solder.getSolderPack(platformInfo.getSolder(), platformInfo.getName(), solder.getMirrorUrl(platformInfo.getSolder()));

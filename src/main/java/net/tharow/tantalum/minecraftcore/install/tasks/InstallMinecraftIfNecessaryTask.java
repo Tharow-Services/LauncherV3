@@ -37,9 +37,9 @@ import java.util.logging.Level;
 
 public class InstallMinecraftIfNecessaryTask extends ListenerTask {
 
-	private ModpackModel pack;
-	private String minecraftVersion;
-	private File cacheDirectory;
+	private final ModpackModel pack;
+	private final String minecraftVersion;
+	private final File cacheDirectory;
 
 	public InstallMinecraftIfNecessaryTask(ModpackModel pack, String minecraftVersion, File cacheDirectory) {
 		this.pack = pack;
@@ -56,7 +56,7 @@ public class InstallMinecraftIfNecessaryTask extends ListenerTask {
 	public void runTask(InstallTasksQueue queue) throws IOException, InterruptedException {
 		super.runTask(queue);
 
-		MojangVersion version = ((InstallTasksQueue<MojangVersion>)queue).getMetadata();
+		@SuppressWarnings("unchecked") MojangVersion version = ((InstallTasksQueue<MojangVersion>)queue).getMetadata();
 
 		String url;
 		GameDownloads dls = version.getDownloads();

@@ -29,7 +29,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class FeedItemView extends JButton {
-    private FeedItem feedItem;
+    private final FeedItem feedItem;
 
     public FeedItemView(ResourceLoader loader, FeedItem feedItem, ImageJob<AuthorshipInfo> avatar) {
         this.setOpaque(false);
@@ -100,15 +100,14 @@ public class FeedItemView extends JButton {
         g2d.setFont(getFont());
         g2d.setColor(getForeground());
 
-        drawTextUgly(feedItem.getContent(), g2d, 92);
+        drawTextUgly(feedItem.getContent(), g2d);
         g2d.setClip(oldClip);
     }
 
-    private void drawTextUgly(String text, Graphics2D g2, int maxY)
+    private void drawTextUgly(String text, Graphics2D g2)
     {
         // Ugly code to wrap text
-        String textToDraw = text;
-        String[] arr = textToDraw.split(" ");
+        String[] arr = text.split(" ");
         int nIndex = 0;
         int startX = 4;
         int startY = 3;
@@ -119,7 +118,7 @@ public class FeedItemView extends JButton {
         {
             int nextStartY = startY + lineSize;
 
-            if (nextStartY > maxY)
+            if (nextStartY > 92)
                 break;
 
             int nextEndY = nextStartY + lineSize;
@@ -136,11 +135,11 @@ public class FeedItemView extends JButton {
                     break;
 
                 lineWidth = g2.getFontMetrics().stringWidth(line+" "+arr[nIndex]);
-                if (nextEndY >= maxY)
+                if (nextEndY >= 92)
                     lineWidth += elipsisSize;
             }
 
-            if (nextEndY >= maxY && nIndex < arr.length)
+            if (nextEndY >= 92 && nIndex < arr.length)
                 line += "...";
 
             g2.drawString(line, startX, startY + g2.getFontMetrics().getAscent());

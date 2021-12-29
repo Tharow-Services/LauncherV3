@@ -37,21 +37,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class UserCellEditor implements ComboBoxEditor, DocumentListener, IImageJobListener<IUserType> {
-    private Font textFont;
+    private final Font textFont;
 
     private static final int ICON_WIDTH=32;
     private static final int ICON_HEIGHT=32;
 
-    private JPanel parentPanel;
-    private JLabel userLabel;
-    private JTextField textField;
-    private CardLayout layout;
+    private final JPanel parentPanel;
+    private final JLabel userLabel;
+    private final JTextField textField;
+    private final CardLayout layout;
 
     private Object currentObject;
-    private HashMap<String, Icon> headMap = new HashMap<String, Icon>();
+    private final HashMap<String, Icon> headMap = new HashMap<>();
 
-    Collection<ActionListener> actionListeners = new HashSet<ActionListener>();
-    private ImageRepository<IUserType> mSkinRepo;
+    final Collection<ActionListener> actionListeners = new HashSet<>();
+    private final ImageRepository<IUserType> mSkinRepo;
 
     private static final String USER = "user";
     private static final String STRING = "string";
@@ -92,13 +92,12 @@ public class UserCellEditor implements ComboBoxEditor, DocumentListener, IImageJ
     public void setItem(Object anObject) {
         currentObject = anObject;
 
-        if (anObject instanceof IUserType) {
-            IUserType mojangUser = (IUserType)anObject;
+        if (anObject instanceof IUserType mojangUser) {
             userLabel.setText(mojangUser.getDisplayName());
             userLabel.setIconTextGap(8);
 
             if (!headMap.containsKey(mojangUser.getUsername())) {
-                ImageJob<IUserType> job = mSkinRepo.startImageJob(mojangUser);
+                @SuppressWarnings("unchecked") ImageJob<IUserType> job = mSkinRepo.startImageJob(mojangUser);
                 job.addJobListener(this);
                 headMap.put(mojangUser.getUsername(), new ImageIcon(ImageUtils.scaleImage(job.getImage(), ICON_WIDTH, ICON_HEIGHT)));
             }

@@ -37,7 +37,7 @@ public class MojangUser implements IUserType {
     private String displayName;
     private Profile profile;
     private UserProperties userProperties;
-    private transient boolean isOffline;
+    private final transient boolean isOffline;
 
     public MojangUser() {
         this.isOffline = false;
@@ -122,6 +122,10 @@ public class MojangUser implements IUserType {
 
     public String getMCUserType() {
         return getProfile().isLegacy() ? LEGACY : MOJANG_USER_TYPE;
+    }
+
+    public UserProperties getProperties(){
+        return this.userProperties;
     }
 
     public String getUserProperties() {

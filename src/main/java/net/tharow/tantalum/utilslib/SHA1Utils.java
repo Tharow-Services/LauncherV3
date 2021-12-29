@@ -30,8 +30,6 @@ public class SHA1Utils {
         try {
             InputStream filestream = new FileInputStream(file);
             return DigestUtils.sha1Hex(filestream);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

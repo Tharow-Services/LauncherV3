@@ -22,9 +22,9 @@ package net.tharow.tantalum.ui.listitems;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 
 public class LanguageItem {
-    private String langCode;
-    private String text;
-    private ResourceLoader languageResources;
+    private final String langCode;
+    private final String text;
+    private final ResourceLoader languageResources;
 
     public LanguageItem(String code, String defaultText, ResourceLoader languageResources) {
         this.langCode = code;

@@ -22,6 +22,7 @@ package net.tharow.tantalum.ui.lang;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -37,7 +38,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 public class ResourceLoader {
-    private final Collection<IRelocalizableResource> resources = new LinkedList<IRelocalizableResource>();
+    private final Collection<IRelocalizableResource> resources = new LinkedList<>();
     private ResourceBundle stringData;
     private Locale currentLocale;
     private String dottedResourcePath;
@@ -52,7 +53,7 @@ public class ResourceLoader {
     public static final String FONT_OPENSANS = "OpenSans+Cyberbit.ttf";
     public static final String FONT_RALEWAY = "Raleway+FireflySung.ttf";
 
-    public static final Map<String, Font> fontCache = new HashMap<String, Font>();
+    public static final Map<String, Font> fontCache = new HashMap<>();
 
     public static final Font fallbackFont = new Font("Arial", Font.PLAIN, 12);
 
@@ -121,12 +122,12 @@ public class ResourceLoader {
     }
 
     public boolean isDefaultLocaleSupported() {
-        return this.isDefaultLocaleSupported;
+        return !this.isDefaultLocaleSupported;
     }
 
     public void setLocale(Locale locale) {
         currentLocale = locale;
-        stringData = ResourceBundle.getBundle(getBundlePath("lang.UIText"), locale);
+        stringData = ResourceBundle.getBundle(getBundlePath(), locale);
         relocalizeResources();
     }
 
@@ -145,7 +146,7 @@ public class ResourceLoader {
         return getCodeFromLocale(currentLocale);
     }
 
-    public String getString(String stringKey, String... replacements) {
+    public String getString(String stringKey, String @NotNull ... replacements) {
         String outString = stringData.getString(stringKey);
         outString = new String(outString.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
 
@@ -203,8 +204,7 @@ public class ResourceLoader {
     private Locale matchClosestSupportedLocale(Locale definiteLocale) {
         Locale bestSupportedLocale = null;
         int bestLocaleScore = 0;
-        for (int i = 0; i < locales.length; i++) {
-            Locale testLocale = locales[i];
+        for (Locale testLocale : locales) {
             int testScore = 0;
 
             if (testLocale.getLanguage().equals(definiteLocale.getLanguage())) {
@@ -313,8 +313,8 @@ public class ResourceLoader {
         }
     }
 
-    private String getBundlePath(String bundle) {
-        return dottedResourcePath + bundle;
+    private String getBundlePath() {
+        return dottedResourcePath + "lang.UIText";
     }
 
     private String getResourcePath(String resource) {

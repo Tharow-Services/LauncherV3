@@ -4,11 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SplatPane extends JComponent {
-    private JComponent hoverTarget;
-    private Icon image;
-    private int alignment;
-    private int offsetX;
-    private int offsetY;
+    private final JComponent hoverTarget;
+    private final Icon image;
+    private final int alignment;
+    private final int offsetX;
+    private final int offsetY;
 
     public SplatPane(JComponent hoverTarget, Icon image, int alignment, int offsetX, int offsetY) {
         this.hoverTarget = hoverTarget;

@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 public class PackImageStore implements IImageStore<ModpackModel> {
-    private IModpackResourceType resourceType;
+    private final IModpackResourceType resourceType;
 
     public PackImageStore(IModpackResourceType resourceType) {
         this.resourceType = resourceType;
@@ -39,9 +39,7 @@ public class PackImageStore implements IImageStore<ModpackModel> {
     @Override
     public boolean canDownloadImage(ModpackModel key, File target) {
         Resource res = resourceType.getResource(key);
-        if (res == null || res.getUrl() == null || res.getUrl().isEmpty())
-            return false;
-        return true;
+        return res != null && res.getUrl() != null && !res.getUrl().isEmpty();
     }
 
     @Override

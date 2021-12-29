@@ -18,9 +18,8 @@
 
 package net.tharow.tantalum.launcher.ui.components.news;
 
-import net.tharow.tantalum.github.io.RepoReleasesData;
 import net.tharow.tantalum.platform.http.HttpPlatformApi;
-import net.tharow.tantalum.rest.RestObject;
+import net.tharow.tantalum.platform.io.INewsData;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
@@ -30,31 +29,26 @@ import net.tharow.tantalum.launcher.ui.controls.feeds.NewsWidget;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
 import net.tharow.tantalum.platform.IPlatformApi;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
-import net.tharow.tantalum.platform.io.NewsArticle;
-import net.tharow.tantalum.platform.io.NewsData;
 import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.utilslib.Utils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.logging.Level;
 
 public class NewsSelector extends JPanel {
-    private ResourceLoader resources;
-    private IPlatformApi platformApi;
+    private final ResourceLoader resources;
+    private final IPlatformApi platformApi;
     private NewsWidget selectedItem;
     private JPanel widgetHost;
-    private CountCircle circle;
-    private TantalumSettings settings;
+    private final CountCircle circle;
+    private final TantalumSettings settings;
     private int newLatestNewsArticle;
 
-    private NewsInfoPanel panel;
+    private final NewsInfoPanel panel;
 
-    private ImageRepository<AuthorshipInfo> avatarRepo;
+    private final ImageRepository<AuthorshipInfo> avatarRepo;
 
     public NewsSelector(ResourceLoader resources, NewsInfoPanel panel, IPlatformApi platformApi, ImageRepository<AuthorshipInfo> avatarRepo, CountCircle count, TantalumSettings settings) {
         this.resources = resources;
@@ -107,7 +101,7 @@ public class NewsSelector extends JPanel {
         circle.setVisible(false);
     }
 
-    protected void loadNewsItems(NewsData news) {
+    protected void loadNewsItems(INewsData news) {
 
         int count = 0;
         newLatestNewsArticle = settings.getLatestNewsArticle();
@@ -127,13 +121,8 @@ public class NewsSelector extends JPanel {
             circle.setVisible(false);
         }
 
-        Collections.sort(news.getArticles(), (o1, o2) -> {
-            if (o1.getDate().getTime() > o2.getDate().getTime())
-                return -1;
-            else if (o1.getDate().getTime() < o2.getDate().getTime())
-                return 1;
-            else
-                return 0;
+        news.getArticles().sort((o1, o2) -> {
+            return Long.compare(o2.getDate().getTime(), o1.getDate().getTime());
         });
 
         widgetHost.removeAll();
@@ -141,7 +130,7 @@ public class NewsSelector extends JPanel {
         GridBagConstraints constraints = new GridBagConstraints(0,0,1,1,1.0,0.0,GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0,0,0,0),0,0);
 
         for (int i = 0; i < news.getArticles().size(); i++) {
-            NewsWidget widget = new NewsWidget(resources, news.getArticles().get(i), avatarRepo.startImageJob(news.getArticles().get(i).getAuthorshipInfo()));
+            @SuppressWarnings("unchecked") NewsWidget widget = new NewsWidget(resources, news.getArticles().get(i), avatarRepo.startImageJob(news.getArticles().get(i).getAuthorshipInfo()));
             widget.addActionListener(e -> {
                 if (e.getSource() instanceof NewsWidget)
                     selectNewsItem((NewsWidget)e.getSource());
@@ -160,8 +149,7 @@ public class NewsSelector extends JPanel {
     private void downloadItems() {
         Thread thread = new Thread(() -> {
             try {
-                RestObject.getRestObject(RepoReleasesData.class, "https://api.github.com/repos/Tharow-Services/Tantalum-Launcher/releases");
-                loadNewsItems(HttpPlatformApi.getNews(false));
+                loadNewsItems(HttpPlatformApi.getNews());
             } catch (RestfulAPIException ex) {
                 Utils.getLogger().log(Level.SEVERE, "Unable to load news\n");
                 ex.printStackTrace();

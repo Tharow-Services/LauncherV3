@@ -26,28 +26,26 @@ import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.solder.ISolderApi;
 import net.tharow.tantalum.solder.ISolderInfo;
 import net.tharow.tantalum.solder.ISolderPackApi;
-import net.tharow.tantalum.solder.http.HttpSolderApi;
 import net.tharow.tantalum.solder.io.SolderPackInfo;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class CachedSolderApi implements ISolderApi {
 
-    private LauncherDirectories directories;
-    private ISolderApi innerApi;
+    private final LauncherDirectories directories;
+    private final ISolderApi innerApi;
     private Collection<SolderPackInfo> cachedPublicPacks = null;
     private DateTime lastSolderPull = new DateTime(0);
-    private int cacheInSeconds;
+    private final int cacheInSeconds;
 
     private class CacheTuple {
-        private String root;
-        private String slug;
-        private String url;
+        private final String root;
+        private final String slug;
+        private final String url;
 
         public CacheTuple(String root, String slug, String url) {
             this.root = root;
@@ -66,9 +64,7 @@ public class CachedSolderApi implements ISolderApi {
                 return false;
             if (!slug.equals(((CacheTuple) obj).slug))
                 return false;
-            if (!url.equals(((CacheTuple) obj).url))
-                return false;
-            return true;
+            return url.equals(((CacheTuple) obj).url);
         }
 
         @Override
@@ -82,7 +78,7 @@ public class CachedSolderApi implements ISolderApi {
         }
     }
 
-    private Cache<CacheTuple, ISolderPackApi> packs;
+    private final Cache<CacheTuple, ISolderPackApi> packs;
 
     public CachedSolderApi(LauncherDirectories directories, ISolderApi innerApi, int cacheInSeconds) {
         this.directories = directories;

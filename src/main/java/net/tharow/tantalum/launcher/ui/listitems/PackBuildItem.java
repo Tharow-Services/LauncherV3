@@ -22,9 +22,9 @@ import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 
 public class PackBuildItem {
-    private boolean isRecommended;
-    private boolean isLatest;
-    private String buildNumber;
+    private final boolean isRecommended;
+    private final boolean isLatest;
+    private final String buildNumber;
     private String display;
 
     public PackBuildItem(String buildNumber, ResourceLoader loader, ModpackModel model) {

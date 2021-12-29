@@ -20,5 +20,5 @@
 package net.tharow.tantalum.ui.lang;
 
 public interface IRelocalizableResource {
-    public void relocalize(ResourceLoader loader);
+    void relocalize(ResourceLoader loader);
 }

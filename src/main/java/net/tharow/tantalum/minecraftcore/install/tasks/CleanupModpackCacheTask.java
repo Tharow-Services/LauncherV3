@@ -32,8 +32,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CleanupModpackCacheTask implements IInstallTask {
-	private ModpackModel pack;
-	private Modpack modpack;
+	private final ModpackModel pack;
+	private final Modpack modpack;
 
 	public CleanupModpackCacheTask(ModpackModel pack, Modpack modpack) {
 		this.pack = pack;
@@ -51,14 +51,14 @@ public class CleanupModpackCacheTask implements IInstallTask {
 	}
 
 	@Override
-	public void runTask(InstallTasksQueue queue) throws IOException {
+	public void runTask(InstallTasksQueue queue) {
 		File[] files = this.pack.getCacheDir().listFiles();
 
 		if (files == null) {
 			return;
 		}
 
-		Set<String> keepFiles = new HashSet<String>(modpack.getMods().size() + 1);
+		Set<String> keepFiles = new HashSet<>(modpack.getMods().size() + 1);
 		for (Mod mod : modpack.getMods()) {
 			String version = mod.getVersion();
 

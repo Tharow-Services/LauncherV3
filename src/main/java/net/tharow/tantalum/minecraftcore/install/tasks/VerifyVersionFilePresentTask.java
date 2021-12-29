@@ -29,9 +29,9 @@ import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersionBuilder;
 import java.io.IOException;
 
 public class VerifyVersionFilePresentTask implements IInstallTask {
-	private MojangVersionBuilder builder;
-    private String minecraftVersion;
-    private ModpackModel modpack;
+	private final MojangVersionBuilder builder;
+    private final String minecraftVersion;
+    private final ModpackModel modpack;
 
 	public VerifyVersionFilePresentTask(ModpackModel modpack, String minecraftVersion, MojangVersionBuilder builder) {
 		this.builder = builder;

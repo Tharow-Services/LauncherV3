@@ -27,10 +27,10 @@ import java.io.IOException;
 
 public class LaunchLauncherMode implements IInstallTask {
 
-    private String description;
-    private Relauncher relauncher;
-    private String launchTarget;
-    private boolean isLegacy;
+    private final String description;
+    private final Relauncher relauncher;
+    private final String launchTarget;
+    private final boolean isLegacy;
 
     public LaunchLauncherMode(String description, Relauncher relauncher, String launchTarget, boolean isLegacy) {
         this.description = description;
@@ -50,7 +50,7 @@ public class LaunchLauncherMode implements IInstallTask {
     }
 
     @Override
-    public void runTask(InstallTasksQueue queue) throws IOException, InterruptedException {
+    public void runTask(InstallTasksQueue queue) {
         String[] args = relauncher.buildLauncherArgs(isLegacy);
         relauncher.launch(launchTarget, args);
     }

@@ -27,7 +27,7 @@ import java.io.IOException;
 
 public class ZipFileRetriever implements MojangVersionRetriever {
 
-    private File zip;
+    private final File zip;
 
     public ZipFileRetriever(File sourceZip) {
         this.zip = sourceZip;

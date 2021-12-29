@@ -30,6 +30,7 @@ import net.tharow.tantalum.minecraftcore.mojang.auth.request.AuthRequest;
 import net.tharow.tantalum.minecraftcore.mojang.auth.request.RefreshRequest;
 import net.tharow.tantalum.minecraftcore.mojang.auth.response.AuthResponse;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutputStream;
@@ -39,15 +40,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class MojangAuthenticator {
+public record MojangAuthenticator(String clientToken) {
     private static final String AUTH_SERVER = "https://authserver.mojang.com/";
-    private final String clientToken;
 
-    public MojangAuthenticator(String clientToken) {
-        this.clientToken = clientToken;
-    }
-
-    public MojangUser loginNewUser(String username, String password) throws AuthenticationException {
+    @Contract(value = "_, _ -> new")
+    public @NotNull MojangUser loginNewUser(String username, String password) throws AuthenticationException {
         AuthRequest request = new AuthRequest(username, password, clientToken);
         String data = MojangUtils.getGson().toJson(request);
 
@@ -63,7 +60,7 @@ public class MojangAuthenticator {
             }
         } catch (ResponseException e) {
             throw e;
-        }  catch (IOException e) {
+        } catch (IOException e) {
             throw new AuthenticationException(
                     "An error was raised while attempting to communicate with " + AUTH_SERVER + ".", e);
         }
@@ -126,7 +123,7 @@ public class MojangAuthenticator {
             try {
                 if (stream != null)
                     stream.close();
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
         }
 

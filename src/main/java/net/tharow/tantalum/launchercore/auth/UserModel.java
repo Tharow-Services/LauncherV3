@@ -33,11 +33,11 @@ import java.util.List;
 
 public class UserModel {
     private IUserType mCurrentUser;
-    private List<IAuthListener> mAuthListeners = new LinkedList<>();
-    private IUserStore mUserStore;
-    private MojangAuthenticator mojangAuthenticator;
-    private MicrosoftAuthenticator microsoftAuthenticator;
-    private AuthlibAuthenticator authlibAuthenticator;
+    private final List<IAuthListener> mAuthListeners = new LinkedList<>();
+    private final IUserStore mUserStore;
+    private final MojangAuthenticator mojangAuthenticator;
+    private final MicrosoftAuthenticator microsoftAuthenticator;
+    private final AuthlibAuthenticator authlibAuthenticator;
 
     public UserModel(IUserStore userStore, MicrosoftAuthenticator microsoftAuthenticator, MojangAuthenticator mojangAuthenticator, AuthlibAuthenticator authlibAuthenticator) {
         this.mCurrentUser = null;

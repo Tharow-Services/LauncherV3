@@ -42,23 +42,19 @@ public class DesktopUtils {
                 else
                     JOptionPane.showMessageDialog(null, "Unable to open browser, please visit the URL:\n" + url, "Unable to open browser", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (IOException ex) {
+        } catch (IOException | RuntimeException | URISyntaxException ex) {
             //Thrown by Desktop.browse() - just log & ignore
             Utils.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (URISyntaxException ex) {
-            //If we got a bogus URL from the internet, then this will throw.  Log & Ignore
-            Utils.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (RuntimeException ex) {
-            //browse() throws a bunch of runtime exceptions if you give it bad input
-            //WHICH IS AWESOME
-            Utils.getLogger().log(Level.SEVERE, ex.getMessage(), ex);
-        }
+        } //If we got a bogus URL from the internet, then this will throw.  Log & Ignore
+        //browse() throws a bunch of runtime exceptions if you give it bad input
+        //WHICH IS AWESOME
+
     }
 
     public static void open(final File file) {
         new SwingWorker<Void, Void>() {
             @Override
-            protected Void doInBackground() throws Exception {
+            protected Void doInBackground() {
                 Utils.getLogger().info("Attempting to open "+file.getAbsolutePath());
                 String asciiUri = file.toURI().toASCIIString();
                 Utils.getLogger().info("Using "+asciiUri);

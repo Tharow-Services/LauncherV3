@@ -28,10 +28,10 @@ import net.tharow.tantalum.solder.io.SolderPackInfo;
 
 public class HttpSolderPackApi implements ISolderPackApi {
 
-    private String baseUrl;
-    private String modpackSlug;
-    private String clientId;
-    private String mirrorUrl;
+    private final String baseUrl;
+    private final String modpackSlug;
+    private final String clientId;
+    private final String mirrorUrl;
 
     protected HttpSolderPackApi(String baseUrl, String modpackSlug, String clientId, String mirrorUrl) throws RestfulAPIException {
         this.baseUrl = baseUrl;

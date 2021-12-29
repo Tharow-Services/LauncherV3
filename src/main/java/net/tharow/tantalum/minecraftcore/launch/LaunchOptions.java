@@ -21,9 +21,9 @@ package net.tharow.tantalum.minecraftcore.launch;
 
 public class LaunchOptions {
 
-    private String title;
-    private String iconPath;
-    private ILaunchOptions options;
+    private final String title;
+    private final String iconPath;
+    private final ILaunchOptions options;
 
     public LaunchOptions(String title, String iconPath, ILaunchOptions options) {
         this.options = options;

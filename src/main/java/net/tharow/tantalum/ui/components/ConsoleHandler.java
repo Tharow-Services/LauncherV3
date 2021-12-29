@@ -24,7 +24,7 @@ import java.util.logging.LogRecord;
 
 public class ConsoleHandler extends Handler {
 
-    private Console console;
+    private final Console console;
 
     public ConsoleHandler(Console console) {
         this.console = console;

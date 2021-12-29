@@ -28,14 +28,26 @@ import net.tharow.tantalum.launchercore.modpacks.sources.IPackSource;
 import java.util.Collection;
 
 public class PackLoader {
-    private IInstalledPackRepository packRepository;
-    private IAuthoritativePackSource authoritativeSource;
-    private LauncherDirectories directories;
+    private final IInstalledPackRepository packRepository;
+    private final IAuthoritativePackSource authoritativeSource;
+    private final LauncherDirectories directories;
 
     public PackLoader(LauncherDirectories directories, IInstalledPackRepository packStore, IAuthoritativePackSource packInfos) {
         this.packRepository = packStore;
         this.authoritativeSource = packInfos;
         this.directories = directories;
+    }
+
+    public LauncherDirectories getDirectories() {
+        return directories;
+    }
+
+    public IInstalledPackRepository getPackRepository() {
+        return packRepository;
+    }
+
+    public IAuthoritativePackSource getAuthoritativeSource() {
+        return authoritativeSource;
     }
 
     public PackLoader(PackLoader packLoader, IAuthoritativePackSource iAuthoritativePackSource){

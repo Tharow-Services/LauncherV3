@@ -21,7 +21,7 @@ package net.tharow.tantalum.minecraftcore.mojang.auth.request;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class ValidateRequest {
-	private String accessToken;
+	private final String accessToken;
 
 	public ValidateRequest(String accessToken) {
 		this.accessToken = accessToken;

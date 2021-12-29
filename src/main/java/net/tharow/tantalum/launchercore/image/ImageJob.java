@@ -31,8 +31,8 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ImageJob<T> {
-    protected IImageMapper<T> mapper;
-    protected IImageStore<T> store;
+    protected final IImageMapper<T> mapper;
+    protected final IImageStore<T> store;
 
     private T lastJobData;
 
@@ -56,6 +56,7 @@ public class ImageJob<T> {
 
     public void addJobListener(IImageJobListener listener) {
         synchronized (jobListeners) {
+            //noinspection unchecked
             jobListeners.add(listener);
         }
     }

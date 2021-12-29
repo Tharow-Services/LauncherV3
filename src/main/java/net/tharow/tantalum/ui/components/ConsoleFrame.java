@@ -23,6 +23,7 @@ import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.Level;
 
 /**
  * Console dialog for showing console messages.
@@ -33,15 +34,21 @@ import java.awt.event.*;
  */
 public class ConsoleFrame extends JFrame implements MouseListener {
     private static final long serialVersionUID = 1L;
-    private static String[] monospaceFontNames = {"Consolas", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Lucida Console"};
+    private static final String[] monospaceFontNames = {"Consolas", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Lucida Console"};
     private final SimpleAttributeSet highlightedAttributes;
     private final SimpleAttributeSet errorAttributes;
     private final SimpleAttributeSet warnAttributes;
+    private final SimpleAttributeSet infoAttributes;
+    private final SimpleAttributeSet configAttributes;
     private final SimpleAttributeSet debugAttributes;
+    private final SimpleAttributeSet fineAttributes;
+    private final SimpleAttributeSet finerAttributes;
+    private final SimpleAttributeSet finestAttributes;
+    private final SimpleAttributeSet invertedAttributes;
     private final SimpleAttributeSet defaultAttributes = new SimpleAttributeSet();
     private JTextComponent textComponent;
     private Document document;
-    private int numLines;
+    private final int numLines;
 
     /**
      * Construct the frame.
@@ -57,11 +64,26 @@ public class ConsoleFrame extends JFrame implements MouseListener {
         StyleConstants.setBackground(highlightedAttributes, Color.YELLOW);
 
         this.errorAttributes = new SimpleAttributeSet();
-        StyleConstants.setForeground(errorAttributes, new Color(200, 0, 0));
+        StyleConstants.setForeground(errorAttributes, Color.RED);
         this.warnAttributes = new SimpleAttributeSet();
-        StyleConstants.setForeground(warnAttributes, new Color(200, 200, 0));
+        StyleConstants.setForeground(warnAttributes, Color.YELLOW);
+        this.infoAttributes = new SimpleAttributeSet();
+        StyleConstants.setForeground(infoAttributes, Color.WHITE);
         this.debugAttributes = new SimpleAttributeSet();
-        StyleConstants.setForeground(debugAttributes, Color.DARK_GRAY);
+        StyleConstants.setForeground(debugAttributes, Color.GREEN);
+        this.configAttributes = new SimpleAttributeSet();
+        StyleConstants.setForeground(configAttributes, Color.BLUE);
+        this.fineAttributes = new SimpleAttributeSet();
+        StyleConstants.setForeground(fineAttributes, Color.LIGHT_GRAY);
+        this.finerAttributes = new SimpleAttributeSet();
+        StyleConstants.setForeground(finerAttributes, Color.GRAY);
+        this.finestAttributes = new SimpleAttributeSet();
+        StyleConstants.setForeground(finestAttributes, Color.DARK_GRAY);
+
+        this.invertedAttributes = new SimpleAttributeSet();
+        StyleConstants.setForeground(invertedAttributes, Color.black);
+        StyleConstants.setBackground(invertedAttributes, Color.WHITE);
+
 
         setSize(new Dimension(650, 400));
         buildUI();
@@ -80,6 +102,25 @@ public class ConsoleFrame extends JFrame implements MouseListener {
     public AttributeSet getWarnAttributes() { return warnAttributes; }
     public AttributeSet getDebugAttributes() { return debugAttributes; }
     public void setCaretPosition(int position) { textComponent.setCaretPosition(position); }
+
+    public AttributeSet getAttributeSet(Level level){
+        final AttributeSet result;
+        switch(level.intValue()){
+            case 1000 -> result = errorAttributes;
+            case 900 -> result = warnAttributes;
+            case 800 -> result = infoAttributes;
+            case 700 -> result = configAttributes;
+            case 600 -> result = debugAttributes;
+            case 500 -> result = fineAttributes;
+            case 400 -> result = finerAttributes;
+            case 300 -> result = finestAttributes;
+            case 200, 100 -> result = defaultAttributes;
+            case -1 -> result = highlightedAttributes;
+            default -> result = invertedAttributes;
+
+        }
+        return result;
+    }
 
     /**
      * Build the interface.
@@ -151,27 +192,17 @@ public class ConsoleFrame extends JFrame implements MouseListener {
 
     private class ContextMenu extends JPopupMenu {
         private static final long serialVersionUID = 1L;
-        JMenuItem copy;
-        JMenuItem clear;
+        final JMenuItem copy;
+        final JMenuItem clear;
 
         public ContextMenu() {
             copy = new JMenuItem("Copy");
             add(copy);
-            copy.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    textComponent.copy();
-                }
-            });
+            copy.addActionListener(e -> textComponent.copy());
 
             clear = new JMenuItem("Clear");
             add(clear);
-            clear.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    textComponent.setText("");
-                }
-            });
+            clear.addActionListener(e -> textComponent.setText(""));
         }
     }
 }

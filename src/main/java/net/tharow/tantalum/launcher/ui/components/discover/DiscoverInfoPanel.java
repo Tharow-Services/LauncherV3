@@ -176,13 +176,10 @@ public class DiscoverInfoPanel extends TiledBackground {
                 FileUtils.writeByteArrayToFile(localCache, data);
                 return doc;
             }
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
         } catch (SSLException ex){
             Utils.getLogger().warning("Discover Page Gave An SSL Error");
             //ex.printStackTrace();
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 

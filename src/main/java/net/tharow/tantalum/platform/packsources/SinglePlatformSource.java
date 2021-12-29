@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class SinglePlatformSource extends PlatformPackInfoRepository implements IPackSource {
-    private String slug;
+    private final String slug;
 
     public SinglePlatformSource(IPlatformApi platformApi, ISolderApi solderApi, String slug) {
         super(platformApi, solderApi);
@@ -43,7 +43,7 @@ public class SinglePlatformSource extends PlatformPackInfoRepository implements 
 
     @Override
     public Collection<PackInfo> getPublicPacks() {
-        ArrayList<PackInfo> packs = new ArrayList<PackInfo>(1);
+        ArrayList<PackInfo> packs = new ArrayList<>(1);
         PackInfo info = getPlatformPackInfo(slug);
 
         if (info != null) {

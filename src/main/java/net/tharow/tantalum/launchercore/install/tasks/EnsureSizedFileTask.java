@@ -27,7 +27,7 @@ import java.io.File;
 
 public class EnsureSizedFileTask extends EnsureFileTask<IWeightedTasksQueue> {
 
-    private int fileSize;
+    private final int fileSize;
     public EnsureSizedFileTask(File fileLocation, IFileVerifier fileVerifier, File zipExtractLocation, String sourceUrl, IWeightedTasksQueue downloadTaskQueue, IWeightedTasksQueue copyTaskQueue, int fileSize) {
         super(fileLocation, fileVerifier, zipExtractLocation, sourceUrl, downloadTaskQueue, copyTaskQueue);
         this.fileSize = fileSize;

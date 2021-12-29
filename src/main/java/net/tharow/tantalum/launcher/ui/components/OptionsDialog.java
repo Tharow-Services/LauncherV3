@@ -103,7 +103,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
     JTextField clientId;
     JCheckBox showConsole;
     JCheckBox launchToModpacks;
-    StartupParameters params;
+    final StartupParameters params;
     Component ramWarning;
     JCheckBox askFirstBox;
     JComboBox<String> useStencil;
@@ -454,7 +454,7 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
 
         for (ActionListener listener : askFirstBox.getActionListeners())
             askFirstBox.removeActionListener(listener);
-        askFirstBox.setSelected(!settings.shouldAutoAcceptModpackRequirements());
+        askFirstBox.setSelected(settings.shouldAutoAcceptModpackRequirements());
         askFirstBox.addActionListener(e -> changeAskFirst());
 
         for (ActionListener listener : useMojangJava.getActionListeners())
@@ -533,10 +533,11 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         langSelect.removeAllItems();
 
         String defaultLocaleText = resources.getString("launcheroptions.language.default");
-        if (!resources.isDefaultLocaleSupported()) {
+        if (resources.isDefaultLocaleSupported()) {
             defaultLocaleText = defaultLocaleText.concat(" (" + resources.getString("launcheroptions.language.unavailable") + ")");
         }
 
+        //noinspection unchecked
         langSelect.setRenderer(new LanguageCellRenderer(resources, null, langSelect.getBackground(), langSelect.getForeground()));
         langSelect.addItem(new LanguageItem(ResourceLoader.DEFAULT_LOCALE, defaultLocaleText, resources));
         for (int i = 0; i < LauncherMain.supportedLanguages.length; i++) {

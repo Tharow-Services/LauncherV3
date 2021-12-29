@@ -27,8 +27,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class TechnicFaceMapper implements IImageMapper<IUserType> {
-    private LauncherDirectories directories;
-    private BufferedImage defaultImage;
+    private final LauncherDirectories directories;
+    private final BufferedImage defaultImage;
 
     public TechnicFaceMapper(LauncherDirectories directories, ResourceLoader resources) {
         this.directories = directories;

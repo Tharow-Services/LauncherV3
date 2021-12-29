@@ -9,9 +9,9 @@ import java.io.IOException;
 
 public class LaunchMoverMode implements IInstallTask {
 
-    private String description;
-    private Relauncher relauncher;
-    private File tempLauncher;
+    private final String description;
+    private final Relauncher relauncher;
+    private final File tempLauncher;
 
     public LaunchMoverMode(String description, File tempLauncher, Relauncher relauncher) {
         this.relauncher = relauncher;
@@ -30,7 +30,7 @@ public class LaunchMoverMode implements IInstallTask {
     }
 
     @Override
-    public void runTask(InstallTasksQueue queue) throws IOException, InterruptedException {
+    public void runTask(InstallTasksQueue queue) throws IOException {
         relauncher.launch(tempLauncher.getAbsolutePath(), relauncher.buildMoverArgs());
     }
 }

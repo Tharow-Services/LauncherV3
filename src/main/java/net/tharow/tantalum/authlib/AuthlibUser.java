@@ -41,7 +41,7 @@ public class AuthlibUser implements IUserType {
     private UserProperties userProperties;
     private String authServer;
     private ServerInfo serverInfo;
-    private transient boolean isOffline;
+    private final transient boolean isOffline;
 
     public AuthlibUser() {
         this.isOffline = false;
@@ -130,6 +130,10 @@ public class AuthlibUser implements IUserType {
             return MojangUtils.getUglyGson().toJson(this.userProperties);
         else
             return "{}";
+    }
+
+    public UserProperties properties() {
+        return userProperties;
     }
 
     public void mergeUserProperties(AuthlibUser mergeUser) {

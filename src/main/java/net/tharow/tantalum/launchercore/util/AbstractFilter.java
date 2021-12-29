@@ -93,8 +93,6 @@ public abstract class AbstractFilter implements BufferedImageOp {
      * and <code>BufferedImage.TYPE_INT_RGB</code> will unmanage the image.</p>
      *
      * @param img the source image
-     * @param x the x location at which to start grabbing pixels
-     * @param y the y location at which to start grabbing pixels
      * @param w the width of the rectangle of pixels to grab
      * @param h the height of the rectangle of pixels to grab
      * @param pixels a pre-allocated array of pixels of size w*h; can be null
@@ -104,7 +102,7 @@ public abstract class AbstractFilter implements BufferedImageOp {
      *   of length &lt; w*h
      */
     protected int[] getPixels(BufferedImage img,
-                                  int x, int y, int w, int h, int[] pixels) {
+                              int w, int h, int[] pixels) {
         if (w == 0 || h == 0) {
             return new int[0];
         }
@@ -120,11 +118,11 @@ public abstract class AbstractFilter implements BufferedImageOp {
         if (imageType == BufferedImage.TYPE_INT_ARGB ||
                 imageType == BufferedImage.TYPE_INT_RGB) {
             Raster raster = img.getRaster();
-            return (int[]) raster.getDataElements(x, y, w, h, pixels);
+            return (int[]) raster.getDataElements(0, 0, w, h, pixels);
         }
 
         // Unmanages the image
-        return img.getRGB(x, y, w, h, pixels, 0, w);
+        return img.getRGB(0, 0, w, h, pixels, 0, w);
     }
 
     /**
@@ -134,8 +132,6 @@ public abstract class AbstractFilter implements BufferedImageOp {
      * and <code>BufferedImage.TYPE_INT_RGB</code> will unmanage the image.</p>
      *
      * @param img the destination image
-     * @param x the x location at which to start storing pixels
-     * @param y the y location at which to start storing pixels
      * @param w the width of the rectangle of pixels to store
      * @param h the height of the rectangle of pixels to store
      * @param pixels an array of pixels, stored as integers
@@ -143,7 +139,7 @@ public abstract class AbstractFilter implements BufferedImageOp {
      *   of length &lt; w*h
      */
     protected void setPixels(BufferedImage img,
-                                 int x, int y, int w, int h, int[] pixels) {
+                             int w, int h, int[] pixels) {
         if (pixels == null || w == 0 || h == 0) {
             return;
         } else if (pixels.length < w * h) {
@@ -155,10 +151,10 @@ public abstract class AbstractFilter implements BufferedImageOp {
         if (imageType == BufferedImage.TYPE_INT_ARGB ||
                 imageType == BufferedImage.TYPE_INT_RGB) {
             WritableRaster raster = img.getRaster();
-            raster.setDataElements(x, y, w, h, pixels);
+            raster.setDataElements(0, 0, w, h, pixels);
         } else {
             // Unmanages the image
-            img.setRGB(x, y, w, h, pixels, 0, w);
+            img.setRGB(0, 0, w, h, pixels, 0, w);
         }
     }
 }

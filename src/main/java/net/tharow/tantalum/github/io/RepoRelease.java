@@ -5,7 +5,6 @@ import net.tharow.tantalum.github.IRepoRelease;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
 import net.tharow.tantalum.platform.io.INewsArticle;
 import net.tharow.tantalum.platform.io.NewsArticle;
-import net.tharow.tantalum.platform.io.NewsData;
 
 import java.util.Date;
 

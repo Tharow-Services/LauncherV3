@@ -25,14 +25,8 @@ import net.tharow.tantalum.utilslib.Utils;
 
 import java.io.IOException;
 
-public class ModpackInstaller<VersionData> {
-    private final IPlatformApi platformApi;
-    private final String clientId;
-
-    public ModpackInstaller(IPlatformApi platformApi, String clientId) {
-        this.clientId = clientId;
-        this.platformApi = platformApi;
-    }
+public record ModpackInstaller<VersionData>(IPlatformApi platformApi,
+                                            String clientId) {
 
     public VersionData installPack(InstallTasksQueue<VersionData> tasksQueue, ModpackModel modpack, String build) throws IOException, InterruptedException {
         modpack.save();
@@ -46,7 +40,7 @@ public class ModpackInstaller<VersionData> {
 
         if (installedVersion == null) {
             platformApi.incrementPackInstalls(modpack.getName());
-            //Utils.sendTracking("installModpack", modpack.getName(), modpack.getBuild(), clientId);
+            Utils.sendTracking("installModpack", modpack.getName(), modpack.getBuild(), clientId);
         }
 
         return tasksQueue.getMetadata();

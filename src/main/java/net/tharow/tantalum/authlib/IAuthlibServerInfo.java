@@ -8,25 +8,25 @@ public interface IAuthlibServerInfo {
 
     void setServerUrl(String serverUrl);
 
-    public String getServerName();
+    String getServerName();
 
-    public String getImplName();
+    String getImplName();
 
-    public String getImplVersion();
+    String getImplVersion();
 
-    public String getHomepage();
+    String getHomepage();
 
-    public String getRegisterPage();
+    String getRegisterPage();
 
-    public boolean isEmailLogin();
+    boolean isEmailLogin();
 
-    public boolean isLegacySkinApi();
+    boolean isLegacySkinApi();
 
-    public boolean isMojangNamespace();
+    boolean isMojangNamespace();
 
-    public List<String> getSkinDomains();
+    List<String> getSkinDomains();
 
-    public String getPublicKey();
+    String getPublicKey();
 
     String toReadable();
 }

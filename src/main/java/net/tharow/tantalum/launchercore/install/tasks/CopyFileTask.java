@@ -26,8 +26,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class CopyFileTask implements IInstallTask {
-    private File source;
-    private File destination;
+    private final File source;
+    private final File destination;
 
     public CopyFileTask(File source, File destination) {
         this.source = source;

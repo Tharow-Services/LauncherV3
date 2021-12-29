@@ -27,8 +27,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class EnsureUpdateFolders implements IInstallTask {
-    private String taskDescription;
-    private LauncherDirectories directories;
+    private final String taskDescription;
+    private final LauncherDirectories directories;
 
     public EnsureUpdateFolders(String taskDescription, LauncherDirectories directories) {
         this.taskDescription = taskDescription;
@@ -46,7 +46,7 @@ public class EnsureUpdateFolders implements IInstallTask {
     }
 
     @Override
-    public void runTask(InstallTasksQueue queue) throws IOException, InterruptedException {
+    public void runTask(InstallTasksQueue queue) {
         File launcherAssets = new File(directories.getAssetsDirectory(), "launcher");
         File patches = new File(launcherAssets, "patches");
 

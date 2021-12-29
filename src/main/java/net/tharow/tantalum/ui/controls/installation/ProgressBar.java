@@ -95,7 +95,7 @@ public class ProgressBar extends JLabel implements DownloadListener {
         g2d.setFont(getFont());
         int textY = y + ((height - g2d.getFontMetrics().getHeight()) / 2) + g2d.getFontMetrics().getAscent();
         int pct = (int)(progressPct * 100);
-        String pctText = Integer.toString(pct) + "%";
+        String pctText = pct + "%";
 
         int textX = (x+width) - (height/4) - g2d.getFontMetrics().stringWidth(pctText);
         g2d.drawString(pctText, textX, textY);
@@ -121,24 +121,14 @@ public class ProgressBar extends JLabel implements DownloadListener {
     }
 
     public void setProgressThreadSafe(final String progressText, final float progress) {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                setProgress(progressText, progress/100.0f);
-            }
-        });
+        EventQueue.invokeLater(() -> setProgress(progressText, progress/100.0f));
     }
 
     public void setProgress(String progressText, float progress) {
         setText(progressText);
         this.progressPct = progress;
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                repaint();
-            }
-        });
+        EventQueue.invokeLater(() -> repaint());
     }
 
     @Override

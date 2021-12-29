@@ -25,6 +25,8 @@ import net.tharow.tantalum.utilslib.Utils;
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import net.tharow.tantalum.utilslib.LogLevel;
+
 import java.util.logging.Level;
 
 public class Console {
@@ -51,20 +53,13 @@ public class Console {
         return handler;
     }
 
-    public void destroyConsole() {
-        if (frame != null) {
-            frame.setVisible(false);
-            frame.dispose();
-        }
-    }
-
     /**
      * Log a message.
      *
      * @param line line
      */
     public void log(String line) {
-        log(line, Level.INFO);
+        log(line, LogLevel.INFO);
     }
 
     /**
@@ -79,13 +74,14 @@ public class Console {
 
         if (line.startsWith("(!!)")) {
             attributes = consoleFrame.getHighlightedAttributes();
-        } else if (level == Level.SEVERE) {
+        } else if (level == LogLevel.SEVERE) {
             attributes = consoleFrame.getErrorAttributes();
-        } else if (level == Level.WARNING) {
+        } else if (level == LogLevel.WARNING) {
             attributes = consoleFrame.getWarnAttributes();
-        } else if (level.intValue() < Level.INFO.intValue()) {
+        } else if (level.intValue() < LogLevel.INFO.intValue()) {
             attributes = consoleFrame.getDebugAttributes();
         }
+        attributes = consoleFrame.getAttributeSet(level);
 
         final String writeText = line.replace("\n\n", "\n");
         final AttributeSet writeAttributes = (attributes != null) ? attributes : consoleFrame.getDefaultAttributes();

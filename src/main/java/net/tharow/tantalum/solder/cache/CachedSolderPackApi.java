@@ -40,16 +40,16 @@ import java.util.concurrent.TimeUnit;
 
 public class CachedSolderPackApi implements ISolderPackApi {
 
-    private LauncherDirectories directories;
-    private ISolderPackApi innerApi;
-    private int cacheInSeconds;
-    private String packSlug;
+    private final LauncherDirectories directories;
+    private final ISolderPackApi innerApi;
+    private final int cacheInSeconds;
+    private final String packSlug;
 
     private SolderPackInfo rootInfoCache = null;
     private DateTime lastInfoAccess = new DateTime(0);
 
-    private Cache<String, Modpack> buildCache;
-    private Cache<String, Boolean> deadBuildCache;
+    private final Cache<String, Modpack> buildCache;
+    private final Cache<String, Boolean> deadBuildCache;
 
     public CachedSolderPackApi(LauncherDirectories directories, ISolderPackApi innerApi, int cacheInSeconds, String packSlug) {
         this.directories = directories;
@@ -128,8 +128,7 @@ public class CachedSolderPackApi implements ISolderPackApi {
 
             if (rootInfoCache != null)
                 rootInfoCache.setLocal();
-        } catch (IOException ex) {
-        } catch (JsonSyntaxException ex) {
+        } catch (IOException | JsonSyntaxException ignored) {
         }
     }
 
@@ -151,7 +150,7 @@ public class CachedSolderPackApi implements ISolderPackApi {
 
         Boolean isDead = deadBuildCache.getIfPresent(build);
 
-        if (isDead != null && isDead.booleanValue())
+        if (isDead != null && isDead)
             return null;
 
         Modpack modpack = buildCache.getIfPresent(build);

@@ -27,7 +27,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class FindMoreWidget extends SelectorWidget {
-    private JLabel moreLabel;
+    private final JLabel moreLabel;
 
     public FindMoreWidget(ResourceLoader resources) {
         super(resources);

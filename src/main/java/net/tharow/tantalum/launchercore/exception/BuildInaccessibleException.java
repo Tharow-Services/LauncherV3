@@ -22,8 +22,8 @@ package net.tharow.tantalum.launchercore.exception;
 import java.io.IOException;
 
 public class BuildInaccessibleException extends IOException {
-    private String packDisplayName;
-    private String build;
+    private final String packDisplayName;
+    private final String build;
     private Throwable cause;
     private static final long serialVersionUID = -4905270588640056830L;
 

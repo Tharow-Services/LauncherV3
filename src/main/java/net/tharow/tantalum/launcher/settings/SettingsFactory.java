@@ -54,9 +54,7 @@ public class SettingsFactory {
 
         File installedSettingsDir = OperatingSystem.getOperatingSystem().getUserDirectoryForApp("tantalum");
 
-        TantalumSettings settings = tryGetSettings(installedSettingsDir);
-
-        return settings;
+        return tryGetSettings(installedSettingsDir);
     }
 
     public static void migrateSettings(TantalumSettings settings, IInstalledPackRepository packStore, LauncherDirectories directories, IUserStore users, List<IMigrator> migrators) {
@@ -95,8 +93,7 @@ public class SettingsFactory {
     }
     @Deprecated
     private static File getPortableSettingsDir(String runningDir, boolean isMover) {
-        File runningFolder = new File(runningDir).getParentFile();
-        return runningFolder;
+        return new File(runningDir).getParentFile();
         //Legacy//
         /*
         if (isMover)

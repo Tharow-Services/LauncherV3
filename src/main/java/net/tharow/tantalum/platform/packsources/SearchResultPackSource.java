@@ -20,7 +20,7 @@
 package net.tharow.tantalum.platform.packsources;
 
 import net.tharow.tantalum.launchercore.modpacks.sources.IPackSource;
-import net.tharow.tantalum.platform.IPlatformSearchApi;
+import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.SearchResult;
 import net.tharow.tantalum.platform.io.SearchResultsData;
 import net.tharow.tantalum.rest.RestfulAPIException;
@@ -29,18 +29,19 @@ import net.tharow.tantalum.rest.io.PackInfo;
 import java.util.*;
 
 public class SearchResultPackSource implements IPackSource {
-    private IPlatformSearchApi platformApi;
-    private String searchTerms;
-    private Map<String, Integer> resultPriorities = new HashMap<String, Integer>();
+    private final String platform;
+    private final String searchTerms;
+    private String buildNumber;
+    private final Map<String, Integer> resultPriorities = new HashMap<>();
 
-    public SearchResultPackSource(IPlatformSearchApi platformApi, String searchTerms) {
-        this.platformApi = platformApi;
+    public SearchResultPackSource(String platform, String searchTerms) {
+        this.platform = platform;
         this.searchTerms = searchTerms;
     }
 
     @Override
     public String getSourceName() {
-        return "Modpack search results for query '" + searchTerms + "'";
+        return "Modpack search results for query '" + searchTerms + " And " + platform + "'";
     }
 
     @Override
@@ -50,12 +51,12 @@ public class SearchResultPackSource implements IPackSource {
         //Get results from server
         SearchResultsData results = null;
         try {
-            results = platformApi.getSearchResults(searchTerms);
+            results = HttpPlatformApi.getSearchResults(platform,searchTerms,800);
         } catch (RestfulAPIException ex) {
             return Collections.emptySet();
         }
 
-        ArrayList<PackInfo> resultPacks = new ArrayList<PackInfo>(results.getResults().length);
+        ArrayList<PackInfo> resultPacks = new ArrayList<>(results.getResults().length);
 
         int priority = 100;
         for (SearchResult result : results.getResults()) {

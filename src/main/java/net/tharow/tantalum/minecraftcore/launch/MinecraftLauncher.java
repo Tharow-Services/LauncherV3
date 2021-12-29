@@ -47,26 +47,16 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-public class MinecraftLauncher {
+public record MinecraftLauncher(IPlatformApi platformApi,
+                                LauncherDirectories directories,
+                                UserModel userModel,
+                                JavaVersionRepository javaVersions,
+                                IBuildNumber buildNumber) {
 
-    private static final String[] BAD_ENV_VARS = new String[] {
+    private static final String[] BAD_ENV_VARS = new String[]{
             "JAVA_ARGS", "CLASSPATH", "CONFIGPATH", "JAVA_HOME", "JRE_HOME",
             "_JAVA_OPTIONS", "JAVA_OPTIONS", "JAVA_TOOL_OPTIONS"
     };
-
-    private final LauncherDirectories directories;
-    private final IPlatformApi platformApi;
-    private final UserModel userModel;
-    private final JavaVersionRepository javaVersions;
-    private final IBuildNumber buildNumber;
-
-    public MinecraftLauncher(final IPlatformApi platformApi, final LauncherDirectories directories, final UserModel userModel, final JavaVersionRepository javaVersions, IBuildNumber buildNumber) {
-        this.directories = directories;
-        this.platformApi = platformApi;
-        this.userModel = userModel;
-        this.javaVersions = javaVersions;
-        this.buildNumber = buildNumber;
-    }
 
     public JavaVersionRepository getJavaVersions() {
         return javaVersions;
@@ -107,9 +97,9 @@ public class MinecraftLauncher {
         if (exitListener != null) mcProcess.setExitListener(exitListener);
 
         platformApi.incrementPackRuns(pack.getName());
-        //if (!Utils.sendTracking("runModpack", pack.getName(), pack.getInstalledVersion().getVersion(), options.getOptions().getClientId())) {
-        //    Utils.getLogger().info("Failed to record event");
-        //}
+        if (!Utils.sendTracking("runModpack", pack.getName(), pack.getInstalledVersion().getVersion(), options.getOptions().getClientId())) {
+            Utils.getLogger().info("Failed to record event");
+        }
 
         return mcProcess;
     }
@@ -145,7 +135,7 @@ public class MinecraftLauncher {
         String cpString = buildClassPath(pack, version);
 
         // build arg parameter map
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         IUserType user = userModel.getCurrentUser();
         File gameDirectory = pack.getInstalledDirectory();
         ILaunchOptions launchOpts = options.getOptions();
@@ -156,8 +146,6 @@ public class MinecraftLauncher {
 
         params.put("auth_player_name", user.getDisplayName());
         params.put("auth_uuid", user.getId());
-
-
 
 
         params.put("profile_name", user.getDisplayName());
@@ -222,7 +210,7 @@ public class MinecraftLauncher {
             permSize = 256;
         }
 
-        if(Objects.equals(user.getUserType(), AuthlibUser.AUTHLIB_USER_TYPE))
+        if (Objects.equals(user.getUserType(), AuthlibUser.AUTHLIB_USER_TYPE))
             commands.addRaw("-javaagent:" + directories.getAssetsDirectory().getAbsolutePath() + "\\launcher\\authlib-injector.jar=" + user.getServerUrl());
 
         commands.addRaw("-Xms" + memory + "m");

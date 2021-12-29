@@ -25,7 +25,7 @@ import org.apache.commons.io.IOUtils;
 import java.nio.charset.StandardCharsets;
 
 public class VersionFileBuildNumber implements IBuildNumber {
-    private ResourceLoader resources;
+    private final ResourceLoader resources;
 
     public VersionFileBuildNumber(ResourceLoader resources) {
         this.resources = resources;

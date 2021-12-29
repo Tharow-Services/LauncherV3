@@ -27,8 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class EnsureLinkedFileTask implements IInstallTask {
-    private Path link;
-    private Path target;
+    private final Path link;
+    private final Path target;
 
     /**
      * Ensures that a symbolic link at "link", pointing to "target" exists and is correct.

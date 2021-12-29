@@ -25,7 +25,7 @@ import net.tharow.tantalum.utilslib.Utils;
 import java.io.File;
 
 public class MD5FileVerifier implements IFileVerifier {
-    private String md5Hash;
+    private final String md5Hash;
 
     public MD5FileVerifier(String md5Hash) {
         this.md5Hash = md5Hash;

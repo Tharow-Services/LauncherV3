@@ -19,7 +19,6 @@
 
 package net.tharow.tantalum.platform;
 
-import net.tharow.tantalum.platform.io.NewsData;
 import net.tharow.tantalum.platform.io.PlatformPackInfo;
 import net.tharow.tantalum.rest.RestfulAPIException;
 
@@ -32,9 +31,6 @@ public interface IPlatformApi {
 
     void incrementPackInstalls(String packSlug);
 
-    NewsData getNews() throws RestfulAPIException;
-
+    @Deprecated
     String getPlatformUri(String slug);
-
-    IPlatformInfo getPlatformInfo() throws RestfulAPIException;
 }

@@ -34,25 +34,13 @@ import net.tharow.tantalum.minecraftcore.mojang.version.io.AssetIndex;
 import java.io.File;
 import java.io.IOException;
 
-public class EnsureAssetsIndexTask implements IInstallTask {
-
-    private final File assetsDirectory;
-    private final ModpackModel modpack;
-    private final ITasksQueue downloadIndexQueue;
-    private final ITasksQueue examineIndexQueue;
-    private final ITasksQueue checkAssetsQueue;
-    private final ITasksQueue downloadAssetsQueue;
-    private final ITasksQueue installAssetsQueue;
-
-    public EnsureAssetsIndexTask(File assetsDirectory, ModpackModel modpack, ITasksQueue downloadIndexQueue, ITasksQueue examineIndexQueue, ITasksQueue checkAssetsQueue, ITasksQueue downloadAssetsQueue, ITasksQueue installAssetsQueue) {
-        this.assetsDirectory = assetsDirectory;
-        this.modpack = modpack;
-        this.downloadIndexQueue = downloadIndexQueue;
-        this.examineIndexQueue = examineIndexQueue;
-        this.checkAssetsQueue = checkAssetsQueue;
-        this.downloadAssetsQueue = downloadAssetsQueue;
-        this.installAssetsQueue = installAssetsQueue;
-    }
+public record EnsureAssetsIndexTask(File assetsDirectory,
+                                    ModpackModel modpack,
+                                    ITasksQueue downloadIndexQueue,
+                                    ITasksQueue examineIndexQueue,
+                                    ITasksQueue checkAssetsQueue,
+                                    ITasksQueue downloadAssetsQueue,
+                                    ITasksQueue installAssetsQueue) implements IInstallTask {
 
     @Override
     public String getTaskDescription() {
@@ -66,7 +54,7 @@ public class EnsureAssetsIndexTask implements IInstallTask {
 
     @Override
     public void runTask(InstallTasksQueue queue) throws IOException {
-        MojangVersion version = ((InstallTasksQueue<MojangVersion>)queue).getMetadata();
+        @SuppressWarnings("unchecked") MojangVersion version = ((InstallTasksQueue<MojangVersion>) queue).getMetadata();
 
         String assetKey = version.getAssetsKey();
         if (assetKey == null || assetKey.isEmpty()) {
@@ -94,7 +82,7 @@ public class EnsureAssetsIndexTask implements IInstallTask {
 
         if (!output.exists() || !fileVerifier.isFileValid(output)) {
             downloadIndexQueue.addTask(new DownloadFileTask(assetsUrl, output, fileVerifier));
-         }
+        }
 
         examineIndexQueue.addTask(new InstallMinecraftAssetsTask(modpack, assetsDirectory.getAbsolutePath(), output, checkAssetsQueue, downloadAssetsQueue, installAssetsQueue));
     }

@@ -24,8 +24,8 @@ import java.awt.*;
 import java.awt.event.FocusEvent;
 
 public class WatermarkTextField extends JTextField {
-    private String watermarkText;
-    private Color watermarkColor;
+    private final String watermarkText;
+    private final Color watermarkColor;
 
     public WatermarkTextField(String watermarkText, Color watermarkColor) {
         this.watermarkColor = watermarkColor;
