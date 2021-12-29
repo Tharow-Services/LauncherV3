@@ -23,6 +23,7 @@ import com.beust.jcommander.converters.FileConverter;
 import com.beust.jcommander.internal.Lists;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 @SuppressWarnings("ALL")
 public final class StartupParameters {
@@ -48,7 +49,7 @@ public final class StartupParameters {
     @Parameter(names = {"-solder","-s"}, description = "An override param for the discover URL")
     private String solder = null;
     @Parameter(names = {"-platform","-p"}, description = "Add A Platform To the list")
-    private List<String> platform = List.of(new String[]{"https://api.technicpack.net/"});
+    private List<String> platform = new ArrayList<>();
     @Parameter(names = {"-overrideRoots"}, description = "Force the override of root ca Certificates")
     private boolean overrideRoots = false;
     @Parameter(names = {"-modpackFile","-mf"}, description = "Install a modpack from file", converter = FileConverter.class)

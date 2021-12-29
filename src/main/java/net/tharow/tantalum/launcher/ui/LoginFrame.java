@@ -712,10 +712,8 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
 
     private void newAuthlibLogin(String name, String srvUrl) {
         try {
-            URL url = Utils.getFullUrl(srvUrl);
-
             AuthlibUser newUser;
-            IAuthlibServerInfo serverInfo = AuthlibServer.getAuthlibServerInfo(url.toString());
+            IAuthlibServerInfo serverInfo = AuthlibServer.getAuthlibServerInfo(srvUrl);
             newUser = userModel.getAuthlibAuthenticator().loginNewUser(name, new String(this.password2.getPassword()), serverInfo);
             userModel.addUser(newUser);
             userModel.setCurrentUser(newUser);
@@ -728,9 +726,6 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
             e.printStackTrace();
         } catch (RestfulAPIException e) {
             showMessageDialog(this, e.getMessage(), "Auth Server Error", ERROR_MESSAGE);
-            e.printStackTrace();
-        } catch (DownloadException e) {
-            showMessageDialog(this, e.getMessage(), "Improper Url", ERROR_MESSAGE);
             e.printStackTrace();
         }
     }

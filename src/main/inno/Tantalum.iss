@@ -49,7 +49,7 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{sys}\tar.exe"; Parameters: "-xf .\jre.zip"; WorkingDir: "{app}"; StatusMsg: "Installing Java Runtime"; Flags: runhidden
-
+Filename: "{sys}\cmd.exe"; Parameters: "/c move .\jdk17* jre"; WorkingDir: "{app}"; StatusMsg: "Seting up Java Runtime"; Flags: runhidden
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
 
@@ -67,14 +67,13 @@ end;
 procedure InitializeWizard;
 begin
   DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), @OnDownloadProgress);
-
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   if CurPageID = wpReady then begin
     DownloadPage.Clear;
-    DownloadPage.Add('https://corretto.aws/downloads/latest/amazon-corretto-8-x64-windows-jre.zip', 'jre.zip', '');
+    DownloadPage.Add('https://corretto.aws/downloads/latest/amazon-corretto-17-x64-windows-jdk.zip', 'jre.zip', '');
     DownloadPage.Show;
     try
       try

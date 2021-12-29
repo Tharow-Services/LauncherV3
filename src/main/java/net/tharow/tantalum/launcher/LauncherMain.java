@@ -89,6 +89,7 @@ import net.tharow.tantalum.ui.controls.installation.SplashScreen;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.utilslib.*;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -236,13 +237,16 @@ public class LauncherMain {
 
     }
 
-    private static IBuildNumber getTechnicBuildNumber(){
+    private static @NotNull IBuildNumber getTechnicBuildNumber(){
         int buildnumber = 800;
         try {
             buildnumber = (RestObject.getRestObject(StreamVersion.class, "https://api.technicpack.net/launcher/version/stable4").getBuild());
         } catch (RestfulAPIException e) {
             Utils.getLogger().warning("Couldn't Contact Technic Platform For Build Number");
-            buildnumber = Integer.getInteger(JOptionPane.showInputDialog(null,"Couldn't contact technicpack.net to get the current build number please enter a build number to use for requests to the technic platform", "Error Need Build Number", JOptionPane.ERROR_MESSAGE));
+            /*try{
+                buildnumber = Integer.getInteger(JOptionPane.showInputDialog(null,"Couldn't contact technicpack.net to get the current build number please enter a build number to use for requests to the technic platform", "Error Need Build Number", JOptionPane.ERROR_MESSAGE));
+            } catch (NullPointerException ignored){}*/
+
         }
         int finalBuildnumber = buildnumber;
         return () -> String.valueOf(finalBuildnumber);
@@ -445,11 +449,6 @@ public class LauncherMain {
         }
     }
 
-    protected static void dump(final TantalumSettings settings, StartupParameters parameters, final LauncherDirectories directories, ResourceLoader resources){
-        TantalumUserStore users = TantalumUserStore.load(new File(directories.getLauncherDirectory(),"users.json"));
-
-    }
-
 
     private static void startLauncher(final TantalumSettings settings, StartupParameters startupParameters, final LauncherDirectories directories, ResourceLoader resources) {
         UIManager.put( "ComboBox.disabledBackground", LauncherFrame.COLOR_FORMELEMENT_INTERNAL );
@@ -506,18 +505,18 @@ public class LauncherMain {
         var httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
 
-        var platforms = TantalumPlatformStore.refresh(new File(directories.getLauncherDirectory(),"platforms.json"));
-        platforms.addPlatforms(startupParameters.getPlatformUrl());
-        Debug.getConfig(platforms);
-        Debug.getConfig(users);
+        var platforms = TantalumPlatformStore.load(new File(directories.getLauncherDirectory(),"platforms.json"));
+        if (startupParameters.getPlatformUrl().isEmpty()){
+            startupParameters.getPlatformUrl().add(0,"https://api.technicpack.net/");
+            startupParameters.getPlatformUrl().add(1,"https://tantalum-auth.azurewebsites.net/platform/");
+        }
         var httpPlatform = new HttpPlatformApi(platforms);
-        Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
+        //Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
         IPlatformApi platform = new ModpackCachePlatformApi(httpPlatform, 60 * 60, directories);
 
         var packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks.json"));
         IAuthoritativePackSource packInfoRepository = new PlatformPackInfoRepository(platform, solder);
         //Debug.getInstalledConfig(packInfoRepository, packStore);
-
         //var source = new SolderPackSource("http://solder.technicpack.net/api/",solder);
         //Debug.getPackSourceConfig(packInfoRepository, source);
 
