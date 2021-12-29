@@ -228,7 +228,7 @@
             <!-- Filtered resources -->
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
-                <targetPath>net//tharow/tantalum/launcher/resources</targetPath>
+                <targetPath>net/tharow/tantalum/launcher/resources</targetPath>
                 <filtering>false</filtering>
                 <includes>
                     <include>**/*</include>
@@ -257,7 +257,7 @@
                 <version>3.8.1</version>
                 <configuration>
                     <source>17</source>
-                    <target>17</target>
+                    <target>8</target>
                     <compilerArguments>
                         <O>-Xlint:all</O>
                         <O>-Xlint:-path</O>
@@ -367,7 +367,7 @@
                                     <headerType>gui</headerType>
                                     <stayAlive>false</stayAlive>
                                     <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
-                                    <outfile>${project.build.directory}/${project.artifactId}-${project.version}.exe</outfile>
+                                    <outfile>${project.build.directory}/TantalumLauncher.exe</outfile>
                                     <classPath>
                                         <mainClass>${mainClass}</mainClass>
                                         <addDependencies>false</addDependencies>
@@ -375,8 +375,6 @@
                                     </classPath>
                                     <jre>
                                         <path>./jre</path>
-                                        <minVersion>17.0.0</minVersion>
-                                        <maxVersion>17.9.9_999</maxVersion>
                                         <opts>
                                             <opt>-Djava.net.preferIPv4Stack=true</opt>
                                             <opt>-Dawt.useSystemAAFontSettings=lcd</opt>
