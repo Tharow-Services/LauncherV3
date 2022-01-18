@@ -237,21 +237,6 @@ public class LauncherMain {
 
     }
 
-    private static @NotNull IBuildNumber getTechnicBuildNumber(){
-        int buildnumber = 800;
-        try {
-            buildnumber = (RestObject.getRestObject(StreamVersion.class, "https://api.technicpack.net/launcher/version/stable4").getBuild());
-        } catch (RestfulAPIException e) {
-            Utils.getLogger().warning("Couldn't Contact Technic Platform For Build Number");
-            /*try{
-                buildnumber = Integer.getInteger(JOptionPane.showInputDialog(null,"Couldn't contact technicpack.net to get the current build number please enter a build number to use for requests to the technic platform", "Error Need Build Number", JOptionPane.ERROR_MESSAGE));
-            } catch (NullPointerException ignored){}*/
-
-        }
-        int finalBuildnumber = buildnumber;
-        return () -> String.valueOf(finalBuildnumber);
-    }
-
     /*
     public static void runProxySetup(TantalumSettings settings2, File torRelayDir) {
         if(settings2.getUseTorRelay()){
@@ -361,7 +346,7 @@ public class LauncherMain {
         Utils.getLogger().log(Level.WARNING,"This is Warning Level");
         Utils.getLogger().log(Level.INFO, "This is info Level");
         Utils.getLogger().log(Level.CONFIG, "This is Config Level");
-        Utils.logDebug("This is Debug Level");
+        Utils.getLogger().log(Level.DEBUG, "This is Debug Level");
         Utils.getLogger().log(Level.FINE, "This is Fine Level");
         Utils.getLogger().log(Level.FINER, "This is Finer Level");
         Utils.getLogger().log(Level.FINEST, "This is Finest Level");
