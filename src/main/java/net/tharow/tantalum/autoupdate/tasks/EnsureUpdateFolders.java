@@ -24,7 +24,6 @@ import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
 
 import java.io.File;
-import java.io.IOException;
 
 public class EnsureUpdateFolders implements IInstallTask {
     private final String taskDescription;

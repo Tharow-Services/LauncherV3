@@ -128,7 +128,7 @@ public class ProgressBar extends JLabel implements DownloadListener {
         setText(progressText);
         this.progressPct = progress;
 
-        EventQueue.invokeLater(() -> repaint());
+        EventQueue.invokeLater(this::repaint);
     }
 
     @Override

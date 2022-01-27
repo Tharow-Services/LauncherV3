@@ -43,7 +43,6 @@ import net.tharow.tantalum.ui.controls.borders.RoundBorder;
 import net.tharow.tantalum.ui.controls.list.SimpleScrollbarUI;
 import net.tharow.tantalum.ui.lang.IRelocalizableResource;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
-import net.tharow.tantalum.utilslib.Debug;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.ui.controls.SimpleDocumentListener;
 import net.tharow.tantalum.utilslib.Utils;

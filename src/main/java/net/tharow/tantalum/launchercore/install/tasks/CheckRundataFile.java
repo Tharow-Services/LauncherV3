@@ -5,7 +5,6 @@ import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.rest.io.Modpack;
 
 import java.io.File;
-import java.io.IOException;
 
 public class CheckRundataFile implements IInstallTask {
     private final ModpackModel modpackModel;

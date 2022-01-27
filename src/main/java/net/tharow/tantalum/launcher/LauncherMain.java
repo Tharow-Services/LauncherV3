@@ -19,16 +19,11 @@
 package net.tharow.tantalum.launcher;
 
 import com.beust.jcommander.JCommander;
-/*
-import com.msopentech.thali.java.toronionproxy.JavaOnionProxyContext;
-import com.msopentech.thali.java.toronionproxy.JavaTorInstaller;
-import com.msopentech.thali.toronionproxy.*;
- */
+import com.sun.org.apache.xerces.internal.dom.DeferredElementNSImpl;
 import net.tharow.tantalum.authlib.AuthlibAuthenticator;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.autoupdate.Relauncher;
 import net.tharow.tantalum.autoupdate.http.HttpUpdateStream;
-import net.tharow.tantalum.autoupdate.io.StreamVersion;
 import net.tharow.tantalum.launcher.autoupdate.CommandLineBuildNumber;
 import net.tharow.tantalum.launcher.autoupdate.TechnicRelauncher;
 import net.tharow.tantalum.launcher.autoupdate.VersionFileBuildNumber;
@@ -75,8 +70,6 @@ import net.tharow.tantalum.platform.PlatformPackInfoRepository;
 import net.tharow.tantalum.platform.cache.ModpackCachePlatformApi;
 import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
-import net.tharow.tantalum.rest.RestObject;
-import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.solder.ISolderApi;
 import net.tharow.tantalum.solder.SolderPackSource;
 import net.tharow.tantalum.solder.cache.CachedSolderApi;
@@ -89,7 +82,6 @@ import net.tharow.tantalum.ui.controls.installation.SplashScreen;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.utilslib.*;
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -100,6 +92,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -112,13 +105,21 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.logging.Handler;
-import java.util.logging.Level;
+import net.tharow.tantalum.utilslib.logger.Level;
+import org.xbill.DNS.*;
+import org.xbill.DNS.config.BaseResolverConfigProvider;
+import org.xbill.DNS.config.PropertyResolverConfigProvider;
+import org.xbill.DNS.hosts.HostsFileParser;
+
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class LauncherMain {
 
     public static final boolean DUMP = false;
+
+    public static final Name MasterDNS = Name.fromConstantString("dns.host");
+    public static final int MasterDNSPort = 53;
 
     public static ConsoleFrame consoleFrame;
 
@@ -192,9 +193,10 @@ public class LauncherMain {
 
         TantalumConstants.setBuildNumber(buildNumber);
 
-        TantalumConstants.setFalseBuildNumber(getTechnicBuildNumber());
-
         setupLogging(directories, resources);
+
+        System.setProperty("dns.server","8.8.8.8, localhost:9150, dns.google");
+        System.setProperty("sun.net.spi.nameservice.provider.1","dns,dnsjava");
 
         //Currently Unused
         //String launcherBuild = buildNumber.getBuildNumber();
@@ -213,7 +215,7 @@ public class LauncherMain {
             Utils.getLogger().setLevel(Level.ALL);
         } else{
             TantalumConstants.setIsDebug(false);
-            Utils.getLogger().setLevel(LogLevel.getLevel(params.getLogLevel()*100));
+            Utils.getLogger().setLevel(Level.getLevel(params.getLogLevel()*100));
         }
 
         //runProxySetup(settings);
@@ -234,6 +236,26 @@ public class LauncherMain {
             e.printStackTrace();
         }
 
+
+    }
+
+    public static void setupDnsJava(final LauncherDirectories directories){
+        // Create Host File Parser For DNS Overrides //
+        HostsFileParser hostsFileParser = new HostsFileParser(new File(directories.getLauncherAssetsDirectory(), "hosts.conf").toPath());
+        try {
+            InetSocketAddress mainDNSServer = new InetSocketAddress(hostsFileParser.getAddressForHost(MasterDNS, Type.A).orElse(InetAddress.getLocalHost()),MasterDNSPort);
+        } catch (IOException e) {
+            Utils.logDebug("There Was an io Error for");
+            e.printStackTrace();
+        }
+
+        // Make DNSJAVA proterys
+        BaseResolverConfigProvider configProvider = new PropertyResolverConfigProvider();
+
+        // Make Configuration
+        //ResolverConfig resolverConfig = ResolverConfig.getCurrentConfig();
+        //resolverConfig.server();
+        //ResolverConfig.getCurrentConfig();
 
     }
 
@@ -479,7 +501,7 @@ public class LauncherMain {
         IModpackResourceType backgroundType = new BackgroundResourceType();
 
         PackResourceMapper iconMapper = new PackResourceMapper(directories, resources.getImage("icon.png"), iconType);
-        var iconRepo = new ImageRepository<>(iconMapper, new PackImageStore(iconType));
+        ImageRepository<ModpackModel> iconRepo = new ImageRepository<>(iconMapper, new PackImageStore(iconType));
         ImageRepository<ModpackModel> logoRepo = new ImageRepository<>(new PackResourceMapper(directories, resources.getImage("modpack/ModImageFiller.png"), logoType), new PackImageStore(logoType));
         ImageRepository<ModpackModel> backgroundRepo = new ImageRepository<>(new PackResourceMapper(directories, null, backgroundType), new PackImageStore(backgroundType));
 
@@ -487,19 +509,19 @@ public class LauncherMain {
 
         ImageRepository<AuthorshipInfo> avatarRepo = new ImageRepository<>(new TantalumAvatarMapper(directories, resources), new WebAvatarImageStore());
 
-        var httpSolder = new HttpSolderApi(settings.getClientId());
+        ISolderApi httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
 
-        var platforms = TantalumPlatformStore.load(new File(directories.getLauncherDirectory(),"platforms.json"));
+        TantalumPlatformStore platforms = TantalumPlatformStore.load(new File(directories.getLauncherDirectory(),"platforms.json"));
         if (startupParameters.getPlatformUrl().isEmpty()){
             startupParameters.getPlatformUrl().add(0,"https://api.technicpack.net/");
             startupParameters.getPlatformUrl().add(1,"https://tantalum-auth.azurewebsites.net/platform/");
         }
-        var httpPlatform = new HttpPlatformApi(platforms);
+        HttpPlatformApi httpPlatform = new HttpPlatformApi(platforms);
         //Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
         IPlatformApi platform = new ModpackCachePlatformApi(httpPlatform, 60 * 60, directories);
 
-        var packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks.json"));
+        IInstalledPackRepository packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks.json"));
         IAuthoritativePackSource packInfoRepository = new PlatformPackInfoRepository(platform, solder);
         //Debug.getInstalledConfig(packInfoRepository, packStore);
         //var source = new SolderPackSource("http://solder.technicpack.net/api/",solder);
@@ -509,7 +531,7 @@ public class LauncherMain {
         migrators.add(new InitialV3Migrator(platform));
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
-        var packList = new PackLoader(directories, packStore, packInfoRepository);
+        PackLoader packList = new PackLoader(directories, packStore, packInfoRepository);
 
         String solderUrl;
         if(startupParameters.getSolderUrl() != null){solderUrl = startupParameters.getSolderUrl();}

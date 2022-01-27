@@ -46,13 +46,14 @@ public class Rule {
     private final List<RuleCondition> conditions = new ArrayList<>();
 
     public Rule(JsonObject rule) {
+        boolean negated1;
         String action = rule.get("action").getAsString();
         switch (action) {
-            case "allow" -> negated = false;
-            case "disallow" -> negated = true;
-            default -> throw new JsonParseException("Expected rule action, got: " + action);
+            case "allow" : negated1 = false; break;
+            case "disallow" : negated1 = true; break;
+            default : throw new JsonParseException("Expected rule action, got: " + action);
         }
-
+        negated = negated1;
         if (rule.has("os")) {
             JsonObject os = rule.get("os").getAsJsonObject();
             conditions.add(new OsCondition(
@@ -140,7 +141,12 @@ public class Rule {
 
     }
 
-    private record CustomResolutionCondition(boolean shouldHaveCustomResolution) implements RuleCondition {
+    private static class CustomResolutionCondition implements RuleCondition {
+        final boolean shouldHaveCustomResolution;
+
+        public CustomResolutionCondition(final boolean shouldHaveCustomResolution){
+            this.shouldHaveCustomResolution = shouldHaveCustomResolution;
+        }
 
         @Override
         public boolean test(ILaunchOptions opts) {
@@ -155,7 +161,10 @@ public class Rule {
 
     }
 
-    private record DemoCondition(boolean shouldBeDemoUser) implements RuleCondition {
+    private static class DemoCondition implements RuleCondition {
+        final boolean shouldBeDemoUser;
+
+        DemoCondition(boolean shouldBeDemoUser){this.shouldBeDemoUser = shouldBeDemoUser;}
 
         @Override
         public boolean test(ILaunchOptions opts) {

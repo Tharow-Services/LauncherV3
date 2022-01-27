@@ -19,6 +19,8 @@
 package net.tharow.tantalum.launcher.io;
 
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
@@ -30,54 +32,24 @@ public class TechnicLauncherDirectories implements LauncherDirectories {
         workDir = rootDir;
     }
 
-    public File getLauncherDirectory() {
-        if (!workDir.exists())
-            workDir.mkdirs();
+    public File getLauncherDirectory() {return getDirectoryBase(null);}
 
-        return workDir;
+    public File getCacheDirectory() {return getDirectoryBase("cache");}
+    public File getAssetsDirectory() {return getDirectoryBase("assets");}
+    public File getModpacksDirectory() {return getDirectoryBase("modpacks");}
+    public File getRuntimesDirectory() {return getDirectoryBase("runtimes");}
+    public File getWorldsDirectory() {return getDirectoryBase("worlds");}
+    public File getLauncherAssetsDirectory() {return getDirectoryBase(getAssetsDirectory(),"launcher");}
+
+
+    private @NotNull File getDirectoryBase(@Nullable final String directory){
+        if (!workDir.exists()){workDir.mkdir();}
+        return directory == null ? getDirectoryBase(workDir, directory) : this.workDir;
+    }
+    private @NotNull File getDirectoryBase(final File parent, final String child){
+        File directory = new File(parent, child);
+        if (!directory.exists()){directory.mkdir();}
+        return directory;
     }
 
-    public File getCacheDirectory() {
-        File cache = new File(getLauncherDirectory(), "cache");
-        if (!cache.exists()) {
-            cache.mkdirs();
-        }
-        return cache;
-    }
-
-    public File getAssetsDirectory() {
-        File assets = new File(getLauncherDirectory(), "assets");
-
-        if (!assets.exists()) {
-            assets.mkdirs();
-        }
-
-        return assets;
-    }
-
-    public File getModpacksDirectory() {
-        File modpacks = new File(getLauncherDirectory(), "modpacks");
-
-        if (!modpacks.exists())
-            modpacks.mkdirs();
-
-        return modpacks;
-    }
-
-    public File getRuntimesDirectory() {
-        File runtimes = new File(getLauncherDirectory(), "runtimes");
-
-        if (!runtimes.exists())
-            runtimes.mkdirs();
-
-        return runtimes;
-    }
-    public File getTorRelayDirectory(){
-        File torRelay = new File(getLauncherDirectory(), "torRelay");
-
-        if (!torRelay.exists()){
-            getRuntimesDirectory().mkdir();
-        }
-        return torRelay;
-    }
 }

@@ -31,8 +31,15 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.logging.Level;
 
-public record SolderPackSource(String baseUrl, ISolderApi solder) implements IPackSource
+public class SolderPackSource implements IPackSource
 {
+    private final String baseUrl;
+    private final ISolderApi solder;
+    public SolderPackSource(String baseUrl, ISolderApi solder){
+        this.baseUrl = baseUrl;
+        this.solder = solder;
+    }
+
 
     @Contract(pure = true)
     @Override

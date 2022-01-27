@@ -63,7 +63,7 @@ class ImageLoadQueue {
     /**
      * Queues a new item to be loaded. Thread-safe.
      *
-     * @param imageResourceLoader
+     * @param imageResourceLoader the image loader
      * @param uri URI of the item to be loaded. As there is no good way of reporting failures, you should ensure
      *            the URI is a proper URL before calling this method.
      */

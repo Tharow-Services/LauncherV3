@@ -19,28 +19,64 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
-import net.tharow.tantalum.launchercore.exception.DownloadException;
-import net.tharow.tantalum.launchercore.install.ITasksQueue;
-import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
-import net.tharow.tantalum.launchercore.install.tasks.DownloadFileTask;
-import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
-import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
-import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
-import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
-import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntime;
-import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntimes;
-import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
-import net.tharow.tantalum.minecraftcore.mojang.version.io.Download;
-import net.tharow.tantalum.minecraftcore.mojang.version.io.JavaVersion;
+import java.util.Objects;
 
-import java.io.File;
-import java.io.IOException;
+public final class EnsureJavaRuntimeManifestTask implements IInstallTask {
+    private final File runtimesDirectory;
+    private final ModpackModel modpack;
+    private final ITasksQueue examineJavaQueue;
+    private final ITasksQueue downloadJavaQueue;
 
-public record EnsureJavaRuntimeManifestTask(File runtimesDirectory,
-                                            ModpackModel modpack,
-                                            ITasksQueue examineJavaQueue,
-                                            ITasksQueue downloadJavaQueue) implements IInstallTask {
+    EnsureJavaRuntimeManifestTask(File runtimesDirectory,
+                                  ModpackModel modpack,
+                                  ITasksQueue examineJavaQueue,
+                                  ITasksQueue downloadJavaQueue) {
+        this.runtimesDirectory = runtimesDirectory;
+        this.modpack = modpack;
+        this.examineJavaQueue = examineJavaQueue;
+        this.downloadJavaQueue = downloadJavaQueue;
+    }
+
+    public File runtimesDirectory() {
+        return runtimesDirectory;
+    }
+
+    public ModpackModel modpack() {
+        return modpack;
+    }
+
+    public ITasksQueue examineJavaQueue() {
+        return examineJavaQueue;
+    }
+
+    public ITasksQueue downloadJavaQueue() {
+        return downloadJavaQueue;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        EnsureJavaRuntimeManifestTask that = (EnsureJavaRuntimeManifestTask) obj;
+        return Objects.equals(this.runtimesDirectory, that.runtimesDirectory) &&
+                Objects.equals(this.modpack, that.modpack) &&
+                Objects.equals(this.examineJavaQueue, that.examineJavaQueue) &&
+                Objects.equals(this.downloadJavaQueue, that.downloadJavaQueue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(runtimesDirectory, modpack, examineJavaQueue, downloadJavaQueue);
+    }
+
+    @Override
+    public String toString() {
+        return "EnsureJavaRuntimeManifestTask[" +
+                "runtimesDirectory=" + runtimesDirectory + ", " +
+                "modpack=" + modpack + ", " +
+                "examineJavaQueue=" + examineJavaQueue + ", " +
+                "downloadJavaQueue=" + downloadJavaQueue + ']';
+    }
 
     @Override
     public String getTaskDescription() {

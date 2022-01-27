@@ -19,8 +19,6 @@
 
 package net.tharow.tantalum.minecraftcore.mojang.auth;
 
-import com.google.common.base.Charsets;
-
 
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.launchercore.exception.ResponseException;
@@ -29,6 +27,7 @@ import net.tharow.tantalum.minecraftcore.MojangUtils;
 import net.tharow.tantalum.minecraftcore.mojang.auth.request.AuthRequest;
 import net.tharow.tantalum.minecraftcore.mojang.auth.request.RefreshRequest;
 import net.tharow.tantalum.minecraftcore.mojang.auth.response.AuthResponse;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -40,8 +39,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public record MojangAuthenticator(String clientToken) {
+public class MojangAuthenticator {
     private static final String AUTH_SERVER = "https://authserver.mojang.com/";
+    private final String clientToken;
+    public MojangAuthenticator(final String clientToken){
+        this.clientToken = clientToken;
+    }
 
     @Contract(value = "_, _ -> new")
     public @NotNull MojangUser loginNewUser(String username, String password) throws AuthenticationException {
@@ -112,7 +115,7 @@ public record MojangAuthenticator(String clientToken) {
         String returnable = null;
         try {
             stream = connection.getInputStream();
-            returnable = IOUtils.toString(stream, Charsets.UTF_8);
+            returnable = IOUtils.toString(stream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             stream = connection.getErrorStream();
 

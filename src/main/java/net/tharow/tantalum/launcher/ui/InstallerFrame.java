@@ -204,7 +204,6 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
                 System.exit(0);
             } catch (UnsupportedEncodingException ex) {
                 ex.printStackTrace();
-                return;
             }
         });
         thread.start();

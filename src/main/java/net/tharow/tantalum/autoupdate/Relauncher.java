@@ -40,10 +40,14 @@ public abstract class Relauncher {
     private final LauncherDirectories directories;
     private boolean didUpdate = false;
 
-    public Relauncher(int currentBuild, LauncherDirectories directories) {
+    public Relauncher(final int currentBuild, final LauncherDirectories directories, String stream){
         this.stream = stream;
         this.currentBuild = currentBuild;
         this.directories = directories;
+    }
+
+    public Relauncher(int currentBuild, LauncherDirectories directories) {
+        this(currentBuild, directories, "stable4");
     }
 
     public int getCurrentBuild() { return currentBuild; }
@@ -58,8 +62,8 @@ public abstract class Relauncher {
 
     public static String getRunningPath(Class clazz) throws UnsupportedEncodingException {
         String path = clazz.getProtectionDomain().getCodeSource().getLocation().getPath();
-        path = path.replace("+", URLEncoder.encode("+", StandardCharsets.UTF_8));
-        return URLDecoder.decode(path, StandardCharsets.UTF_8);
+        path = path.replace("+", URLEncoder.encode("+", String.valueOf(StandardCharsets.UTF_8)));
+        return URLDecoder.decode(path, String.valueOf(StandardCharsets.UTF_8));
     }
 
     protected abstract Class getMainClass();
@@ -154,10 +158,10 @@ public abstract class Relauncher {
             commands.add(launchPath);
         commands.addAll(Arrays.asList(args));
 
-        String command = "";
+        StringBuilder command = new StringBuilder();
 
         for (String token : commands) {
-            command += token + " ";
+            command.append(token).append(" ");
         }
 
         Utils.getLogger().info("Launching command: '" + command + "'");
@@ -181,7 +185,7 @@ public abstract class Relauncher {
         outArgs.add(getRunningPath());
         outArgs.add("-moveronly");
         outArgs.addAll(Arrays.asList(getLaunchArgs()));
-        return outArgs.toArray(new String[outArgs.size()]);
+        return outArgs.toArray(new String[0]);
     }
 
     public String[] buildLauncherArgs(boolean isLegacy) {
@@ -192,6 +196,6 @@ public abstract class Relauncher {
             outArgs.add("-launcher");
         outArgs.addAll(Arrays.asList(getLaunchArgs()));
         outArgs.remove("-moveronly");
-        return outArgs.toArray(new String[outArgs.size()]);
+        return outArgs.toArray(new String[0]);
     }
 }

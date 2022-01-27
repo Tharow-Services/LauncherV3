@@ -27,7 +27,6 @@ import net.tharow.tantalum.rest.io.Mod;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 

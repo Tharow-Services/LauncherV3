@@ -34,7 +34,6 @@ import net.tharow.tantalum.utilslib.Utils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Collections;
 import java.util.logging.Level;
 
 public class NewsSelector extends JPanel {
@@ -121,9 +120,7 @@ public class NewsSelector extends JPanel {
             circle.setVisible(false);
         }
 
-        news.getArticles().sort((o1, o2) -> {
-            return Long.compare(o2.getDate().getTime(), o1.getDate().getTime());
-        });
+        news.getArticles().sort((o1, o2) -> Long.compare(o2.getDate().getTime(), o1.getDate().getTime()));
 
         widgetHost.removeAll();
 

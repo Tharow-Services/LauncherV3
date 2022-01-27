@@ -35,6 +35,7 @@ public class DateTypeAdapter
 
     public DateTypeAdapter() {
         this.enUsFormat = DateFormat.getDateTimeInstance(2, 2, Locale.US);
+        //noinspection SpellCheckingInspection
         this.iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     }
 

@@ -41,7 +41,7 @@ public class LimitLinesDocumentListener implements DocumentListener {
      * the boolean value specified.
      *
      * @param maximumLines      number of lines
-     * @param isRemoveFromStart
+     * @param isRemoveFromStart Extra lines will be removed from the start or end
      */
     public LimitLinesDocumentListener(int maximumLines, boolean isRemoveFromStart) {
         setLimitLines(maximumLines);

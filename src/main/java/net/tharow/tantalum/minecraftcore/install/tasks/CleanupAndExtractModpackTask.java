@@ -19,28 +19,73 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
-import net.tharow.tantalum.launchercore.exception.CacheDeleteException;
-import net.tharow.tantalum.launchercore.install.ITasksQueue;
-import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
-import net.tharow.tantalum.launchercore.install.tasks.EnsureFileTask;
-import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
-import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
-import net.tharow.tantalum.minecraftcore.install.ModpackZipFilter;
-import net.tharow.tantalum.rest.io.Modpack;
-import net.tharow.tantalum.rest.io.Mod;
-import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
-import net.tharow.tantalum.launchercore.install.verifiers.MD5FileVerifier;
-import net.tharow.tantalum.launchercore.install.verifiers.ValidZipFileVerifier;
-import net.tharow.tantalum.utilslib.IZipFileFilter;
+import java.util.Objects;
 
-import java.io.File;
-import java.io.IOException;
+public final class CleanupAndExtractModpackTask implements IInstallTask {
+	private final ModpackModel pack;
+	private final Modpack modpack;
+	private final ITasksQueue checkModQueue;
+	private final ITasksQueue downloadModQueue;
+	private final ITasksQueue copyModQueue;
 
-public record CleanupAndExtractModpackTask(ModpackModel pack,
-										   Modpack modpack,
-										   ITasksQueue checkModQueue,
-										   ITasksQueue downloadModQueue,
-										   ITasksQueue copyModQueue) implements IInstallTask {
+	CleanupAndExtractModpackTask(ModpackModel pack,
+								 Modpack modpack,
+								 ITasksQueue checkModQueue,
+								 ITasksQueue downloadModQueue,
+								 ITasksQueue copyModQueue) {
+		this.pack = pack;
+		this.modpack = modpack;
+		this.checkModQueue = checkModQueue;
+		this.downloadModQueue = downloadModQueue;
+		this.copyModQueue = copyModQueue;
+	}
+
+	public ModpackModel pack() {
+		return pack;
+	}
+
+	public Modpack modpack() {
+		return modpack;
+	}
+
+	public ITasksQueue checkModQueue() {
+		return checkModQueue;
+	}
+
+	public ITasksQueue downloadModQueue() {
+		return downloadModQueue;
+	}
+
+	public ITasksQueue copyModQueue() {
+		return copyModQueue;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) return true;
+		if (obj == null || obj.getClass() != this.getClass()) return false;
+		CleanupAndExtractModpackTask that = (CleanupAndExtractModpackTask) obj;
+		return Objects.equals(this.pack, that.pack) &&
+				Objects.equals(this.modpack, that.modpack) &&
+				Objects.equals(this.checkModQueue, that.checkModQueue) &&
+				Objects.equals(this.downloadModQueue, that.downloadModQueue) &&
+				Objects.equals(this.copyModQueue, that.copyModQueue);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(pack, modpack, checkModQueue, downloadModQueue, copyModQueue);
+	}
+
+	@Override
+	public String toString() {
+		return "CleanupAndExtractModpackTask[" +
+				"pack=" + pack + ", " +
+				"modpack=" + modpack + ", " +
+				"checkModQueue=" + checkModQueue + ", " +
+				"downloadModQueue=" + downloadModQueue + ", " +
+				"copyModQueue=" + copyModQueue + ']';
+	}
 
 	@Override
 	public String getTaskDescription() {
@@ -92,12 +137,12 @@ public record CleanupAndExtractModpackTask(ModpackModel pack,
 
 			File cache = new File(this.pack.getCacheDir(), name);
 
-            IFileVerifier verifier = null;
+			IFileVerifier verifier = null;
 
-            if (md5 != null && !md5.isEmpty())
-                verifier = new MD5FileVerifier(md5);
-            else
-                verifier = new ValidZipFileVerifier();
+			if (md5 != null && !md5.isEmpty())
+				verifier = new MD5FileVerifier(md5);
+			else
+				verifier = new ValidZipFileVerifier();
 
 			//noinspection unchecked
 			checkModQueue.addTask(new EnsureFileTask(cache, verifier, packOutput, url, downloadModQueue, copyModQueue, zipFilter));

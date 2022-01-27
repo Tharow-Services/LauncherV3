@@ -36,7 +36,35 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public record AuthlibAuthenticator(String clientToken) {
+public final class AuthlibAuthenticator {
+    private final String clientToken;
+
+    public AuthlibAuthenticator(String clientToken) {
+        this.clientToken = clientToken;
+    }
+
+    public String clientToken() {
+        return clientToken;
+    }
+
+    @Override
+    public boolean equals(java.lang.Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        AuthlibAuthenticator that = (AuthlibAuthenticator) obj;
+        return java.util.Objects.equals(this.clientToken, that.clientToken);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(clientToken);
+    }
+
+    @Override
+    public String toString() {
+        return "AuthlibAuthenticator[" +
+                "clientToken=" + clientToken + ']';
+    }
     //TODO Implement non email login
 
 
@@ -54,8 +82,6 @@ public record AuthlibAuthenticator(String clientToken) {
             if (response.hasError()) {
                 throw new ResponseException(response.getError(), response.getErrorMessage());
             }
-        } catch (ResponseException e) {
-            throw e;
         } catch (IOException e) {
             throw new AuthenticationException(
                     "An error was raised while attempting to communicate with " + authServer + ".", e);

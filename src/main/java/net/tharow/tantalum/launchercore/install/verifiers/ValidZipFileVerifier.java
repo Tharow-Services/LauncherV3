@@ -29,8 +29,6 @@ public class ValidZipFileVerifier implements IFileVerifier {
     public boolean isFileValid(File file) {
         try (ZipFile zipfile = new ZipFile(file)) {
             return true;
-        } catch (ZipException e) {
-            return false;
         } catch (IOException e) {
             return false;
         }

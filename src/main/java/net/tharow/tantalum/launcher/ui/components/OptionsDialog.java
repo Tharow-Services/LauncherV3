@@ -336,12 +336,11 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
 
     protected void changeWindowType() {
         switch (windowSelect.getSelectedIndex()) {
-            case 0 -> settings.setLaunchWindowType(WindowType.DEFAULT);
-            case 1 -> settings.setLaunchWindowType(WindowType.FULLSCREEN);
-            case 2 -> {
+            case 0 : settings.setLaunchWindowType(WindowType.DEFAULT);
+            case 1 : settings.setLaunchWindowType(WindowType.FULLSCREEN);
+            case 2 :
                 settings.setLaunchWindowType(WindowType.CUSTOM);
                 changeWindowDimensions();
-            }
         }
 
         updateDimensionsEnabled();
@@ -522,9 +521,9 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         launchSelect.addItem(new OnLaunchItem(resources.getString("launcheroptions.packlaunch.nothing"), LaunchAction.NOTHING));
 
         switch (settings.getLaunchAction()) {
-            case CLOSE -> launchSelect.setSelectedIndex(1);
-            case NOTHING -> launchSelect.setSelectedIndex(2);
-            default -> launchSelect.setSelectedIndex(0);
+            case CLOSE : launchSelect.setSelectedIndex(1); break;
+            case NOTHING : launchSelect.setSelectedIndex(2); break;
+            default : launchSelect.setSelectedIndex(0);
         }
         launchSelect.addActionListener(e -> changeLaunchAction());
 
@@ -575,9 +574,9 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         windowSelect.addItem(resources.getString("launcheroptions.video.windowSize.fullscreen"));
         windowSelect.addItem(resources.getString("launcheroptions.video.windowSize.custom"));
         switch (settings.getLaunchWindowType()) {
-            case DEFAULT -> windowSelect.setSelectedIndex(0);
-            case FULLSCREEN -> windowSelect.setSelectedIndex(1);
-            case CUSTOM -> windowSelect.setSelectedIndex(2);
+            case DEFAULT : windowSelect.setSelectedIndex(0);
+            case FULLSCREEN : windowSelect.setSelectedIndex(1);
+            case CUSTOM : windowSelect.setSelectedIndex(2);
         }
         windowSelect.addActionListener(e -> changeWindowType());
         updateDimensionsEnabled();

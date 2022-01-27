@@ -43,9 +43,9 @@ public class SimpleTabPaneUI extends BasicTabbedPaneUI {
                                       boolean isSelected ) {
         g.setColor(tabPane.getBackgroundAt(tabIndex));
         switch (tabPlacement) {
-            case LEFT -> g.fillRect(x + 1, y, w - 1, h - 2);
-            default -> g.fillRect(x, y, w - 2, h - 2);
-            case BOTTOM -> g.fillRect(x, y, w - 2, h - 1);
+            case LEFT : g.fillRect(x + 1, y, w - 1, h - 2); break;
+            case BOTTOM : g.fillRect(x, y, w - 2, h - 1); break;
+            default : g.fillRect(x, y, w - 2, h - 2); break;
         }
     }
 
@@ -84,25 +84,26 @@ public class SimpleTabPaneUI extends BasicTabbedPaneUI {
         int h = tabRect.height;
 
         switch (tabPane.getTabPlacement()) {
-            case LEFT -> {
+            case LEFT : {
                 int height = y + (h - 2) / 2;
                 triangle.addPoint(x + w, height - 5);
                 triangle.addPoint(x + w, height + 5);
                 triangle.addPoint(x + w + 8, height);
             }
-            case RIGHT -> {
+            case RIGHT : {
                 int height = y + (h - 2) / 2;
                 triangle.addPoint(x, height - 5);
                 triangle.addPoint(x, height + 5);
                 triangle.addPoint(x - 8, height);
             }
-            case BOTTOM -> {
+            case BOTTOM : {
                 int width = x + (w - 2) / 2;
                 triangle.addPoint(width - 5, y);
                 triangle.addPoint(width + 5, y);
                 triangle.addPoint(width, y - 8);
+                break;
             }
-            default -> {
+            default : {
                 int width = x + (w - 2) / 2;
                 triangle.addPoint(width - 6, y + h - 2);
                 triangle.addPoint(width + 6, y + h - 2);

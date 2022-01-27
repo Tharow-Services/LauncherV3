@@ -19,30 +19,82 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import net.tharow.tantalum.launchercore.exception.DownloadException;
-import net.tharow.tantalum.launchercore.install.ITasksQueue;
-import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
-import net.tharow.tantalum.launchercore.install.tasks.CopyFileTask;
-import net.tharow.tantalum.launchercore.install.tasks.EnsureFileTask;
-import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
-import net.tharow.tantalum.launchercore.install.verifiers.FileSizeVerifier;
-import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
-import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
-import org.apache.commons.io.FileUtils;
+import java.util.Objects;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
+public final class InstallMinecraftAssetsTask implements IInstallTask {
+    private final ModpackModel modpack;
+    private final String assetsDirectory;
+    private final File assetsIndex;
+    private final ITasksQueue checkAssetsQueue;
+    private final ITasksQueue downloadAssetsQueue;
+    private final ITasksQueue copyAssetsQueue;
 
-public record InstallMinecraftAssetsTask(ModpackModel modpack,
-                                         String assetsDirectory, File assetsIndex,
-                                         ITasksQueue checkAssetsQueue,
-                                         ITasksQueue downloadAssetsQueue,
-                                         ITasksQueue copyAssetsQueue) implements IInstallTask {
+    InstallMinecraftAssetsTask(ModpackModel modpack,
+                               String assetsDirectory, File assetsIndex,
+                               ITasksQueue checkAssetsQueue,
+                               ITasksQueue downloadAssetsQueue,
+                               ITasksQueue copyAssetsQueue) {
+        this.modpack = modpack;
+        this.assetsDirectory = assetsDirectory;
+        this.assetsIndex = assetsIndex;
+        this.checkAssetsQueue = checkAssetsQueue;
+        this.downloadAssetsQueue = downloadAssetsQueue;
+        this.copyAssetsQueue = copyAssetsQueue;
+    }
+
+    public ModpackModel modpack() {
+        return modpack;
+    }
+
+    public String assetsDirectory() {
+        return assetsDirectory;
+    }
+
+    public File assetsIndex() {
+        return assetsIndex;
+    }
+
+    public ITasksQueue checkAssetsQueue() {
+        return checkAssetsQueue;
+    }
+
+    public ITasksQueue downloadAssetsQueue() {
+        return downloadAssetsQueue;
+    }
+
+    public ITasksQueue copyAssetsQueue() {
+        return copyAssetsQueue;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        InstallMinecraftAssetsTask that = (InstallMinecraftAssetsTask) obj;
+        return Objects.equals(this.modpack, that.modpack) &&
+                Objects.equals(this.assetsDirectory, that.assetsDirectory) &&
+                Objects.equals(this.assetsIndex, that.assetsIndex) &&
+                Objects.equals(this.checkAssetsQueue, that.checkAssetsQueue) &&
+                Objects.equals(this.downloadAssetsQueue, that.downloadAssetsQueue) &&
+                Objects.equals(this.copyAssetsQueue, that.copyAssetsQueue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modpack, assetsDirectory, assetsIndex, checkAssetsQueue, downloadAssetsQueue, copyAssetsQueue);
+    }
+
+    @Override
+    public String toString() {
+        return "InstallMinecraftAssetsTask[" +
+                "modpack=" + modpack + ", " +
+                "assetsDirectory=" + assetsDirectory + ", " +
+                "assetsIndex=" + assetsIndex + ", " +
+                "checkAssetsQueue=" + checkAssetsQueue + ", " +
+                "downloadAssetsQueue=" + downloadAssetsQueue + ", " +
+                "copyAssetsQueue=" + copyAssetsQueue + ']';
+    }
+
     private final static String virtualField = "virtual";
     private final static String mapToResourcesField = "map_to_resources";
     private final static String objectsField = "objects";

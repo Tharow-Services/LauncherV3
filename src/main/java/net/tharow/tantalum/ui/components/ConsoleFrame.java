@@ -104,22 +104,23 @@ public class ConsoleFrame extends JFrame implements MouseListener {
     public void setCaretPosition(int position) { textComponent.setCaretPosition(position); }
 
     public AttributeSet getAttributeSet(Level level){
-        final AttributeSet result;
+        AttributeSet result1;
         switch(level.intValue()){
-            case 1000 -> result = errorAttributes;
-            case 900 -> result = warnAttributes;
-            case 800 -> result = infoAttributes;
-            case 700 -> result = configAttributes;
-            case 600 -> result = debugAttributes;
-            case 500 -> result = fineAttributes;
-            case 400 -> result = finerAttributes;
-            case 300 -> result = finestAttributes;
-            case 200, 100 -> result = defaultAttributes;
-            case -1 -> result = highlightedAttributes;
-            default -> result = invertedAttributes;
+            case 1000 : result1 = errorAttributes;
+            case 900 : result1 = warnAttributes;
+            case 800 : result1 = infoAttributes;
+            case 700 : result1 = configAttributes;
+            case 600 : result1 = debugAttributes;
+            case 500 : result1 = fineAttributes;
+            case 400 : result1 = finerAttributes;
+            case 300 : result1 = finestAttributes;
+            case 200 : result1 = defaultAttributes;
+            case 100 : result1 = defaultAttributes;
+            case -1 : result1 = highlightedAttributes;
+            default : result1 = invertedAttributes;
 
         }
-        return result;
+        return result1;
     }
 
     /**

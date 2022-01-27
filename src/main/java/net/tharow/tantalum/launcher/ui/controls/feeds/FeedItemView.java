@@ -111,8 +111,8 @@ public class FeedItemView extends JButton {
         int nIndex = 0;
         int startX = 4;
         int startY = 3;
-        int lineSize = (int)g2.getFontMetrics().getHeight();
-        int elipsisSize = (int)g2.getFontMetrics().stringWidth("...");
+        int lineSize = g2.getFontMetrics().getHeight();
+        int elipsisSize = g2.getFontMetrics().stringWidth("...");
 
         while ( nIndex < arr.length )
         {
@@ -123,12 +123,12 @@ public class FeedItemView extends JButton {
 
             int nextEndY = nextStartY + lineSize;
 
-            String line = arr[nIndex++];
-            int lineWidth = g2.getFontMetrics().stringWidth(line);
+            StringBuilder line = new StringBuilder(arr[nIndex++]);
+            int lineWidth = g2.getFontMetrics().stringWidth(line.toString());
 
             while ( ( nIndex < arr.length ) && (lineWidth < 243) )
             {
-                line = line + " " + arr[nIndex];
+                line.append(" ").append(arr[nIndex]);
                 nIndex++;
 
                 if (nIndex == arr.length)
@@ -140,9 +140,9 @@ public class FeedItemView extends JButton {
             }
 
             if (nextEndY >= 92 && nIndex < arr.length)
-                line += "...";
+                line.append("...");
 
-            g2.drawString(line, startX, startY + g2.getFontMetrics().getAscent());
+            g2.drawString(line.toString(), startX, startY + g2.getFontMetrics().getAscent());
             startY = nextStartY;
         }
     }

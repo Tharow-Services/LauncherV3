@@ -1,16 +1,11 @@
 package net.tharow.tantalum.minecraftcore.mojang.version.io.argument;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import net.tharow.tantalum.minecraftcore.launch.ILaunchOptions;
-import org.apache.commons.text.StringSubstitutor;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public record ArgumentList(List<Argument> args) {
+public class ArgumentList {
 
+	private final List<Argument> args;
 	public ArgumentList(List<Argument> args) {
 		this.args = Collections.unmodifiableList(args);
 	}

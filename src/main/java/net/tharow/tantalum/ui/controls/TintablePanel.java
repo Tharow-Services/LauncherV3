@@ -53,10 +53,10 @@ public class TintablePanel extends JPanel {
 
         if (overIcon != null) {
             overIcon.setVisible(tintActive);
-            EventQueue.invokeLater(() -> revalidate());
+            EventQueue.invokeLater(this::revalidate);
         }
 
-        EventQueue.invokeLater(() -> repaint());
+        EventQueue.invokeLater(this::repaint);
     }
 
     @Override

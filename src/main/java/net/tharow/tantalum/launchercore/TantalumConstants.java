@@ -30,7 +30,7 @@ public class TantalumConstants {
     public static final String technicVersions = "https://tantalum.tharow.net/launcher/version/";
     public static final String technicFmlLibRepo = technicURL + "lib/fml/";
     public static final String technicForgeRepo = technicURL + "lib/";
-    public static URL UpdateUrl = null;
+    public static final URL UpdateUrl = null;
 
     static {
         try {

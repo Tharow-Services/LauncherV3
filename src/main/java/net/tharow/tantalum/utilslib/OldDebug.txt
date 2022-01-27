@@ -1,39 +1,29 @@
 package net.tharow.tantalum.utilslib;
 
 import net.tharow.tantalum.authlib.AuthlibUser;
-import net.tharow.tantalum.authlib.IAuthlibServerInfo;
 import net.tharow.tantalum.authlib.io.ServerInfo;
 import net.tharow.tantalum.launcher.io.*;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.exception.BuildInaccessibleException;
-import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.launchercore.modpacks.*;
 import net.tharow.tantalum.launchercore.modpacks.sources.IAuthoritativePackSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.IPackSource;
 import net.tharow.tantalum.minecraftcore.microsoft.auth.MicrosoftUser;
 import net.tharow.tantalum.minecraftcore.mojang.auth.MojangUser;
 import net.tharow.tantalum.minecraftcore.mojang.auth.io.Profile;
-import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
 import net.tharow.tantalum.platform.io.FeedItem;
 import net.tharow.tantalum.platform.io.PlatformPackInfo;
-import net.tharow.tantalum.platform.packsources.FeaturedPackSource;
 import net.tharow.tantalum.rest.io.Mod;
 import net.tharow.tantalum.rest.io.Modpack;
 import net.tharow.tantalum.rest.io.PackInfo;
 import net.tharow.tantalum.solder.SolderPackSource;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.logging.Logger;
+
 
 public class Debug {
-
-
 
     public static void getObjectConfig(Object object){
         if(object instanceof IUserType userType){getUserConfig(userType);}
@@ -230,10 +220,6 @@ public class Debug {
         item.getBuilds().forEach(build->config(i+2,"Build",build));
         if (item.getFeed() != null) {item.getFeed().forEach(feed->getFeedConfig(feed, i+1));}
         else{config(i+1,"There is no feed");}
-
-    }
-
-    private static void getBuilds(PackInfo item, int i){
 
     }
 

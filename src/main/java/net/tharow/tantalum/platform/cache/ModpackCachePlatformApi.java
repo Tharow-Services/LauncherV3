@@ -120,7 +120,7 @@ public class ModpackCachePlatformApi implements IPlatformApi {
     private boolean isDead(String packSlug) {
         Boolean isDead = deadPacks.getIfPresent(packSlug);
 
-        return isDead != null && isDead.booleanValue();
+        return isDead != null && isDead;
     }
 
     private PlatformPackInfo pullAndCache(String packSlug) throws RestfulAPIException {
@@ -167,7 +167,6 @@ public class ModpackCachePlatformApi implements IPlatformApi {
         try {
             FileUtils.writeStringToFile(cacheFile, packCache, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            return;
         }
     }
 

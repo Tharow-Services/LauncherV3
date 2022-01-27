@@ -62,7 +62,7 @@ public class HorizontalGallery extends JPanel {
         }
 
         if (!hasNoComponents) {
-            int startX = 0 - pixelPosition;
+            int startX = -pixelPosition;
 
             for (Component component : getComponents()) {
                 Rectangle cBounds = component.getBounds();

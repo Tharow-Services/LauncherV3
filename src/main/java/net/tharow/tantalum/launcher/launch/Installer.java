@@ -303,7 +303,7 @@ public class Installer {
         HashMap<String, String> fmlLibs = new HashMap<>();
 
         switch (minecraft) {
-            case "1.4", "1.4.1", "1.4.2", "1.4.3", "1.4.4", "1.4.5", "1.4.6", "1.4.7" -> fmlLibsZip = "fml_libs.zip";
+            /*case "1.4", "1.4.1", "1.4.2", "1.4.3", "1.4.4", "1.4.5", "1.4.6", "1.4.7" -> fmlLibsZip = "fml_libs.zip";
             case "1.5" -> {
                 fmlLibsZip = "fml_libs15.zip";
                 fmlLibs.put("deobfuscation_data_1.5.zip", "dba6d410a91a855f3b84457c86a8132a");
@@ -311,12 +311,12 @@ public class Installer {
             case "1.5.1" -> {
                 fmlLibsZip = "fml_libs15.zip";
                 fmlLibs.put("deobfuscation_data_1.5.1.zip", "c4fc2fedba60d920e4c7f9a095b2b883");
-            }
-            case "1.5.2" -> {
+            }*/
+            case "1.5.2" : {
                 fmlLibsZip = "fml_libs15.zip";
                 fmlLibs.put("deobfuscation_data_1.5.2.zip", "270d9775872cc9fa773389812cab91fe");
             }
-            default -> fmlLibsZip = "";
+            default : fmlLibsZip = "";
         }
 
         if (!fmlLibsZip.isEmpty()) {

@@ -19,39 +19,89 @@
 
 package net.tharow.tantalum.minecraftcore.launch;
 
-import net.tharow.tantalum.authlib.AuthlibUser;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
-import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.auth.UserModel;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.launchercore.launch.GameProcess;
 import net.tharow.tantalum.launchercore.launch.ProcessExitListener;
 import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
-import net.tharow.tantalum.launchercore.modpacks.RunData;
-import net.tharow.tantalum.minecraftcore.MojangUtils;
 import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
 import net.tharow.tantalum.minecraftcore.mojang.version.io.CompleteVersion;
-import net.tharow.tantalum.minecraftcore.mojang.version.io.JavaVersion;
-import net.tharow.tantalum.minecraftcore.mojang.version.io.Library;
 import net.tharow.tantalum.minecraftcore.mojang.version.io.argument.ArgumentList;
 import net.tharow.tantalum.platform.IPlatformApi;
-import net.tharow.tantalum.utilslib.JavaUtils;
-import net.tharow.tantalum.utilslib.OperatingSystem;
 import net.tharow.tantalum.utilslib.Utils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringSubstitutor;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-public record MinecraftLauncher(IPlatformApi platformApi,
-                                LauncherDirectories directories,
-                                UserModel userModel,
-                                JavaVersionRepository javaVersions,
-                                IBuildNumber buildNumber) {
+public final class MinecraftLauncher {
+    private final IPlatformApi platformApi;
+    private final LauncherDirectories directories;
+    private final UserModel userModel;
+    private final JavaVersionRepository javaVersions;
+    private final IBuildNumber buildNumber;
+
+    public MinecraftLauncher(IPlatformApi platformApi,
+                             LauncherDirectories directories,
+                             UserModel userModel,
+                             JavaVersionRepository javaVersions,
+                             IBuildNumber buildNumber) {
+        this.platformApi = platformApi;
+        this.directories = directories;
+        this.userModel = userModel;
+        this.javaVersions = javaVersions;
+        this.buildNumber = buildNumber;
+    }
+
+    public IPlatformApi platformApi() {
+        return platformApi;
+    }
+
+    public LauncherDirectories directories() {
+        return directories;
+    }
+
+    public UserModel userModel() {
+        return userModel;
+    }
+
+    public JavaVersionRepository javaVersions() {
+        return javaVersions;
+    }
+
+    public IBuildNumber buildNumber() {
+        return buildNumber;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        MinecraftLauncher that = (MinecraftLauncher) obj;
+        return Objects.equals(this.platformApi, that.platformApi) &&
+                Objects.equals(this.directories, that.directories) &&
+                Objects.equals(this.userModel, that.userModel) &&
+                Objects.equals(this.javaVersions, that.javaVersions) &&
+                Objects.equals(this.buildNumber, that.buildNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(platformApi, directories, userModel, javaVersions, buildNumber);
+    }
+
+    @Override
+    public String toString() {
+        return "MinecraftLauncher[" +
+                "platformApi=" + platformApi + ", " +
+                "directories=" + directories + ", " +
+                "userModel=" + userModel + ", " +
+                "javaVersions=" + javaVersions + ", " +
+                "buildNumber=" + buildNumber + ']';
+    }
 
     private static final String[] BAD_ENV_VARS = new String[]{
             "JAVA_ARGS", "CLASSPATH", "CONFIGPATH", "JAVA_HOME", "JRE_HOME",

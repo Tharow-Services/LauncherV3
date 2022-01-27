@@ -56,7 +56,6 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -677,13 +676,14 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
             setCurrentUser(microsoftUser);
         } catch (MicrosoftAuthException e) {
             switch (e.getType()) {
-                case UNDERAGE -> showMessage("microsoft.underage");
-                case NO_XBOX_ACCOUNT -> {
+                case UNDERAGE : showMessage("microsoft.underage"); break;
+                case NO_XBOX_ACCOUNT : {
                     showMessage("microsoft.noxbox");
                     DesktopUtils.browseUrl("https://www.minecraft.net/login");
+                    break;
                 }
-                case NO_MINECRAFT -> showMessage("microsoft.nomc");
-                default -> {
+                case NO_MINECRAFT : showMessage("microsoft.nomc"); break;
+                default : {
                     e.printStackTrace();
                     showMessageDialog(this, e.getMessage(), resources.getString("login.microsoft.default.title"), ERROR_MESSAGE);
                 }

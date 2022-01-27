@@ -64,7 +64,7 @@ public class PackLoadJob implements Runnable {
         if (EventQueue.isDispatchThread()) {
             isCancelled = true;
         } else {
-            EventQueue.invokeLater(() -> cancel());
+            EventQueue.invokeLater(this::cancel);
         }
     }
 
@@ -116,7 +116,7 @@ public class PackLoadJob implements Runnable {
     }
 
     protected void refreshCompleteThreadSafe() {
-        EventQueue.invokeLater(() -> container.refreshComplete());
+        EventQueue.invokeLater(container::refreshComplete);
     }
 
 

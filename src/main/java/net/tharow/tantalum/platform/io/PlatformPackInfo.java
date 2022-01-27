@@ -19,7 +19,6 @@
 
 package net.tharow.tantalum.platform.io;
 
-import net.tharow.tantalum.launchercore.exception.BuildInaccessibleException;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.io.Modpack;
 import net.tharow.tantalum.rest.io.PackInfo;

@@ -25,6 +25,8 @@ import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
 import net.tharow.tantalum.launchercore.mirror.download.Download;
 import net.tharow.tantalum.launchercore.util.DownloadListener;
+import net.tharow.tantalum.utilslib.logger.Level;
+import net.tharow.tantalum.utilslib.logger.TantalumLogger;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -36,8 +38,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class Utils {
@@ -54,6 +54,7 @@ public class Utils {
         // Make sure we're logging everything we want to be logging
     }
 
+    public static void noOperation(){}
 
     public static Date getDate(String date){
         return getDateFromPattern("yyyy-MM-dd'T'HH:mm:ssZ",date);
@@ -80,7 +81,7 @@ public class Utils {
     }
 
     public static void logDebug(String msg){
-        getLogger().log(LogLevel.DEBUG,msg);
+        getLogger().log(Level.DEBUG,msg);
     }
     public static void entering(Class scr, String method, Object[] prams){
         getLogger().entering(scr.getName(), method, prams);
@@ -155,7 +156,7 @@ public class Utils {
                 return false;
             }
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, "Got an error when pinging " + urlLoc, ex);
+            logger.log(java.util.logging.Level.SEVERE, "Got an error when pinging " + urlLoc, ex);
             return false;
         }
     }
@@ -185,7 +186,7 @@ public class Utils {
                 try (final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                     String line;
                     while ((line = bufferedReader.readLine()) != null) {
-                        response.append(line + "\n");
+                        response.append(line).append("\n");
                     }
                 } catch (IOException ex) {
                     //Don't let other process' problems concern us

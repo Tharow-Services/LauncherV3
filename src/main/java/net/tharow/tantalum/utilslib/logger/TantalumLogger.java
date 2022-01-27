@@ -1,11 +1,10 @@
-package net.tharow.tantalum.utilslib;
+package net.tharow.tantalum.utilslib.logger;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.MissingResourceException;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
@@ -21,14 +20,11 @@ public class TantalumLogger extends Logger {
      *                           be based on the package name or class name
      *                           of the subsystem, such as java.net
      *                           or javax.swing.  It may be null for anonymous Loggers.
-     * @param resourceBundleName name of ResourceBundle to be used for localizing
-     *                           messages for this logger.  May be null if none
-     *                           of the messages require localization.
      * @throws MissingResourceException if the resourceBundleName is non-null and
      *                                  no corresponding resource can be found.
      */
-    protected TantalumLogger(String name, String resourceBundleName) {
-        super(name, resourceBundleName);
+    protected TantalumLogger(String name) {
+        super(name, null);
     }
 
     /**
@@ -86,18 +82,18 @@ public class TantalumLogger extends Logger {
      * @return true if the given message level is currently being logged.
      */
     @Override
-    public boolean isLoggable(Level level) {
+    public boolean isLoggable(java.util.logging.Level level) {
         return super.isLoggable(level);
     }
 
 
 
     public void debug(String msg){
-        this.log(new LogRecord(LogLevel.DEBUG, msg));
+        this.log(new LogRecord(Level.DEBUG, msg));
     }
 
     public void debug(Supplier<String> msgSupplier){
-        this.log(LogLevel.DEBUG, msgSupplier);
+        this.log(Level.DEBUG, msgSupplier);
     }
 
 
@@ -123,7 +119,7 @@ public class TantalumLogger extends Logger {
 
     @Contract("!null -> new")
     public static @NotNull TantalumLogger getLogger(String name) {
-        return new TantalumLogger(name,null);
+        return new TantalumLogger(name);
     }
 
 }

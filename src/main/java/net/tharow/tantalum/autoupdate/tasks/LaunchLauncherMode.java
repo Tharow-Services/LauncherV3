@@ -23,8 +23,6 @@ import net.tharow.tantalum.autoupdate.Relauncher;
 import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
 import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
 
-import java.io.IOException;
-
 public class LaunchLauncherMode implements IInstallTask {
 
     private final String description;

@@ -32,6 +32,8 @@ public interface LauncherDirectories {
 
     File getRuntimesDirectory();
 
-    File getTorRelayDirectory();
+    File getWorldsDirectory();
+
+    File getLauncherAssetsDirectory();
 }
 

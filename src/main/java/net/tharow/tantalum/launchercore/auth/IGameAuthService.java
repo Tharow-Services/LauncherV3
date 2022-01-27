@@ -19,8 +19,6 @@
 
 package net.tharow.tantalum.launchercore.auth;
 
-import net.tharow.tantalum.launchercore.exception.AuthenticationException;
-
 public interface IGameAuthService<UserData> {
     UserData createClearedUser(String username, IAuthResponse response);
 

@@ -25,7 +25,6 @@ import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
 import net.tharow.tantalum.utilslib.IZipFileFilter;
 
 import java.io.File;
-import java.io.IOException;
 
 public class EnsureFileTask<TaskQueue extends ITasksQueue> implements IInstallTask {
     private final File cacheLocation;

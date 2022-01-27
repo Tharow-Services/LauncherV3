@@ -13,8 +13,6 @@ import net.tharow.tantalum.utilslib.Memory;
 import javax.swing.*;
 import javax.swing.text.View;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class FixRunDataDialog extends LauncherDialog {
 

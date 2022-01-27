@@ -22,7 +22,7 @@ import com.google.gson.JsonSyntaxException;
 import net.tharow.tantalum.platform.io.PlatformInfo;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.RestfulAPIException;
-import net.tharow.tantalum.utilslib.TantalumLogger;
+import net.tharow.tantalum.utilslib.logger.TantalumLogger;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;

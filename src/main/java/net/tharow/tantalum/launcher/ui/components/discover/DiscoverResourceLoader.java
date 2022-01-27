@@ -83,7 +83,7 @@ public class DiscoverResourceLoader extends ImageResourceLoader {
                     sr.close();
                 }
             } catch (IOException e) {
-                // couldnt open stream at URI...
+                // couldn't open stream at URI...
                 XRLog.exception("Can't open stream for URI '" + uri + "': " + e.getMessage());
             }
 
@@ -206,12 +206,21 @@ public class DiscoverResourceLoader extends ImageResourceLoader {
         }
     }
 
-    private record CacheKey(String uri, int width, int height) {
+    private static class CacheKey {
+
+        private final String uri;
+        private final int width;
+        private final int height;
+        public CacheKey(final String uri, final int width, final int height){
+            this.uri = uri;
+            this.width = width;
+            this.height = height;
+        }
 
         public boolean equals(final Object o) {
             if (this == o) return true;
-            if (!(o instanceof final CacheKey cacheKey)) return false;
-
+            if (!(o instanceof CacheKey)) return false;
+            CacheKey cacheKey = (CacheKey) o;
             if (height != cacheKey.height) return false;
             if (width != cacheKey.width) return false;
             return uri.equals(cacheKey.uri);

@@ -19,30 +19,81 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
-import net.tharow.tantalum.launchercore.exception.DownloadException;
-import net.tharow.tantalum.launchercore.install.ITasksQueue;
-import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
-import net.tharow.tantalum.launchercore.install.tasks.EnsureFileTask;
-import net.tharow.tantalum.launchercore.install.tasks.EnsureLinkedFileTask;
-import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
-import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
-import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
-import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
-import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntimeFileType;
-import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntimeManifest;
-import net.tharow.tantalum.minecraftcore.mojang.version.io.Download;
-import org.apache.commons.io.FileUtils;
+import java.util.Objects;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+public final class InstallJavaRuntimeTask implements IInstallTask {
+    private final ModpackModel modpack;
+    private final File runtimesDirectory;
+    private final File runtimeManifestFile;
+    private final String runtimeName;
+    private final ITasksQueue examineJavaQueue;
+    private final ITasksQueue downloadJavaQueue;
 
-public record InstallJavaRuntimeTask(ModpackModel modpack,
-                                     File runtimesDirectory, File runtimeManifestFile,
-                                     String runtimeName,
-                                     ITasksQueue examineJavaQueue,
-                                     ITasksQueue downloadJavaQueue) implements IInstallTask {
+    InstallJavaRuntimeTask(ModpackModel modpack,
+                           File runtimesDirectory, File runtimeManifestFile,
+                           String runtimeName,
+                           ITasksQueue examineJavaQueue,
+                           ITasksQueue downloadJavaQueue) {
+        this.modpack = modpack;
+        this.runtimesDirectory = runtimesDirectory;
+        this.runtimeManifestFile = runtimeManifestFile;
+        this.runtimeName = runtimeName;
+        this.examineJavaQueue = examineJavaQueue;
+        this.downloadJavaQueue = downloadJavaQueue;
+    }
+
+    public ModpackModel modpack() {
+        return modpack;
+    }
+
+    public File runtimesDirectory() {
+        return runtimesDirectory;
+    }
+
+    public File runtimeManifestFile() {
+        return runtimeManifestFile;
+    }
+
+    public String runtimeName() {
+        return runtimeName;
+    }
+
+    public ITasksQueue examineJavaQueue() {
+        return examineJavaQueue;
+    }
+
+    public ITasksQueue downloadJavaQueue() {
+        return downloadJavaQueue;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        InstallJavaRuntimeTask that = (InstallJavaRuntimeTask) obj;
+        return Objects.equals(this.modpack, that.modpack) &&
+                Objects.equals(this.runtimesDirectory, that.runtimesDirectory) &&
+                Objects.equals(this.runtimeManifestFile, that.runtimeManifestFile) &&
+                Objects.equals(this.runtimeName, that.runtimeName) &&
+                Objects.equals(this.examineJavaQueue, that.examineJavaQueue) &&
+                Objects.equals(this.downloadJavaQueue, that.downloadJavaQueue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modpack, runtimesDirectory, runtimeManifestFile, runtimeName, examineJavaQueue, downloadJavaQueue);
+    }
+
+    @Override
+    public String toString() {
+        return "InstallJavaRuntimeTask[" +
+                "modpack=" + modpack + ", " +
+                "runtimesDirectory=" + runtimesDirectory + ", " +
+                "runtimeManifestFile=" + runtimeManifestFile + ", " +
+                "runtimeName=" + runtimeName + ", " +
+                "examineJavaQueue=" + examineJavaQueue + ", " +
+                "downloadJavaQueue=" + downloadJavaQueue + ']';
+    }
 
     @Override
     public String getTaskDescription() {

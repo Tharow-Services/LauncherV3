@@ -19,28 +19,91 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
-import net.tharow.tantalum.launchercore.install.ITasksQueue;
-import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
-import net.tharow.tantalum.launchercore.install.tasks.DownloadFileTask;
-import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
-import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
-import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
-import net.tharow.tantalum.launchercore.install.verifiers.ValidJsonFileVerifier;
-import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
-import net.tharow.tantalum.minecraftcore.MojangUtils;
-import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
-import net.tharow.tantalum.minecraftcore.mojang.version.io.AssetIndex;
+import java.util.Objects;
 
-import java.io.File;
-import java.io.IOException;
+public final class EnsureAssetsIndexTask implements IInstallTask {
+    private final File assetsDirectory;
+    private final ModpackModel modpack;
+    private final ITasksQueue downloadIndexQueue;
+    private final ITasksQueue examineIndexQueue;
+    private final ITasksQueue checkAssetsQueue;
+    private final ITasksQueue downloadAssetsQueue;
+    private final ITasksQueue installAssetsQueue;
 
-public record EnsureAssetsIndexTask(File assetsDirectory,
-                                    ModpackModel modpack,
-                                    ITasksQueue downloadIndexQueue,
-                                    ITasksQueue examineIndexQueue,
-                                    ITasksQueue checkAssetsQueue,
-                                    ITasksQueue downloadAssetsQueue,
-                                    ITasksQueue installAssetsQueue) implements IInstallTask {
+    EnsureAssetsIndexTask(File assetsDirectory,
+                          ModpackModel modpack,
+                          ITasksQueue downloadIndexQueue,
+                          ITasksQueue examineIndexQueue,
+                          ITasksQueue checkAssetsQueue,
+                          ITasksQueue downloadAssetsQueue,
+                          ITasksQueue installAssetsQueue) {
+        this.assetsDirectory = assetsDirectory;
+        this.modpack = modpack;
+        this.downloadIndexQueue = downloadIndexQueue;
+        this.examineIndexQueue = examineIndexQueue;
+        this.checkAssetsQueue = checkAssetsQueue;
+        this.downloadAssetsQueue = downloadAssetsQueue;
+        this.installAssetsQueue = installAssetsQueue;
+    }
+
+    public File assetsDirectory() {
+        return assetsDirectory;
+    }
+
+    public ModpackModel modpack() {
+        return modpack;
+    }
+
+    public ITasksQueue downloadIndexQueue() {
+        return downloadIndexQueue;
+    }
+
+    public ITasksQueue examineIndexQueue() {
+        return examineIndexQueue;
+    }
+
+    public ITasksQueue checkAssetsQueue() {
+        return checkAssetsQueue;
+    }
+
+    public ITasksQueue downloadAssetsQueue() {
+        return downloadAssetsQueue;
+    }
+
+    public ITasksQueue installAssetsQueue() {
+        return installAssetsQueue;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        EnsureAssetsIndexTask that = (EnsureAssetsIndexTask) obj;
+        return Objects.equals(this.assetsDirectory, that.assetsDirectory) &&
+                Objects.equals(this.modpack, that.modpack) &&
+                Objects.equals(this.downloadIndexQueue, that.downloadIndexQueue) &&
+                Objects.equals(this.examineIndexQueue, that.examineIndexQueue) &&
+                Objects.equals(this.checkAssetsQueue, that.checkAssetsQueue) &&
+                Objects.equals(this.downloadAssetsQueue, that.downloadAssetsQueue) &&
+                Objects.equals(this.installAssetsQueue, that.installAssetsQueue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(assetsDirectory, modpack, downloadIndexQueue, examineIndexQueue, checkAssetsQueue, downloadAssetsQueue, installAssetsQueue);
+    }
+
+    @Override
+    public String toString() {
+        return "EnsureAssetsIndexTask[" +
+                "assetsDirectory=" + assetsDirectory + ", " +
+                "modpack=" + modpack + ", " +
+                "downloadIndexQueue=" + downloadIndexQueue + ", " +
+                "examineIndexQueue=" + examineIndexQueue + ", " +
+                "checkAssetsQueue=" + checkAssetsQueue + ", " +
+                "downloadAssetsQueue=" + downloadAssetsQueue + ", " +
+                "installAssetsQueue=" + installAssetsQueue + ']';
+    }
 
     @Override
     public String getTaskDescription() {

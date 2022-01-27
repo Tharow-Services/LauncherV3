@@ -92,7 +92,8 @@ public class UserCellEditor implements ComboBoxEditor, DocumentListener, IImageJ
     public void setItem(Object anObject) {
         currentObject = anObject;
 
-        if (anObject instanceof IUserType mojangUser) {
+        if (anObject instanceof IUserType) {
+            final IUserType mojangUser = (IUserType) anObject;
             userLabel.setText(mojangUser.getDisplayName());
             userLabel.setIconTextGap(8);
 
@@ -175,8 +176,7 @@ public class UserCellEditor implements ComboBoxEditor, DocumentListener, IImageJ
     @Override
     public void jobComplete(ImageJob<IUserType> job) {
         IUserType mojangUser = job.getJobData();
-        if (headMap.containsKey(mojangUser.getUsername()))
-            headMap.remove(mojangUser.getUsername());
+        headMap.remove(mojangUser.getUsername());
 
         headMap.put(mojangUser.getUsername(), new ImageIcon(ImageUtils.scaleImage(job.getImage(), ICON_WIDTH, ICON_HEIGHT)));
         this.parentPanel.revalidate();
