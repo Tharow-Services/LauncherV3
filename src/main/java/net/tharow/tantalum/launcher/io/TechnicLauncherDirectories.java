@@ -44,7 +44,7 @@ public class TechnicLauncherDirectories implements LauncherDirectories {
 
     private @NotNull File getDirectoryBase(@Nullable final String directory){
         if (!workDir.exists()){workDir.mkdir();}
-        return directory == null ? getDirectoryBase(workDir, directory) : this.workDir;
+        return directory != null ? getDirectoryBase(workDir, directory) : this.workDir;
     }
     private @NotNull File getDirectoryBase(final File parent, final String child){
         File directory = new File(parent, child);

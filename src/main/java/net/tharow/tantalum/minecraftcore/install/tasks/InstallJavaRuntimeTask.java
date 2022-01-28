@@ -19,6 +19,24 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
+import net.tharow.tantalum.launchercore.exception.DownloadException;
+import net.tharow.tantalum.launchercore.install.ITasksQueue;
+import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
+import net.tharow.tantalum.launchercore.install.tasks.EnsureFileTask;
+import net.tharow.tantalum.launchercore.install.tasks.EnsureLinkedFileTask;
+import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
+import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
+import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
+import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
+import net.tharow.tantalum.minecraftcore.MojangUtils;
+import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntimeFileType;
+import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntimeManifest;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.Download;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public final class InstallJavaRuntimeTask implements IInstallTask {

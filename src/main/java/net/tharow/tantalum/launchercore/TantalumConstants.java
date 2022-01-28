@@ -30,15 +30,7 @@ public class TantalumConstants {
     public static final String technicVersions = "https://tantalum.tharow.net/launcher/version/";
     public static final String technicFmlLibRepo = technicURL + "lib/fml/";
     public static final String technicForgeRepo = technicURL + "lib/";
-    public static final URL UpdateUrl = null;
 
-    static {
-        try {
-            UpdateUrl = Utils.getFullUrl("https://tantalum-auth.azurewebsites.net/");
-        } catch (DownloadException ignored) {}
-    }
-
-    private static IBuildNumber falseBuildNumber;
     private static IBuildNumber buildNumber;
     private static String userAgent;
     private static boolean isDebug;
@@ -65,13 +57,5 @@ public class TantalumConstants {
 
     public static void setIsDebug(boolean isDebug) {
         TantalumConstants.isDebug = isDebug;
-    }
-
-    public static IBuildNumber getFalseBuildNumber() {
-        return falseBuildNumber;
-    }
-
-    public static void setFalseBuildNumber(IBuildNumber falseBuildNumber) {
-        TantalumConstants.falseBuildNumber = falseBuildNumber;
     }
 }

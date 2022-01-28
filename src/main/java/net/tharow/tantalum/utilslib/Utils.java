@@ -33,6 +33,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,6 +53,13 @@ public class Utils {
         gson = builder.create();
 
         // Make sure we're logging everything we want to be logging
+    }
+
+    public static String urlEncoder(final String input){
+        String string = null;
+        try{string = URLEncoder.encode(input, "utf-8");}
+        catch (UnsupportedEncodingException ignored){}
+        return string;
     }
 
     public static void noOperation(){}

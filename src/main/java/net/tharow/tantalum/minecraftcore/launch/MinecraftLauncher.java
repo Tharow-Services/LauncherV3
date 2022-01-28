@@ -19,23 +19,33 @@
 
 package net.tharow.tantalum.minecraftcore.launch;
 
+import net.tharow.tantalum.authlib.AuthlibUser;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
+import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.auth.UserModel;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.launchercore.launch.GameProcess;
 import net.tharow.tantalum.launchercore.launch.ProcessExitListener;
 import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
+import net.tharow.tantalum.launchercore.modpacks.RunData;
+import net.tharow.tantalum.minecraftcore.MojangUtils;
 import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
 import net.tharow.tantalum.minecraftcore.mojang.version.io.CompleteVersion;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.JavaVersion;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.Library;
 import net.tharow.tantalum.minecraftcore.mojang.version.io.argument.ArgumentList;
 import net.tharow.tantalum.platform.IPlatformApi;
+import net.tharow.tantalum.utilslib.JavaUtils;
+import net.tharow.tantalum.utilslib.OperatingSystem;
 import net.tharow.tantalum.utilslib.Utils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.nio.file.Path;
+import java.util.*;
 
 public final class MinecraftLauncher {
     private final IPlatformApi platformApi;

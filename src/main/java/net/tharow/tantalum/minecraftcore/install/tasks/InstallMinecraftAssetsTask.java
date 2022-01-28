@@ -19,6 +19,24 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.tharow.tantalum.launchercore.exception.DownloadException;
+import net.tharow.tantalum.launchercore.install.ITasksQueue;
+import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
+import net.tharow.tantalum.launchercore.install.tasks.CopyFileTask;
+import net.tharow.tantalum.launchercore.install.tasks.EnsureFileTask;
+import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
+import net.tharow.tantalum.launchercore.install.verifiers.FileSizeVerifier;
+import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
+import net.tharow.tantalum.minecraftcore.MojangUtils;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 
 public final class InstallMinecraftAssetsTask implements IInstallTask {

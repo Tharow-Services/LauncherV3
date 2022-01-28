@@ -32,6 +32,7 @@ import net.tharow.tantalum.platform.io.SearchResultsData;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.utilslib.Utils;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URLEncoder;
@@ -60,7 +61,8 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
         return getPlatformUri(platform,packSlug, Integer.parseInt(buildnumber));
     }
 
-    private String getPlatformUri(String platform, String packSlug, int buildnumber){
+    @Contract(pure = true)
+    private @NotNull String getPlatformUri(String platform, String packSlug, int buildnumber){
         return platform + "modpack/" + packSlug + "?build="+ buildnumber;
     }
 
@@ -158,14 +160,14 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
         return getSearchResults(searchTerm, "https://platform.test/", Integer.parseInt(buildnumber));
     }
 
-    public static SearchResultsData getFeaturedPacks(String platform) throws RestfulAPIException {
+    public static @NotNull SearchResultsData getFeaturedPacks(String platform) throws RestfulAPIException {
         String url = platform + "search?featured&build=" + buildnumber;
         return RestObject.getRestObject(SearchResultsData.class, url);
     }
 
     public static @NotNull SearchResultsData getSearchResults(@NotNull String searchTerm, String platform, int buildnumber) throws RestfulAPIException
     {
-        String url = platform + "search?q=" + URLEncoder.encode(searchTerm.trim(), StandardCharsets.UTF_8) + "&build=" + buildnumber;
+        String url = platform + "search?q=" + Utils.urlEncoder(searchTerm.trim()) + "&build=" + buildnumber;
         return RestObject.getRestObject(SearchResultsData.class, url);
     }
 }

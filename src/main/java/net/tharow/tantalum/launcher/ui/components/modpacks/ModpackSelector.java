@@ -48,11 +48,13 @@ import net.tharow.tantalum.ui.controls.SimpleDocumentListener;
 import net.tharow.tantalum.utilslib.Utils;
 
 import javax.swing.*;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -189,7 +191,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         filterContents.setCaretColor(LauncherFrame.COLOR_BUTTON_BLUE);
         filterContents.setColumns(20);
         ((AbstractDocument)filterContents.getDocument()).setDocumentFilter(documentFilter);
-        filterContents.getDocument().addDocumentListener(new SimpleDocumentListener(this::detectFilterChanges));
+        filterContents.getDocument().addDocumentListener( new SimpleDocumentListener(this::detectFilterChanges));
 
         header.add(filterContents, new GridBagConstraints(1,0,1,1,1,0,GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(3,0,3,0), 0, 12));
         widgetList = new JPanel();
@@ -526,7 +528,9 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
                 tempPlatform = "https://api.technicpack.net/";
                 encodedSearch  = filterContents.getText().substring(1);
             }
-            encodedSearch = URLEncoder.encode(encodedSearch, StandardCharsets.UTF_8);
+            try {
+                encodedSearch = URLEncoder.encode(encodedSearch, StandardCharsets.UTF_8.toString());
+            } catch (UnsupportedEncodingException ignored) {}
             findMoreUrl = "https://www.technicpack.net/modpacks?q="+encodedSearch;
             findMoreWidget.setWidgetData(resources.getString("launcher.packselector.more"));
 
@@ -575,11 +579,11 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
     protected boolean optionWarning(){
         int tempint = JOptionPane.showOptionDialog(this.launcherFrame,  "Warning Adding Technic Packs Using Search\nIs known to cause issues use at your own risk\nif Accepted This will not come up again", "Warning Technic Packs", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, UIManager.getIcon("OptionPane.warningIcon"), new String[]{"I Understand","Cancel"}, "Cancel");
         switch (tempint){
-            case JOptionPane.OK_OPTION -> Utils.getLogger().warning("Ok Option");
-            case JOptionPane.NO_OPTION -> Utils.getLogger().warning("No Option");
-            case JOptionPane.CANCEL_OPTION -> Utils.getLogger().warning("Cancel Option");
-            case JOptionPane.CLOSED_OPTION -> Utils.getLogger().warning("Closed option");
-            default -> throw new IllegalStateException("Unexpected value: " + tempint);
+            case JOptionPane.OK_OPTION : Utils.getLogger().warning("Ok Option"); break;
+            case JOptionPane.NO_OPTION : Utils.getLogger().warning("No Option"); break;
+            case JOptionPane.CANCEL_OPTION : Utils.getLogger().warning("Cancel Option"); break;
+            case JOptionPane.CLOSED_OPTION : Utils.getLogger().warning("Closed option"); break;
+            default : throw new IllegalStateException("Unexpected value: " + tempint);
         }
         return tempint == JOptionPane.OK_OPTION;
     }

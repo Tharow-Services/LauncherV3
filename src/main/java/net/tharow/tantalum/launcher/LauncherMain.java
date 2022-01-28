@@ -19,7 +19,6 @@
 package net.tharow.tantalum.launcher;
 
 import com.beust.jcommander.JCommander;
-import com.sun.org.apache.xerces.internal.dom.DeferredElementNSImpl;
 import net.tharow.tantalum.authlib.AuthlibAuthenticator;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.autoupdate.Relauncher;
@@ -39,6 +38,7 @@ import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.launcher.ui.LoginFrame;
 import net.tharow.tantalum.launcher.ui.components.discover.DiscoverInfoPanel;
 import net.tharow.tantalum.launcher.ui.components.modpacks.ModpackSelector;
+import net.tharow.tantalum.launchercore.ComputerInfo;
 import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.auth.UserModel;
@@ -91,9 +91,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -109,6 +107,7 @@ import net.tharow.tantalum.utilslib.logger.Level;
 import org.xbill.DNS.*;
 import org.xbill.DNS.config.BaseResolverConfigProvider;
 import org.xbill.DNS.config.PropertyResolverConfigProvider;
+import org.xbill.DNS.config.WindowsResolverConfigProvider;
 import org.xbill.DNS.hosts.HostsFileParser;
 
 import java.util.logging.Logger;
@@ -120,6 +119,15 @@ public class LauncherMain {
 
     public static final Name MasterDNS = Name.fromConstantString("dns.host");
     public static final int MasterDNSPort = 53;
+    public static URL UPDATE_URL;
+
+    static {
+        try {
+            UPDATE_URL = new URL("https://tantalum-auth.azurewebsites.net/");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static ConsoleFrame consoleFrame;
 
@@ -219,12 +227,11 @@ public class LauncherMain {
         }
 
         //runProxySetup(settings);
-
         runStartupDebug(settings, params);
         //injectNewRootCerts();
-        injectNewRootCerts(settings.getForceOverrideRootCerts() || params.isOverrideRoots());
+        injectNewRootCerts(settings.getForceOverrideRootCerts() || params.isOverrideRoots() || ComputerInfo.isSchoolEnv());
         //startLauncher(settings, params, directories, resources);
-        Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream(TantalumConstants.UpdateUrl), build, directories, resources, params);
+        Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream(UPDATE_URL), build, directories, resources, params);
         try {
             if (launcher.runAutoUpdater())
                 startLauncher(settings, params, directories, resources);
@@ -250,7 +257,13 @@ public class LauncherMain {
         }
 
         // Make DNSJAVA proterys
-        BaseResolverConfigProvider configProvider = new PropertyResolverConfigProvider();
+        PropertyResolverConfigProvider configProvider = new PropertyResolverConfigProvider() {
+            public void init(final InetSocketAddress mainDNServer){
+                addNameserver(mainDNServer);
+                addNameserver(new InetSocketAddress(InetAddress.getLoopbackAddress(),9150));
+            }
+        };
+
 
         // Make Configuration
         //ResolverConfig resolverConfig = ResolverConfig.getCurrentConfig();
@@ -462,7 +475,8 @@ public class LauncherMain {
         UIManager.put( "ComboBox.disabledForeground", LauncherFrame.COLOR_GREY_TEXT );
         System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
 
-       // runProxySetup(settings, directories.getTorRelayDirectory()); //Check and run proxy and custom dns settings
+
+        // runProxySetup(settings, directories.getTorRelayDirectory()); //Check and run proxy and custom dns settings
 
         //Remove all log files older than a week
         new Thread(() -> {

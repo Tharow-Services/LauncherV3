@@ -19,6 +19,22 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
+import net.tharow.tantalum.launchercore.exception.CacheDeleteException;
+import net.tharow.tantalum.launchercore.install.ITasksQueue;
+import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
+import net.tharow.tantalum.launchercore.install.tasks.EnsureFileTask;
+import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
+import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
+import net.tharow.tantalum.launchercore.install.verifiers.MD5FileVerifier;
+import net.tharow.tantalum.launchercore.install.verifiers.ValidZipFileVerifier;
+import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
+import net.tharow.tantalum.minecraftcore.install.ModpackZipFilter;
+import net.tharow.tantalum.rest.io.Mod;
+import net.tharow.tantalum.rest.io.Modpack;
+import net.tharow.tantalum.utilslib.IZipFileFilter;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 
 public final class CleanupAndExtractModpackTask implements IInstallTask {
@@ -28,11 +44,11 @@ public final class CleanupAndExtractModpackTask implements IInstallTask {
 	private final ITasksQueue downloadModQueue;
 	private final ITasksQueue copyModQueue;
 
-	CleanupAndExtractModpackTask(ModpackModel pack,
-								 Modpack modpack,
-								 ITasksQueue checkModQueue,
-								 ITasksQueue downloadModQueue,
-								 ITasksQueue copyModQueue) {
+	public CleanupAndExtractModpackTask(ModpackModel pack,
+										Modpack modpack,
+										ITasksQueue checkModQueue,
+										ITasksQueue downloadModQueue,
+										ITasksQueue copyModQueue) {
 		this.pack = pack;
 		this.modpack = modpack;
 		this.checkModQueue = checkModQueue;

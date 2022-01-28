@@ -19,6 +19,23 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
+import net.tharow.tantalum.launchercore.exception.DownloadException;
+import net.tharow.tantalum.launchercore.install.ITasksQueue;
+import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
+import net.tharow.tantalum.launchercore.install.tasks.DownloadFileTask;
+import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
+import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
+import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
+import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
+import net.tharow.tantalum.minecraftcore.MojangUtils;
+import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntime;
+import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntimes;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.Download;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.JavaVersion;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 
 public final class EnsureJavaRuntimeManifestTask implements IInstallTask {
@@ -27,10 +44,10 @@ public final class EnsureJavaRuntimeManifestTask implements IInstallTask {
     private final ITasksQueue examineJavaQueue;
     private final ITasksQueue downloadJavaQueue;
 
-    EnsureJavaRuntimeManifestTask(File runtimesDirectory,
-                                  ModpackModel modpack,
-                                  ITasksQueue examineJavaQueue,
-                                  ITasksQueue downloadJavaQueue) {
+    public EnsureJavaRuntimeManifestTask(File runtimesDirectory,
+                                         ModpackModel modpack,
+                                         ITasksQueue examineJavaQueue,
+                                         ITasksQueue downloadJavaQueue) {
         this.runtimesDirectory = runtimesDirectory;
         this.modpack = modpack;
         this.examineJavaQueue = examineJavaQueue;

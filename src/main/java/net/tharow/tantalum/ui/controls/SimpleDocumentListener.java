@@ -1,5 +1,8 @@
 package net.tharow.tantalum.ui.controls;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 public class SimpleDocumentListener implements DocumentListener {
 
     private final Runnable runnable;

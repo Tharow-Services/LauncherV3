@@ -19,6 +19,20 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
+import net.tharow.tantalum.launchercore.install.ITasksQueue;
+import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
+import net.tharow.tantalum.launchercore.install.tasks.DownloadFileTask;
+import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
+import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
+import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
+import net.tharow.tantalum.launchercore.install.verifiers.ValidJsonFileVerifier;
+import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
+import net.tharow.tantalum.minecraftcore.MojangUtils;
+import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
+import net.tharow.tantalum.minecraftcore.mojang.version.io.AssetIndex;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 
 public final class EnsureAssetsIndexTask implements IInstallTask {
@@ -30,13 +44,13 @@ public final class EnsureAssetsIndexTask implements IInstallTask {
     private final ITasksQueue downloadAssetsQueue;
     private final ITasksQueue installAssetsQueue;
 
-    EnsureAssetsIndexTask(File assetsDirectory,
-                          ModpackModel modpack,
-                          ITasksQueue downloadIndexQueue,
-                          ITasksQueue examineIndexQueue,
-                          ITasksQueue checkAssetsQueue,
-                          ITasksQueue downloadAssetsQueue,
-                          ITasksQueue installAssetsQueue) {
+    public EnsureAssetsIndexTask(File assetsDirectory,
+                                 ModpackModel modpack,
+                                 ITasksQueue downloadIndexQueue,
+                                 ITasksQueue examineIndexQueue,
+                                 ITasksQueue checkAssetsQueue,
+                                 ITasksQueue downloadAssetsQueue,
+                                 ITasksQueue installAssetsQueue) {
         this.assetsDirectory = assetsDirectory;
         this.modpack = modpack;
         this.downloadIndexQueue = downloadIndexQueue;
