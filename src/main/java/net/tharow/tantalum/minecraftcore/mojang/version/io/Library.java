@@ -30,14 +30,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import static net.tharow.tantalum.launchercore.TantalumConstants.FALLBACK_MIRROR;
 @SuppressWarnings({"unused"})
 public class Library {
-    private static final String[] FALLBACK = {
-        "https://libraries.minecraft.net/",
-        "https://files.minecraftforge.net/maven/",
-        "https://mirror.technicpack.net/Technic/lib/",
-    };
+
     private static final Pattern GRADLE_PATTERN = Pattern.compile("^([^:@]+):([^:@]+):([^:@]+)(?::([^:@]+))?(?:@([^:@]+))?$");
     private static final Pattern FORGE_MAVEN_ROOT = Pattern.compile("^https://files\\.minecraftforge\\.net/maven/(.+)$");
 
@@ -204,7 +200,7 @@ public class Library {
 
         // Check if any fallback mirrors we know of have this library
         // These also work as a Maven root URL
-        for (String string : FALLBACK) {
+        for (String string : FALLBACK_MIRROR) {
             possibleUrls.add(string + path);
         }
 

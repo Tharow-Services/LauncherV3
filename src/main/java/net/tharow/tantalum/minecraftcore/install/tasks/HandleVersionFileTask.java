@@ -19,6 +19,7 @@
 
 package net.tharow.tantalum.minecraftcore.install.tasks;
 
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.install.ITasksQueue;
 import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
@@ -84,7 +85,7 @@ public class HandleVersionFileTask implements IInstallTask {
         if (isLegacy) {
             Library legacyWrapper = new Library();
             legacyWrapper.setName("net.tharow.tantalum:legacywrapper:1.2.1");
-            legacyWrapper.setUrl("https://mirror.technicpack.net/Technic/lib/");
+            legacyWrapper.setUrl(TantalumConstants.technicForgeRepo);
 
             version.addLibrary(legacyWrapper);
 
@@ -111,7 +112,7 @@ public class HandleVersionFileTask implements IInstallTask {
                     // For Forge 1.12.2 > 2847, we have to inject the universal jar as a dependency
                     if (is1_12_2) {
                         library.setName(library.getName() + ":universal");
-                        library.setUrl("https://files.minecraftforge.net/maven/");
+                        library.setUrl(TantalumConstants.forgeMavenRepo);
 
                         // Add the mutated library
                         version.addLibrary(library);
@@ -140,14 +141,14 @@ public class HandleVersionFileTask implements IInstallTask {
                     if (library.isForge()) {
                         Library forgeLauncher = new Library();
                         forgeLauncher.setName(library.getName() + ":launcher");
-                        forgeLauncher.setUrl("https://files.minecraftforge.net/maven/");
+                        forgeLauncher.setUrl(TantalumConstants.forgeMavenRepo);
 
                         version.addLibrary(forgeLauncher);
                         checkLibraryQueue.addTask(new InstallVersionLibTask(forgeLauncher, checkNonMavenLibsQueue, downloadLibraryQueue, copyLibraryQueue, pack, directories));
 
                         Library forgeUniversal = new Library();
                         forgeUniversal.setName(library.getName() + ":universal");
-                        forgeUniversal.setUrl("https://files.minecraftforge.net/maven/");
+                        forgeUniversal.setUrl(TantalumConstants.forgeMavenRepo);
 
                         checkLibraryQueue.addTask(new InstallVersionLibTask(forgeUniversal, checkNonMavenLibsQueue, downloadLibraryQueue, copyLibraryQueue, pack, directories));
 

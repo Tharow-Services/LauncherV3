@@ -30,6 +30,16 @@ public class TantalumConstants {
     public static final String technicVersions = "https://tantalum.tharow.net/launcher/version/";
     public static final String technicFmlLibRepo = technicURL + "lib/fml/";
     public static final String technicForgeRepo = technicURL + "lib/";
+    public static final String forgeMavenRepo = "https://files.minecraftforge.net/maven/";
+    public static final String JAVA_RUNTIMES = "https://download.mcbbs.net/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
+    public static final String MINECRAFT_ASSETS = "https://download.mcbbs.net/assets/";
+
+    public static final String[] FALLBACK_MIRROR = {
+            "https://libraries.minecraft.net/",
+            "https://files.minecraftforge.net/maven/",
+            "https://mirror.technicpack.net/Technic/lib/",
+            "https://download.mcbbs.net/maven/",
+    };
 
     private static IBuildNumber buildNumber;
     private static String userAgent;

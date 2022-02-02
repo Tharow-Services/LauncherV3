@@ -19,6 +19,8 @@
 
 package net.tharow.tantalum.ui.components;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
@@ -103,21 +105,21 @@ public class ConsoleFrame extends JFrame implements MouseListener {
     public AttributeSet getDebugAttributes() { return debugAttributes; }
     public void setCaretPosition(int position) { textComponent.setCaretPosition(position); }
 
-    public AttributeSet getAttributeSet(Level level){
+    public AttributeSet getAttributeSet(@NotNull Level level){
         AttributeSet result1;
         switch(level.intValue()){
-            case 1000 : result1 = errorAttributes;
-            case 900 : result1 = warnAttributes;
-            case 800 : result1 = infoAttributes;
-            case 700 : result1 = configAttributes;
-            case 600 : result1 = debugAttributes;
-            case 500 : result1 = fineAttributes;
-            case 400 : result1 = finerAttributes;
-            case 300 : result1 = finestAttributes;
-            case 200 : result1 = defaultAttributes;
-            case 100 : result1 = defaultAttributes;
-            case -1 : result1 = highlightedAttributes;
-            default : result1 = invertedAttributes;
+            case 1000 : result1 = errorAttributes; break;
+            case 900 : result1 = warnAttributes; break;
+            case 800 : result1 = infoAttributes; break;
+            case 700 : result1 = configAttributes; break;
+            case 600 : result1 = debugAttributes; break;
+            case 500 : result1 = fineAttributes; break;
+            case 400 : result1 = finerAttributes; break;
+            case 300 : result1 = finestAttributes; break;
+            case 200 : result1 = defaultAttributes; break;
+            case 100 : result1 = defaultAttributes; break;
+            case -1 : result1 = highlightedAttributes; break;
+            default : result1 = invertedAttributes; break;
 
         }
         return result1;

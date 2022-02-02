@@ -18,6 +18,7 @@
 
 package net.tharow.tantalum.launcher;
 
+import com.alibaba.dcm.DnsCacheManipulator;
 import com.beust.jcommander.JCommander;
 import net.tharow.tantalum.authlib.AuthlibAuthenticator;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
@@ -82,6 +83,7 @@ import net.tharow.tantalum.ui.controls.installation.SplashScreen;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.utilslib.*;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -104,21 +106,11 @@ import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.logging.Handler;
 import net.tharow.tantalum.utilslib.logger.Level;
-import org.xbill.DNS.*;
-import org.xbill.DNS.config.BaseResolverConfigProvider;
-import org.xbill.DNS.config.PropertyResolverConfigProvider;
-import org.xbill.DNS.config.WindowsResolverConfigProvider;
-import org.xbill.DNS.hosts.HostsFileParser;
-
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class LauncherMain {
 
-    public static final boolean DUMP = false;
-
-    public static final Name MasterDNS = Name.fromConstantString("dns.host");
-    public static final int MasterDNSPort = 53;
     public static URL UPDATE_URL;
 
     static {
@@ -203,8 +195,6 @@ public class LauncherMain {
 
         setupLogging(directories, resources);
 
-        System.setProperty("dns.server","8.8.8.8, localhost:9150, dns.google");
-        System.setProperty("sun.net.spi.nameservice.provider.1","dns,dnsjava");
 
         //Currently Unused
         //String launcherBuild = buildNumber.getBuildNumber();
@@ -226,6 +216,7 @@ public class LauncherMain {
             Utils.getLogger().setLevel(Level.getLevel(params.getLogLevel()*100));
         }
 
+        setupDnsJava(directories);
         //runProxySetup(settings);
         runStartupDebug(settings, params);
         //injectNewRootCerts();
@@ -246,56 +237,33 @@ public class LauncherMain {
 
     }
 
-    public static void setupDnsJava(final LauncherDirectories directories){
-        // Create Host File Parser For DNS Overrides //
-        HostsFileParser hostsFileParser = new HostsFileParser(new File(directories.getLauncherAssetsDirectory(), "hosts.conf").toPath());
+    public static void setupDnsJava(final @NotNull LauncherDirectories directories) {
+        //System.setProperty("dns.server","8.8.8.8, localhost:9150, dns.google");
+        //DnsCacheManipulator.loadDnsCacheConfig("dns.properties");
+
+        Properties properties = new Properties();
         try {
-            InetSocketAddress mainDNSServer = new InetSocketAddress(hostsFileParser.getAddressForHost(MasterDNS, Type.A).orElse(InetAddress.getLocalHost()),MasterDNSPort);
+            properties.loadFromXML(new FileInputStream(new File(directories.getLauncherAssetsDirectory(), "dnsCache.xml")));
         } catch (IOException e) {
-            Utils.logDebug("There Was an io Error for");
             e.printStackTrace();
         }
-
-        // Make DNSJAVA proterys
-        PropertyResolverConfigProvider configProvider = new PropertyResolverConfigProvider() {
-            public void init(final InetSocketAddress mainDNServer){
-                addNameserver(mainDNServer);
-                addNameserver(new InetSocketAddress(InetAddress.getLoopbackAddress(),9150));
-            }
-        };
-
-
-        // Make Configuration
-        //ResolverConfig resolverConfig = ResolverConfig.getCurrentConfig();
-        //resolverConfig.server();
-        //ResolverConfig.getCurrentConfig();
+        //InputStream inputStream new FileInputStream(new File(directories.getLauncherAssetsDirectory(), "dnsCache.xml"));
+        DnsCacheManipulator.setDnsCache(properties);
+        DnsCacheManipulator.getWholeDnsCache().getCache().forEach((dnsCacheEntry -> {
+            Utils.getLogger().config(dnsCacheEntry.toString());
+        }));
 
     }
 
-    /*
-    public static void runProxySetup(TantalumSettings settings2, File torRelayDir) {
+
+    public static void runProxySetup(@NotNull TantalumSettings settings2) {
         if(settings2.getUseTorRelay()){
-            //Setup Tor Config and other things//
-            TorConfig torConfig = TorConfig.createFlatConfig(torRelayDir);
-            //TorConfig torConfig = TorConfig.createConfig(torRelayDir,torRelayDir,torRelayDir);
-            TorInstaller torInstaller = new JavaTorInstaller(torConfig);
-            OnionProxyContext proxyContext = new JavaOnionProxyContext(torConfig, torInstaller, null);
-            final OnionProxyManager onionProxyManager = new OnionProxyManager(proxyContext);
-            final TorConfigBuilder torConfigBuilder = onionProxyManager.getContext().newConfigBuilder();
-            try {
-                onionProxyManager.getContext().getInstaller().updateTorConfigCustom(torConfigBuilder.asString());
-                onionProxyManager.setup();
-                Utils.getLogger().info("List of bridges "+ onionProxyManager.getContext().getSettings().getListOfSupportedBridges());
-                onionProxyManager.start();
-            } catch (IOException | TimeoutException e) {
-                e.printStackTrace();
-            }
-
-
+            return;
         }
         if(settings2.getUseDNSOnly()) {
+            return;
+        }
             //Setup http Proxy
-
             if (settings2.getUseHTTPProxy()) {
                 Utils.getLogger().info("HTTP Proxy is currently configured as \n  HTTP Proxy Host: " + settings2.getHTTPProxyHost() + "\n  HTTP Proxy Port: " + settings2.getHTTPProxyPort() + "\n HTTP Proxy Non Proxies Hosts: " + settings2.getHTTPProxyBypassDomains());
                 System.setProperty("http.proxyHost", settings2.getHTTPProxyHost());
@@ -311,9 +279,8 @@ public class LauncherMain {
                     System.setProperty("socksProxyVersion", "4");
                 }//Set Socks Version To Four if we aren't using v5
             }
-        }
+
     }
-     */
 
     private static void checkIfRunningInsideOneDrive(File launcherRoot) {
         if (OperatingSystem.getOperatingSystem() != OperatingSystem.WINDOWS) {
@@ -470,11 +437,12 @@ public class LauncherMain {
     }
 
 
-    private static void startLauncher(final TantalumSettings settings, StartupParameters startupParameters, final LauncherDirectories directories, ResourceLoader resources) {
+    private static void startLauncher(final @NotNull TantalumSettings settings, @NotNull StartupParameters startupParameters, final LauncherDirectories directories, @NotNull ResourceLoader resources) {
         UIManager.put( "ComboBox.disabledBackground", LauncherFrame.COLOR_FORMELEMENT_INTERNAL );
         UIManager.put( "ComboBox.disabledForeground", LauncherFrame.COLOR_GREY_TEXT );
         System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
 
+        //setupDnsJava(directories);
 
         // runProxySetup(settings, directories.getTorRelayDirectory()); //Check and run proxy and custom dns settings
 
@@ -528,8 +496,7 @@ public class LauncherMain {
 
         TantalumPlatformStore platforms = TantalumPlatformStore.load(new File(directories.getLauncherDirectory(),"platforms.json"));
         if (startupParameters.getPlatformUrl().isEmpty()){
-            startupParameters.getPlatformUrl().add(0,"https://api.technicpack.net/");
-            startupParameters.getPlatformUrl().add(1,"https://tantalum-auth.azurewebsites.net/platform/");
+            startupParameters.getPlatformUrl().add(0,"https://tantalum-auth.azurewebsites.net/platform/");
         }
         HttpPlatformApi httpPlatform = new HttpPlatformApi(platforms);
         //Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());

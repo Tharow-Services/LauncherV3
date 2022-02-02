@@ -100,22 +100,22 @@
     <!-- Project dependencies -->
     <dependencies>
         <!-- Included in final JAR -->
-        <!--<dependency>
-            <groupId>org.briarproject</groupId>
-            <artifactId>jtorctl</artifactId>
-            <version>0.3</version>
-        </dependency> -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.13</version>
+        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.32</version>
+            <version>1.7.33</version>
         </dependency>
 
         <dependency>
-            <groupId>dnsjava</groupId>
-            <artifactId>dnsjava</artifactId>
-            <version>3.4.3</version>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dns-cache-manipulator</artifactId>
+            <version>1.7.1</version>
         </dependency>
 
         <!--<dependency>

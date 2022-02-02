@@ -29,6 +29,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.tharow.tantalum.launcher.io.IUserTypeInstanceCreator;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.minecraftcore.mojang.auth.io.UserProperties;
 import net.tharow.tantalum.minecraftcore.mojang.auth.io.UserPropertiesAdapter;
@@ -62,9 +63,9 @@ public class MojangUtils {
     public static final String assetsIndexes = baseURL + "indexes/";
     public static final String versions = baseURL + "versions/";
 
-    public static final String assets = "https://resources.download.minecraft.net/";
+    public static final String assets = TantalumConstants.MINECRAFT_ASSETS;
 
-    public static final String RUNTIMES_URL = "https://tantalum.tharow.net/launcher/java.json";
+    public static final String RUNTIMES_URL = TantalumConstants.JAVA_RUNTIMES;
     private static JavaRuntimes javaRuntimes;
 
     /** @deprecated Uses old S3 bucket */

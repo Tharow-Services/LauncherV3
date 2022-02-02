@@ -72,14 +72,9 @@ public class Console {
 
         if (line.startsWith("(!!)")) {
             attributes = consoleFrame.getHighlightedAttributes();
-        } else if (level == Level.SEVERE) {
-            attributes = consoleFrame.getErrorAttributes();
-        } else if (level == Level.WARNING) {
-            attributes = consoleFrame.getWarnAttributes();
-        } else if (level.intValue() < Level.INFO.intValue()) {
-            attributes = consoleFrame.getDebugAttributes();
+        } else {
+            attributes = consoleFrame.getAttributeSet(level);
         }
-        attributes = consoleFrame.getAttributeSet(level);
 
         final String writeText = line.replace("\n\n", "\n");
         final AttributeSet writeAttributes = (attributes != null) ? attributes : consoleFrame.getDefaultAttributes();

@@ -503,7 +503,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
 
             String encodedSearch;
             ArrayList<IPackSource> sources = new ArrayList<>(2);
-            String tempPlatform = "http://platform.test/";
+            String tempPlatform = "https://tantalum-auth.azurewebsites.net/platform/";
             boolean doNormal= true;
             if(localSearchTag.charAt(0) == '`'){
                 if(!settings.isAcceptedWarnings()) {
@@ -526,6 +526,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
                 localSearchTag = localSearchTag.substring(1);
                 Utils.getLogger().warning("Using Technic Platform For Search May Cause Issues");
                 tempPlatform = "https://api.technicpack.net/";
+                tempPlatform = "http://tantalum-auth.azurewebsites.net/platform/";
                 encodedSearch  = filterContents.getText().substring(1);
             }
             try {
@@ -538,7 +539,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             Utils.logDebug("Whats Currently in the source: ");
             sources.forEach(iPackSource -> Utils.logDebug(iPackSource.getSourceName()));
             //Debug.getConfig(this);
-            currentLoadJob= packLoader.createRepositoryLoadJob(ModpackSelector.this, sources, null, false);
+            currentLoadJob = packLoader.createRepositoryLoadJob(ModpackSelector.this, sources, null, false);
         });
         currentSearchTimer.setRepeats(false);
         currentSearchTimer.start();

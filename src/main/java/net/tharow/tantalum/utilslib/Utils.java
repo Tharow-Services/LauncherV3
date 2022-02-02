@@ -28,6 +28,7 @@ import net.tharow.tantalum.launchercore.util.DownloadListener;
 import net.tharow.tantalum.utilslib.logger.Level;
 import net.tharow.tantalum.utilslib.logger.TantalumLogger;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -37,6 +38,7 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -91,11 +93,17 @@ public class Utils {
     public static void logDebug(String msg){
         getLogger().log(Level.DEBUG,msg);
     }
-    public static void entering(Class scr, String method, Object[] prams){
-        getLogger().entering(scr.getName(), method, prams);
+    public static void entering(@NotNull Class scr, String method, @NotNull Object prams){
+        getLogger().finer("ENTERING "+scr.getName()+ '.' + method + " With Prams " + prams);
+        //getLogger().entering(scr.getName(),method,prams);
     }
-    public static void exiting(Class src, String method, Object result){
-        getLogger().exiting(src.getName(), method, result);
+    public static void entering(@NotNull Class scr, String method, Object @NotNull [] prams){
+        getLogger().finer("ENTERING "+scr.getName() + '.'+  method + " With Prams " + Arrays.toString(prams));
+        //getLogger().entering(scr.getName(), method, prams);
+    }
+    public static void exiting(@NotNull Class src, String method, Object result){
+        getLogger().finer("EXITING "+src.getName()+'.'+method+ " With result "+result);
+        //getLogger().exiting(src.getName(), method, result);
     }
 
     /**
