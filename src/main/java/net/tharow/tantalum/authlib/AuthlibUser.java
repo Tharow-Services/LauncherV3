@@ -19,7 +19,7 @@
 
 package net.tharow.tantalum.authlib;
 
-import net.tharow.tantalum.authlib.io.ServerInfo;
+import com.google.gson.annotations.SerializedName;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.auth.UserModel;
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
@@ -27,6 +27,11 @@ import net.tharow.tantalum.minecraftcore.MojangUtils;
 import net.tharow.tantalum.minecraftcore.mojang.auth.io.Profile;
 import net.tharow.tantalum.minecraftcore.mojang.auth.io.UserProperties;
 import net.tharow.tantalum.minecraftcore.mojang.auth.response.AuthResponse;
+import net.tharow.tantalum.rest.RestfulAPIException;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class AuthlibUser implements IUserType {
@@ -39,8 +44,8 @@ public class AuthlibUser implements IUserType {
     private String displayName;
     private Profile profile;
     private UserProperties userProperties;
-    private String authServer;
-    private ServerInfo serverInfo;
+    @SerializedName("authServerUUID") private UUID uuid;
+    //private ServerInfo serverInfo;
     private final transient boolean isOffline;
 
     public AuthlibUser() {
@@ -58,11 +63,11 @@ public class AuthlibUser implements IUserType {
         this.userProperties = new UserProperties();
     }
 
-    public AuthlibUser(String username, AuthResponse response, IAuthlibServerInfo serverInfo) {
+    public AuthlibUser(String username, AuthResponse response, final UUID authServerUUID) {
         this.isOffline = false;
         this.username = username;
-        this.serverInfo = (ServerInfo) serverInfo;
-        this.authServer = serverInfo.getServerUrl();
+        //this.serverInfo = (ServerInfo) serverInfo;
+        this.uuid = authServerUUID;
         refreshToken(response);
     }
 
@@ -80,8 +85,19 @@ public class AuthlibUser implements IUserType {
     }
 
     @Override
-    public void login(UserModel userModel) throws AuthenticationException {
-        refreshToken(userModel.getAuthlibAuthenticator().requestRefresh(this));
+    public void login(@NotNull UserModel userModel) throws AuthenticationException {
+        AuthlibAuthenticator authenticator;
+        try {
+            authenticator = userModel.getAuthlib().loadServer(this.getAuthServerUUID()).getAuthenticator();
+        } catch (NoSuchElementException e) {
+            throw new AuthenticationException(e.getMessage(),e.getCause());
+        }
+        refreshToken(authenticator.requestRefresh(this));
+    }
+
+    @Override
+    public UUID getAuthServerUUID() {
+        return this.uuid;
     }
 
     @Override
@@ -139,15 +155,6 @@ public class AuthlibUser implements IUserType {
     public void mergeUserProperties(AuthlibUser mergeUser) {
         if (this.userProperties != null && mergeUser.userProperties != null)
             this.userProperties.merge(mergeUser.userProperties);
-    }
-
-    public IAuthlibServerInfo getAuthlibServerInfo(){
-        this.serverInfo.setServerUrl(this.authServer);
-        return this.serverInfo;
-    }
-    @Override
-    public String getServerUrl(){
-        return this.authServer;
     }
 
     @Override

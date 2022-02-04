@@ -8,6 +8,8 @@ public interface IAuthlibServerInfo {
 
     void setServerUrl(String serverUrl);
 
+    IAuthlibServerInfo setApiLocation(String ALI);
+
     String getServerName();
 
     String getImplName();

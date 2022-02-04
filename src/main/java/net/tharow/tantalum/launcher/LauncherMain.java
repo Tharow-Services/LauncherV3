@@ -20,6 +20,7 @@ package net.tharow.tantalum.launcher;
 
 import com.alibaba.dcm.DnsCacheManipulator;
 import com.beust.jcommander.JCommander;
+import net.tharow.tantalum.authlib.Authlib;
 import net.tharow.tantalum.authlib.AuthlibAuthenticator;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.autoupdate.Relauncher;
@@ -52,6 +53,8 @@ import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.launch.java.source.FileJavaSource;
 import net.tharow.tantalum.launchercore.launch.java.source.InstalledJavaSource;
 import net.tharow.tantalum.launchercore.logging.BuildLogFormatter;
+import net.tharow.tantalum.launchercore.logging.Level;
+import net.tharow.tantalum.launchercore.logging.Logger;
 import net.tharow.tantalum.launchercore.logging.RotatingFileHandler;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.launchercore.modpacks.PackLoader;
@@ -83,6 +86,7 @@ import net.tharow.tantalum.ui.controls.installation.SplashScreen;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.utilslib.*;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.varia.NullAppender;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
@@ -105,8 +109,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.logging.Handler;
-import net.tharow.tantalum.utilslib.logger.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class LauncherMain {
@@ -177,7 +179,7 @@ public class LauncherMain {
             return;
         }
 
-        LauncherDirectories directories = new TechnicLauncherDirectories(settings.getTechnicRoot());
+        LauncherDirectories directories = new TantalumLauncherDirectories(settings.getTechnicRoot());
         ResourceLoader resources = new ResourceLoader(directories, "net","tharow","tantalum","launcher","resources");
         resources.setSupportedLanguages(supportedLanguages);
         resources.setLocale(settings.getLanguageCode());
@@ -213,7 +215,7 @@ public class LauncherMain {
             Utils.getLogger().setLevel(Level.ALL);
         } else{
             TantalumConstants.setIsDebug(false);
-            Utils.getLogger().setLevel(Level.getLevel(params.getLogLevel()*100));
+            Utils.getLogger().setLevel(Level.convert(params.getLogLevel()*100));
         }
 
         setupDnsJava(directories);
@@ -303,12 +305,10 @@ public class LauncherMain {
         }
     }
 
-    private static void setupLogging(LauncherDirectories directories, ResourceLoader resources) {
+    private static void setupLogging(@NotNull LauncherDirectories directories, ResourceLoader resources) {
         System.out.println("Setting up logging");
         final Logger logger = Utils.getLogger();
-        File logDirectory = new File(directories.getLauncherDirectory(), "logs");
-        if (!logDirectory.exists()) {Utils.ignored=logDirectory.mkdir();}
-        File logs = new File(logDirectory, "tantalumLauncher_%D.log");
+        File logs = new File(directories.getLogsDirectory(), "tantalumLauncher_%D.log");
         RotatingFileHandler fileHandler = new RotatingFileHandler(logs.getPath());
 
         fileHandler.setFormatter(new BuildLogFormatter(buildNumber.getBuildNumber()));
@@ -325,12 +325,15 @@ public class LauncherMain {
 
         logger.addHandler(new ConsoleHandler(console));
 
+        final Logger systemOut = Logger.getLogger("SystemOut");
+        systemOut.setParent(logger);
         System.setOut(new PrintStream(new LoggerOutputStream(console, Level.WARNING, logger), true));
         System.setErr(new PrintStream(new LoggerOutputStream(console, Level.SEVERE, logger), true));
-        org.apache.log4j.Appender rootappender = new org.apache.log4j.ConsoleAppender(new org.apache.log4j.SimpleLayout(), "System.out");
-        org.apache.log4j.LogManager.getRootLogger().addAppender(rootappender);
+        org.apache.log4j.LogManager.getRootLogger().addAppender(new NullAppender());
         org.apache.log4j.LogManager.getRootLogger().setLevel(org.apache.log4j.Level.ALL);
         org.apache.log4j.LogManager.getRootLogger().info("Apache Logger Has Initialised");
+        //org.apache.log4j.LogManager.shutdown();
+        logger.setParent(Logger.getGlobal());
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             e.printStackTrace();
             logger.log(Level.SEVERE, "Unhandled Exception in " + t, e);
@@ -344,14 +347,7 @@ public class LauncherMain {
         Utils.getLogger().info("Identified as "+ OperatingSystem.getOperatingSystem().getName());
         Utils.getLogger().info("Java: " + System.getProperty("java.version") + " " + JavaUtils.getJavaBitness() + "-bit (" + System.getProperty("os.arch") + ")");
         Utils.getLogger().info("Launcher Build: " + TantalumConstants.getBuildNumber().getBuildNumber());
-        Utils.getLogger().log(Level.SEVERE,"This is Severe Level");
-        Utils.getLogger().log(Level.WARNING,"This is Warning Level");
-        Utils.getLogger().log(Level.INFO, "This is info Level");
-        Utils.getLogger().log(Level.CONFIG, "This is Config Level");
-        Utils.getLogger().log(Level.DEBUG, "This is Debug Level");
-        Utils.getLogger().log(Level.FINE, "This is Fine Level");
-        Utils.getLogger().log(Level.FINER, "This is Finer Level");
-        Utils.getLogger().log(Level.FINEST, "This is Finest Level");
+        //Logger.demoLevels();
         final String[] domains = {"tantalum.tharow.net","tantalum-auth.azurewebsites.net","minecraft.net", "session.minecraft.net", "textures.minecraft.net", "libraries.minecraft.net", "authserver.mojang.com", "account.mojang.com", "technicpack.net", "launcher.technicpack.net", "api.technicpack.net", "mirror.technicpack.net", "solder.technicpack.net", "files.minecraftforge.net"};
         for (String domain : domains) {
             try {
@@ -472,11 +468,9 @@ public class LauncherMain {
 
         TantalumUserStore users = TantalumUserStore.load(new File(directories.getLauncherDirectory(),"users.json"));
         MojangAuthenticator mojangAuthenticator = new MojangAuthenticator(users.getClientToken());
-        AuthlibAuthenticator authlibAuthenticator = new AuthlibAuthenticator(users.getClientToken());
+        Authlib authlib = new Authlib(new File(directories.getLauncherDirectory(),"authlib-servers.json"));
         MicrosoftAuthenticator microsoftAuthenticator = new MicrosoftAuthenticator(new File(directories.getLauncherDirectory(), "oauth"));
-        UserModel userModel = new UserModel(users, microsoftAuthenticator, mojangAuthenticator, authlibAuthenticator);
-
-
+        UserModel userModel = new UserModel(users, microsoftAuthenticator, mojangAuthenticator, authlib);
 
         IModpackResourceType iconType = new IconResourceType();
         IModpackResourceType logoType = new LogoResourceType();
@@ -494,9 +488,10 @@ public class LauncherMain {
         ISolderApi httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
 
-        TantalumPlatformStore platforms = TantalumPlatformStore.load(new File(directories.getLauncherDirectory(),"platforms.json"));
+        TantalumPlatformStore platforms = TantalumPlatformStore.load(new File(directories.getLauncherDirectory(),"platforms.json"),false);
         if (startupParameters.getPlatformUrl().isEmpty()){
             startupParameters.getPlatformUrl().add(0,"https://tantalum-auth.azurewebsites.net/platform/");
+            startupParameters.getPlatformUrl().add(1, "https://api.technicpack.net/");
         }
         HttpPlatformApi httpPlatform = new HttpPlatformApi(platforms);
         //Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());

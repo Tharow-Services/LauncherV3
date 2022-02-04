@@ -6,6 +6,8 @@ import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.minecraftcore.microsoft.auth.model.MinecraftProfile;
 import net.tharow.tantalum.minecraftcore.microsoft.auth.model.XboxMinecraftResponse;
 
+import java.util.UUID;
+
 public class MicrosoftUser implements IUserType {
     public static final String MC_MS_USER_TYPE = "msa";
 
@@ -74,8 +76,8 @@ public class MicrosoftUser implements IUserType {
     }
 
     @Override
-    public String getServerUrl() {
-        return null;
+    public UUID getAuthServerUUID() {
+        return UUID.fromString(MC_MS_USER_TYPE);
     }
 
     public void updateAuthToken(XboxMinecraftResponse authResponse) {

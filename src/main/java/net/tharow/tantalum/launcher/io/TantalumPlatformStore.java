@@ -22,7 +22,7 @@ import com.google.gson.JsonSyntaxException;
 import net.tharow.tantalum.platform.io.PlatformInfo;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.RestfulAPIException;
-import net.tharow.tantalum.utilslib.logger.TantalumLogger;
+import net.tharow.tantalum.launchercore.logging.Logger;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
@@ -40,21 +40,22 @@ import java.util.logging.Level;
 
 public class TantalumPlatformStore {
     private static final transient Platform NULL_PLATFORM = new Platform();
-    private static final transient TantalumLogger l = Utils.getLogger();
+    private static final transient Logger l = Utils.getLogger();
     private transient File loadedFile;
 
     private final Map<String, Platform> knownPlatforms = new HashMap<>();
     private final List<String> byHost = new ArrayList<>();
     private final Map<String, String> slugDictionary = new HashMap<>();
 
-    public TantalumPlatformStore(File jsonFile) {
+    public TantalumPlatformStore(File jsonFile, final boolean doRefresh) {
         setLoadedFile(jsonFile);
+        if(doRefresh){refresh();}
     }
 
-    public static @NotNull TantalumPlatformStore load(@NotNull File jsonFile) {
+    public static @NotNull TantalumPlatformStore load(@NotNull File jsonFile, final boolean doRefresh) {
         if (!jsonFile.exists()) {
             Utils.getLogger().log(Level.WARNING, "Unable to load installedPacks from " + jsonFile + " because it does not exist.");
-            return new TantalumPlatformStore(jsonFile);
+            return new TantalumPlatformStore(jsonFile, doRefresh);
         }
 
         try {
@@ -65,33 +66,19 @@ public class TantalumPlatformStore {
                 parsedList.setLoadedFile(jsonFile);
                 return parsedList;
             } else
-                return new TantalumPlatformStore(jsonFile);
+                return new TantalumPlatformStore(jsonFile, doRefresh);
         } catch (JsonSyntaxException | IOException e) {
             Utils.getLogger().log(Level.WARNING, "Unable to load Platforms from " + jsonFile);
-            return new TantalumPlatformStore(jsonFile);
+            return new TantalumPlatformStore(jsonFile,doRefresh);
         }
     }
 
-    public static @NotNull TantalumPlatformStore refresh(File jsonfile){
-        Utils.getLogger().info("Tantalum Platform Store is Refreshing");
-        TantalumPlatformStore store = TantalumPlatformStore.load(jsonfile);
-        try {
-            EventQueue.invokeAndWait(store::refresh);
-        } catch (InterruptedException e) {
-            Utils.getLogger().severe("Tantalum Platform Store Was Interrupted While Trying to refresh");
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            Utils.getLogger().severe("Tantalum Platform Store Had An Error While Refreshing");
-            e.printStackTrace();
-        }
-        l.info("The Tantalum Platform Store has finished refreshing");
-        return store;
-    }
-
-    private void refresh(){
+    public synchronized void refresh(){
         byHost.forEach(this::refresh);
         save();
+        l.info("The Tantalum Platform Store has finished refreshing");
     }
+
     protected void refresh(String host){
         Platform oldPlatform = knownPlatforms.get(host);
         String platform = oldPlatform.getUrl();
@@ -223,4 +210,7 @@ public class TantalumPlatformStore {
         }
     }
 
+    public Map<String, Platform> getMap() {
+        return knownPlatforms;
+    }
 }

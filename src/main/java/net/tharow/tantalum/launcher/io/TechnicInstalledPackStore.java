@@ -23,6 +23,7 @@ import net.tharow.tantalum.launchercore.modpacks.InstalledPack;
 import net.tharow.tantalum.launchercore.modpacks.sources.IInstalledPackRepository;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +46,7 @@ public class TechnicInstalledPackStore implements IInstalledPackRepository, ISto
         setLoadedFile(jsonFile);
     }
 
-    public static TechnicInstalledPackStore load(File jsonFile) {
+    public static @NotNull TechnicInstalledPackStore load(@NotNull File jsonFile) {
         if (!jsonFile.exists()) {
             Utils.getLogger().log(Level.WARNING, "Unable to load installedPacks from " + jsonFile + " because it does not exist.");
             return new TechnicInstalledPackStore(jsonFile);

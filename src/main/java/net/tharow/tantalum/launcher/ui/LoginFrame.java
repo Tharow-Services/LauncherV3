@@ -18,9 +18,8 @@
 
 package net.tharow.tantalum.launcher.ui;
 
-import net.tharow.tantalum.authlib.AuthlibServer;
-import net.tharow.tantalum.authlib.AuthlibUser;
-import net.tharow.tantalum.authlib.IAuthlibServerInfo;
+import com.sun.javafx.fxml.builder.URLBuilder;
+import net.tharow.tantalum.authlib.*;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.launcher.LauncherMain;
 import net.tharow.tantalum.launcher.settings.StartupParameters;
@@ -49,6 +48,7 @@ import net.tharow.tantalum.launchercore.auth.UserModel;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.utilslib.Utils;
+import sun.net.util.URLUtil;
 
 
 import javax.swing.*;
@@ -56,8 +56,11 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
@@ -312,7 +315,7 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
 
         // Authlib field
         authServer = new JTextField();
-        authServer.setText("tantalum-auth.azurewebsites.net");
+        authServer.setText("https://auth-demo.yushi.moe/");
         authServer.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 10));
         authServer.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         authServer.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
@@ -655,6 +658,8 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
                 // This is the last time we'll have access to the user's real username,
                 // so we should set the last-used username now
                 userModel.setLastUser(user);
+                userModel.setCurrentUser(userModel.getMojangAuthenticator().createOfflineUser(user.getDisplayName()));
+                setCurrentUser(userModel.getCurrentUser());
             }
         }
     }
@@ -712,20 +717,37 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
 
     private void newAuthlibLogin(String name, String srvUrl) {
         try {
-            AuthlibUser newUser;
-            IAuthlibServerInfo serverInfo = AuthlibServer.getAuthlibServerInfo(srvUrl);
-            newUser = userModel.getAuthlibAuthenticator().loginNewUser(name, new String(this.password2.getPassword()), serverInfo);
-            userModel.addUser(newUser);
-            userModel.setCurrentUser(newUser);
-            setCurrentUser(newUser);
+            URL url;
+            try{
+                url = new URL(srvUrl);
+            } catch (MalformedURLException e) {
+                url = new URL("https://"+srvUrl);
+            }
+            final Authlib authlib = userModel.getAuthlib();
+            final AuthlibServer server = authlib.newServer(url);
+            final AuthlibAuthenticator auth = server.getAuthenticator();
+            final AuthlibUser user = auth.loginNewUser(name, new String(this.password2.getPassword()));
+            userModel.addUser(user);
+            userModel.setCurrentUser(user);
+            setCurrentUser(user);
+
+            //AuthlibUser newUser;
+            //IAuthlibServerInfo serverInfo = AuthlibServer.getAuthlibServerInfo(srvUrl);
+            //newUser = userModel.getAuthlibAuthenticator().loginNewUser(name, new String(this.password2.getPassword()), serverInfo);
+            //userModel.addUser(newUser);
+            //userModel.setCurrentUser(newUser);
+            //setCurrentUser(newUser);
         } catch(ResponseException e) {
             showMessageDialog(this, e.getMessage(), e.getError(), ERROR_MESSAGE);
-        } catch (AuthenticationException e) {
+        } catch (AuthenticationException | MalformedURLException e) {
             // What else is uncaught here? Nothing As Far As I Can Tell
             showMessageDialog(this, e.getMessage(), "Authentication error", ERROR_MESSAGE);
             e.printStackTrace();
         } catch (RestfulAPIException e) {
             showMessageDialog(this, e.getMessage(), "Auth Server Error", ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (NoSuchElementException e) {
+            showMessageDialog(this, e.getMessage(), "Auth Server Wasn't Found?", ERROR_MESSAGE);
             e.printStackTrace();
         }
     }

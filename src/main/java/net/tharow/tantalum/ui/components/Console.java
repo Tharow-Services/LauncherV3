@@ -19,13 +19,16 @@
 
 package net.tharow.tantalum.ui.components;
 
+import net.tharow.tantalum.launchercore.logging.ConsoleFormatter;
+import net.tharow.tantalum.launchercore.logging.Level;
 import net.tharow.tantalum.launchercore.logging.RotatingFileHandler;
 import net.tharow.tantalum.utilslib.Utils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import net.tharow.tantalum.utilslib.logger.Level;
+import java.util.logging.LogRecord;
 
 public class Console {
     private final ConsoleFrame frame = null;
@@ -51,6 +54,21 @@ public class Console {
         return handler;
     }
 
+    public void log(@NotNull LogRecord record){
+        final ConsoleFormatter formatter = new ConsoleFormatter();
+        final AttributeSet attributes = Level.convert(record.getLevel().getName());
+
+        final String writeText = formatter.format(record).replace("\n\n", "\n");
+        final AttributeSet writeAttributes = (attributes != null) ? attributes : consoleFrame.getDefaultAttributes();
+        SwingUtilities.invokeLater(() -> {
+            try {
+                int offset = consoleFrame.getDocument().getLength();
+                consoleFrame.getDocument().insertString(offset, writeText, writeAttributes);
+                consoleFrame.setCaretPosition(consoleFrame.getDocument().getLength());
+            } catch (BadLocationException | NullPointerException ignored) {}
+        });
+    }
+
     /**
      * Log a message.
      *
@@ -65,19 +83,11 @@ public class Console {
      *
      * @param line       line
      */
-    public void log(String line, java.util.logging.Level level) {
+    public void log(String line, Level level) {
         line = "[B#" + build + "] " + line;
 
-        AttributeSet attributes = consoleFrame.getDefaultAttributes();
-
-        if (line.startsWith("(!!)")) {
-            attributes = consoleFrame.getHighlightedAttributes();
-        } else {
-            attributes = consoleFrame.getAttributeSet(level);
-        }
-
         final String writeText = line.replace("\n\n", "\n");
-        final AttributeSet writeAttributes = (attributes != null) ? attributes : consoleFrame.getDefaultAttributes();
+        final AttributeSet writeAttributes = (level != null) ? level : consoleFrame.getDefaultAttributes();
         SwingUtilities.invokeLater(() -> {
             try {
                 int offset = consoleFrame.getDocument().getLength();

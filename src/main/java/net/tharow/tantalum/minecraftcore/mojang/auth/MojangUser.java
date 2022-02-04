@@ -27,6 +27,8 @@ import net.tharow.tantalum.minecraftcore.mojang.auth.io.Profile;
 import net.tharow.tantalum.minecraftcore.mojang.auth.io.UserProperties;
 import net.tharow.tantalum.minecraftcore.mojang.auth.response.AuthResponse;
 
+import java.util.UUID;
+
 public class MojangUser implements IUserType {
     public static final String MOJANG_USER_TYPE = "mojang";
     private static final String LEGACY = "legacy";
@@ -79,8 +81,8 @@ public class MojangUser implements IUserType {
     }
 
     @Override
-    public String getServerUrl() {
-        return null;
+    public UUID getAuthServerUUID() {
+        return UUID.fromString(MOJANG_USER_TYPE);
     }
 
     @Override

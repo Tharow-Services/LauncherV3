@@ -21,6 +21,8 @@ package net.tharow.tantalum.launchercore.auth;
 
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 
+import java.util.UUID;
+
 public interface IUserType {
     String getUserType();
 
@@ -42,5 +44,5 @@ public interface IUserType {
 
     void login(UserModel userModel) throws AuthenticationException;
 
-    String getServerUrl();
+    UUID getAuthServerUUID();
 }

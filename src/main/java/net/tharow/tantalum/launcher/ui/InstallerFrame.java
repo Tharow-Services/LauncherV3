@@ -23,7 +23,7 @@ import net.tharow.tantalum.autoupdate.tasks.MoveLauncherPackage;
 import net.tharow.tantalum.launcher.LauncherMain;
 import net.tharow.tantalum.launcher.autoupdate.TechnicRelauncher;
 import net.tharow.tantalum.launcher.autoupdate.VersionFileBuildNumber;
-import net.tharow.tantalum.launcher.io.TechnicLauncherDirectories;
+import net.tharow.tantalum.launcher.io.TantalumLauncherDirectories;
 import net.tharow.tantalum.launcher.settings.StartupParameters;
 import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.ui.controls.list.popupformatters.RoundedBorderFormatter;
@@ -197,7 +197,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
             VersionFileBuildNumber buildNumber = new VersionFileBuildNumber(resources);
             Utils.sendTracking("installLauncher", "standard", buildNumber.getBuildNumber(), settings.getClientId());
 
-            Relauncher relauncher = new TechnicRelauncher(null, 0, new TechnicLauncherDirectories(settings.getTechnicRoot()), resources, params);
+            Relauncher relauncher = new TechnicRelauncher(null, 0, new TantalumLauncherDirectories(settings.getTechnicRoot()), resources, params);
             try {
                 String currentPath = relauncher.getRunningPath();
                 relauncher.launch(currentPath, params.getArgs());
@@ -211,7 +211,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
 
     protected void portableInstall() {
         String targetPath = null;
-        final Relauncher relauncher = new TechnicRelauncher(null, 0, new TechnicLauncherDirectories(settings.getTechnicRoot()), resources, params);
+        final Relauncher relauncher = new TechnicRelauncher(null, 0, new TantalumLauncherDirectories(settings.getTechnicRoot()), resources, params);
         try {
             String currentPath = relauncher.getRunningPath();
             String launcher = (currentPath.endsWith(".exe"))?"TantalumLauncher.exe":"TantalumLauncher.jar";
@@ -305,7 +305,7 @@ public class InstallerFrame extends DraggableFrame implements IRelocalizableReso
 
         if (result == JFileChooser.APPROVE_OPTION) {
             if (chooser.getSelectedFile().listFiles().length > 0) {
-                JOptionPane.showMessageDialog(this, resources.getString("modpackoptions.move.errortext"), resources.getString("modpackoptions.move.errortitle"), JOptionPane.OK_OPTION);
+                JOptionPane.showMessageDialog(this, resources.getString("modpackoptions.move.errortext"), resources.getString("modpackoptions.move.errortitle"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
 

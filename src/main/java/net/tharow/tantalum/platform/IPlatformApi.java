@@ -19,8 +19,11 @@
 
 package net.tharow.tantalum.platform;
 
+import net.tharow.tantalum.launcher.io.Platform;
 import net.tharow.tantalum.platform.io.PlatformPackInfo;
 import net.tharow.tantalum.rest.RestfulAPIException;
+
+import java.util.Map;
 
 public interface IPlatformApi {
     PlatformPackInfo getPlatformPackInfoForBulk(String packSlug) throws RestfulAPIException;
@@ -33,4 +36,6 @@ public interface IPlatformApi {
 
     @Deprecated
     String getPlatformUri(String slug);
+
+    Map<String, Platform> getMap();
 }

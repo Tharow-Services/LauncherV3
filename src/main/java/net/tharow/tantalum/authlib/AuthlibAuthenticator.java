@@ -27,20 +27,36 @@ import net.tharow.tantalum.minecraftcore.MojangUtils;
 import net.tharow.tantalum.minecraftcore.mojang.auth.request.AuthRequest;
 import net.tharow.tantalum.minecraftcore.mojang.auth.request.RefreshRequest;
 import net.tharow.tantalum.minecraftcore.mojang.auth.response.AuthResponse;
+import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.PhantomReference;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public final class AuthlibAuthenticator {
-    private final String clientToken;
 
-    public AuthlibAuthenticator(String clientToken) {
+    private final String clientToken;
+    private final UUID uuid;
+    private final String url;
+
+    public AuthlibAuthenticator(@NotNull AuthlibServer authServer){
+        this.clientToken = authServer.getClientToken();
+        this.uuid = authServer.get();
+        this.url = authServer.getServerUrl();
+    }
+
+    public AuthlibAuthenticator(String clientToken, AuthlibServer authlibServer) {
         this.clientToken = clientToken;
+        this.uuid = authlibServer.get();
+        this.url = authlibServer.getServerUrl();
     }
 
     public String clientToken() {
@@ -62,16 +78,21 @@ public final class AuthlibAuthenticator {
 
     @Override
     public String toString() {
-        return "AuthlibAuthenticator[" +
-                "clientToken=" + clientToken + ']';
+        return "AuthlibAuthenticator{" +
+                "clientToken='" + clientToken + '\'' +
+                ", uuid=" + uuid +
+                ", url='" + url + '\'' +
+                '}';
     }
+
+
     //TODO Implement non email login
 
 
-    public AuthlibUser loginNewUser(String username, String password, IAuthlibServerInfo authlibServerInfo) throws AuthenticationException {
+    public AuthlibUser loginNewUser(String username, String password) throws AuthenticationException {
         AuthRequest request = new AuthRequest(username, password, this.clientToken);
         String data = MojangUtils.getGson().toJson(request);
-        String authServer = authlibServerInfo.getServerUrl();
+        String authServer = this.url;
         AuthResponse response;
         try {
             String returned = postJson(authServer + "authserver/authenticate", data);
@@ -87,13 +108,13 @@ public final class AuthlibAuthenticator {
                     "An error was raised while attempting to communicate with " + authServer + ".", e);
         }
 
-        return new AuthlibUser(username, response, authlibServerInfo);
+        return new AuthlibUser(username, response, this.uuid);
     }
 
     public AuthResponse requestRefresh(AuthlibUser authlibUser) throws AuthenticationException {
         RefreshRequest refreshRequest = new RefreshRequest(authlibUser.getAccessToken(), authlibUser.getClientToken());
         String data = MojangUtils.getGson().toJson(refreshRequest);
-        String authServer = authlibUser.getServerUrl();
+        String authServer = this.url;
 
 
         AuthResponse response;
@@ -113,6 +134,9 @@ public final class AuthlibAuthenticator {
 
         return response;
     }
+
+
+
 
     private String postJson(String url, String data) throws IOException {
         byte[] rawData = data.getBytes(StandardCharsets.UTF_8);

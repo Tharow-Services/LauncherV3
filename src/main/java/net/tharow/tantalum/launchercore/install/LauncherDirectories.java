@@ -34,6 +34,8 @@ public interface LauncherDirectories {
 
     File getWorldsDirectory();
 
+    File getLogsDirectory();
+
     File getLauncherAssetsDirectory();
 }
 

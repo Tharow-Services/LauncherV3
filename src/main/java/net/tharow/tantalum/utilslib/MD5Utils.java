@@ -20,10 +20,11 @@
 package net.tharow.tantalum.utilslib;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class MD5Utils {
 
@@ -37,6 +38,10 @@ public class MD5Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static @NotNull String getMD5(String input){
+        return DigestUtils.md5Hex(input);
     }
 
     public static boolean checkMD5(File file, String md5) {

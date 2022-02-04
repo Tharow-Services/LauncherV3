@@ -20,17 +20,19 @@ package net.tharow.tantalum.utilslib;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.tharow.tantalum.authlib.AuthlibAuthenticator;
 import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
+import net.tharow.tantalum.launchercore.logging.Level;
+import net.tharow.tantalum.launchercore.logging.Logger;
 import net.tharow.tantalum.launchercore.mirror.download.Download;
 import net.tharow.tantalum.launchercore.util.DownloadListener;
-import net.tharow.tantalum.utilslib.logger.Level;
-import net.tharow.tantalum.utilslib.logger.TantalumLogger;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,17 +43,24 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
+
 
 
 public class Utils {
-    private static final Gson gson;
-    private static final TantalumLogger logger = TantalumLogger.getLogger("net.tharow.tantalum.launcher.LauncherMain");
+    private static final Logger logger = Logger.getLogger("Launcher");
     private static final int DOWNLOAD_RETRIES = 3;
     @SuppressWarnings("unused")
     public static volatile Object ignored;
+
+    private static final Gson gson;
     static {
         GsonBuilder builder = new GsonBuilder();
         builder.setPrettyPrinting();
+        builder.setExclusionStrategies(new AnnotationExclusionStrategy(AuthlibAuthenticator.class));
+        builder.excludeFieldsWithModifiers(Modifier.TRANSIENT, Modifier.STATIC, Modifier.PROTECTED);
+        builder.registerTypeAdapter(UUID.class, new UUIDTypeAdapter());
+
         gson = builder.create();
 
         // Make sure we're logging everything we want to be logging
@@ -65,6 +74,10 @@ public class Utils {
     }
 
     public static void noOperation(){}
+
+    public static @NotNull UUID getUUID(String name){
+        return UUID5.fromUTF8(null, name);
+    }
 
     public static Date getDate(String date){
         return getDateFromPattern("yyyy-MM-dd'T'HH:mm:ssZ",date);
@@ -86,24 +99,12 @@ public class Utils {
         return gson;
     }
 
-    public static TantalumLogger getLogger() {
+    public static Logger getLogger() {
         return logger;
     }
 
     public static void logDebug(String msg){
         getLogger().log(Level.DEBUG,msg);
-    }
-    public static void entering(@NotNull Class scr, String method, @NotNull Object prams){
-        getLogger().finer("ENTERING "+scr.getName()+ '.' + method + " With Prams " + prams);
-        //getLogger().entering(scr.getName(),method,prams);
-    }
-    public static void entering(@NotNull Class scr, String method, Object @NotNull [] prams){
-        getLogger().finer("ENTERING "+scr.getName() + '.'+  method + " With Prams " + Arrays.toString(prams));
-        //getLogger().entering(scr.getName(), method, prams);
-    }
-    public static void exiting(@NotNull Class src, String method, Object result){
-        getLogger().finer("EXITING "+src.getName()+'.'+method+ " With result "+result);
-        //getLogger().exiting(src.getName(), method, result);
     }
 
     /**
@@ -178,7 +179,7 @@ public class Utils {
     }
 
     public static boolean sendTracking(String category, String action, String label, String clientId) {
-        logDebug("Block Tracking Command. Category: "+category+" Action: "+action+" Label: "+label+" Client ID: "+clientId);
+        getLogger().log(Level.TRACKING,"Block Tracking Command. Category: "+category+" Action: "+action+" Label: "+label+" Client ID: "+clientId);
         return false;
     }
 

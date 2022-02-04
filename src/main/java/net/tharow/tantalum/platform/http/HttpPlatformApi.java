@@ -23,6 +23,8 @@ import net.tharow.tantalum.github.io.RepoReleasesData;
 import net.tharow.tantalum.launcher.io.Platform;
 import net.tharow.tantalum.launcher.io.TantalumPlatformStore;
 import net.tharow.tantalum.launchercore.TantalumConstants;
+import net.tharow.tantalum.launchercore.logging.Level;
+import net.tharow.tantalum.launchercore.logging.Logger;
 import net.tharow.tantalum.platform.IPlatformApi;
 import net.tharow.tantalum.platform.IPlatformSearchApi;
 import net.tharow.tantalum.platform.io.INewsData;
@@ -37,19 +39,24 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Logger;
-
-import static net.tharow.tantalum.utilslib.Utils.*;
+import java.util.Map;
 
 public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
-    private static final Logger l = Utils.getLogger();
+    private static final Logger l = Logger.getLogger("Platform API");
+    static {
+        l.setParent(Utils.getLogger());
+    }
     private static final String buildnumber = TantalumConstants.getBuildNumber().getBuildNumber();
     private final TantalumPlatformStore store;
 
 
     public HttpPlatformApi(TantalumPlatformStore store){
         this.store = store;
-        Utils.getLogger().config("Http Platform Has Been Constructed");
+        l.log(Level.CONSTRUCTOR, "Tantalum Platform API Was Constructed");
+    }
+
+    public Map<String, Platform> getMap(){
+        return store.getMap();
     }
 
     @Deprecated
@@ -63,7 +70,8 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
 
     @Contract(pure = true)
     private @NotNull String getPlatformUri(String platform, String packSlug, int buildnumber){
-        return platform + "modpack/" + packSlug + "/?build="+ buildnumber;
+        String temp = platform.endsWith("/") ? "modpack/":"/modpack/";
+        return platform + temp + packSlug + "/?build="+ buildnumber;
     }
 
     @Override
@@ -73,38 +81,38 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
 
     @Override
     public PlatformPackInfo getPlatformPackInfo(String packSlug) throws RestfulAPIException {
-        entering(this.getClass(), "getPlatformPackInfo(String packSlug)",packSlug);
+        l.entering(this.getClass(), "getPlatformPackInfo(String packSlug)",packSlug);
         //Utils.getLogger().warning("Using old get platform uri method please don't use this");
-        logDebug("Trying to find modpack with slug of: "+packSlug);
+        l.debug("Trying to find modpack with slug of: "+packSlug);
         //Check Slug dict for the slug, so we can skip this//
         if (this.store.getSlugHost(packSlug) != null) {
-            logDebug("The Slug of: "+packSlug+" was found in the slug dict");
+            l.debug("The Slug of: "+packSlug+" was found in the slug dict");
             PlatformPackInfo temp = RestObject.getRestObject(PlatformPackInfo.class,getPlatformUri(store.getSlugUrl(packSlug),packSlug));
-            exiting(this.getClass(), "getPlatformPackInfo(String packSlug)",temp);
+            l.exiting(this.getClass(), "getPlatformPackInfo(String packSlug)",temp);
             return temp;
         }
-        logDebug("The pack wasn't found in dict trying our known platforms");
+        l.debug("The pack wasn't found in dict trying our known platforms");
         //Time to Check our Platforms to see if any of them have this pack//
         for (String hosts : this.store.getHosts()) {
             Platform hostPlatform = store.getHostPlatform(hosts);// the last time we should need to access the store
             PlatformPackInfo packInfo = getPlatformSlugPack(hostPlatform, packSlug);
             if (packInfo != null) {
                 store.putSlug(packSlug, hosts); // if it was found add it to the dict
-                logDebug("Found the modpack adding to dict and Returning");
-                exiting(this.getClass(), "getPlatformPackInfo(String packSlug)", packInfo);
+                l.debug("Found the modpack adding to dict and Returning");
+                l.exiting(this.getClass(), "getPlatformPackInfo(String packSlug)", packInfo);
                 return packInfo;
             }
         }
         // Utils.logDebug("Unable to find modpack");
-        exiting(this.getClass(), "getPlatformPackInfo(String packSlug)", new RestfulAPIException("Unable to find Modpack"));
+        l.exiting(this.getClass(), "getPlatformPackInfo(String packSlug)", new RestfulAPIException("Unable to find Modpack"));
         throw new RestfulAPIException("Unable To Find Modpack");
     }
     protected PlatformPackInfo getPlatformSlugPack(@NotNull Platform platform,@NotNull String packSlug){
-        entering(this.getClass(),"getPlatformSlugPack(Platform,String)", new Object[]{platform,packSlug});
+        l.entering(this.getClass(),"getPlatformSlugPack(Platform,String)", new Object[]{platform,packSlug});
         final String name = platform.getName();
         final String platformUrl = getPlatformUri(platform.getUrl(), packSlug, platform.getBuild());
         Utils.getLogger().info("Trying to get modpack with Slug: " + packSlug + " From: " + name);
-        logDebug("With Url: "+platformUrl);
+        l.debug("With Url: "+platformUrl);
         PlatformPackInfo newPack = null;
         try {
             newPack = RestObject.getRestObject(PlatformPackInfo.class, platformUrl);
@@ -115,21 +123,21 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
         if (newPack != null) {
             if (!newPack.hasError()) {
                 Utils.getLogger().info("Got Modpack: " + newPack.getDisplayName() + " From Platform: "+name);
-                logDebug("With Url of "+platformUrl);
+                l.debug("With Url of "+platformUrl);
             } else {
-                Utils.getLogger().severe("The modpack from: "+name+" has an error: "+newPack.getError()+" Discarding Modpack");
+                l.severe("The modpack from: "+name+" has an error: "+newPack.getError()+" Discarding Modpack");
             }
         } else {
-            logDebug("The Modpack from "+name+" was null ");
+            l.debug("The Modpack from "+name+" was null ");
         }
-        exiting(this.getClass(),"getPlatformSlugPack(Platform,String)", newPack);
+        l.exiting(this.getClass(),"getPlatformSlugPack(Platform,String)", newPack);
         return newPack;
     }
 
     @Override
     public void incrementPackRuns(String packSlug) {
-        entering(this.getClass(), "incrementPackRuns(String packSlug)",packSlug);
-        Utils.logDebug("Incrementing Pack Runs for slug: "+packSlug);
+        l.entering(this.getClass(), "incrementPackRuns(String packSlug)",packSlug);
+        l.debug("Incrementing Pack Runs for slug: "+packSlug);
         final String platformUrl = store.getSlugUrl(packSlug);
         if (platformUrl == null) {
             l.severe("While Trying to increment pack runs, we were unable to find the owner of the modpack slug: "+packSlug);
@@ -173,6 +181,7 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
     public static @NotNull SearchResultsData getSearchResults(@NotNull String searchTerm, String platform, int buildnumber) throws RestfulAPIException
     {
         String url = platform + "search?q=" + Utils.urlEncoder(searchTerm.trim()) + "&build=" + buildnumber;
+        l.logp(Level.CONFIG, HttpPlatformApi.class.getSimpleName(), "getSearchResults(@NotNull String, String, int)", url);
         return RestObject.getRestObject(SearchResultsData.class, url);
     }
 }

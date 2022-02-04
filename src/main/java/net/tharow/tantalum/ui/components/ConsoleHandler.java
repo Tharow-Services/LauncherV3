@@ -19,6 +19,10 @@
 
 package net.tharow.tantalum.ui.components;
 
+import net.tharow.tantalum.launchercore.logging.BuildLogFormatter;
+import net.tharow.tantalum.launchercore.logging.Level;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -31,8 +35,11 @@ public class ConsoleHandler extends Handler {
     }
 
     @Override
-    public void publish(LogRecord record) {
-        this.console.log(record.getMessage() + '\n', record.getLevel());
+    public void publish(@NotNull LogRecord record) {
+        //formatter.format(record);
+        this.console.log(record);
+        //this.console.log(formatter.format(record), Level.convert(record.getLevel().getName()));
+        //this.console.log(record.getMessage() + '\n', Level.convert(record.getLevel()));
     }
 
     @Override

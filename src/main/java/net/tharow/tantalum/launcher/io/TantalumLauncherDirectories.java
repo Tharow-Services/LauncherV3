@@ -25,10 +25,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class TechnicLauncherDirectories implements LauncherDirectories {
+public class TantalumLauncherDirectories implements LauncherDirectories {
     private final File workDir;
 
-    public TechnicLauncherDirectories(File rootDir) {
+    public TantalumLauncherDirectories(File rootDir) {
         workDir = rootDir;
     }
 
@@ -39,6 +39,7 @@ public class TechnicLauncherDirectories implements LauncherDirectories {
     public File getModpacksDirectory() {return getDirectoryBase("modpacks");}
     public File getRuntimesDirectory() {return getDirectoryBase("runtimes");}
     public File getWorldsDirectory() {return getDirectoryBase("worlds");}
+    public File getLogsDirectory() {return  getDirectoryBase("logs");}
     public File getLauncherAssetsDirectory() {return getDirectoryBase(getAssetsDirectory(),"launcher");}
 
 

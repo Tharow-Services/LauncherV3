@@ -215,11 +215,12 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         modpacksTab.setIsActive(false);
         newsTab.setIsActive(false);
         switch (tabName.toLowerCase(Locale.ROOT)) {
-            case TAB_DISCOVER : discoverTab.setIsActive(true);
-            case TAB_MODPACKS : modpacksTab.setIsActive(true);
+            case TAB_DISCOVER : discoverTab.setIsActive(true); break;
+            case TAB_MODPACKS : modpacksTab.setIsActive(true); break;
             case TAB_NEWS : {
                 newsTab.setIsActive(true);
                 newsSelector.ping();
+                break;
             }
         }
 

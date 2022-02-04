@@ -19,17 +19,20 @@
 
 package net.tharow.tantalum.launchercore.auth;
 
+import net.tharow.tantalum.authlib.Authlib;
 import net.tharow.tantalum.authlib.AuthlibAuthenticator;
 import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.launchercore.exception.ResponseException;
 import net.tharow.tantalum.launchercore.exception.SessionException;
 import net.tharow.tantalum.minecraftcore.microsoft.auth.MicrosoftAuthenticator;
 import net.tharow.tantalum.minecraftcore.mojang.auth.MojangAuthenticator;
+import net.tharow.tantalum.rest.RestfulAPIException;
 
 import javax.swing.JOptionPane;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class UserModel {
     private IUserType mCurrentUser;
@@ -37,14 +40,14 @@ public class UserModel {
     private final IUserStore mUserStore;
     private final MojangAuthenticator mojangAuthenticator;
     private final MicrosoftAuthenticator microsoftAuthenticator;
-    private final AuthlibAuthenticator authlibAuthenticator;
+    private final Authlib authlib;
 
-    public UserModel(IUserStore userStore, MicrosoftAuthenticator microsoftAuthenticator, MojangAuthenticator mojangAuthenticator, AuthlibAuthenticator authlibAuthenticator) {
+    public UserModel(IUserStore userStore, MicrosoftAuthenticator microsoftAuthenticator, MojangAuthenticator mojangAuthenticator, Authlib authlib) {
         this.mCurrentUser = null;
         this.mUserStore = userStore;
         this.mojangAuthenticator = mojangAuthenticator;
         this.microsoftAuthenticator = microsoftAuthenticator;
-        this.authlibAuthenticator = authlibAuthenticator;
+        this.authlib = authlib;
 
     }
 
@@ -114,8 +117,12 @@ public class UserModel {
         mUserStore.setLastUser(user.getUsername());
     }
 
-    public AuthlibAuthenticator getAuthlibAuthenticator(){
-        return this.authlibAuthenticator;
+    public Authlib getAuthlib(){
+        return this.authlib;
+    }
+
+    public AuthlibAuthenticator getAuthlibAuthenticator(UUID uuid){
+        return this.getAuthlib().loadServer(uuid).getAuthenticator();
     }
 
     public MojangAuthenticator getMojangAuthenticator(){

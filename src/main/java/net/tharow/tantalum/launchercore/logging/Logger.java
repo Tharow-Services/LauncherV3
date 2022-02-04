@@ -1,14 +1,16 @@
-package net.tharow.tantalum.utilslib.logger;
+package net.tharow.tantalum.launchercore.logging;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
+import net.tharow.tantalum.utilslib.Utils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.function.Supplier;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
-public class TantalumLogger extends Logger {
+public class Logger extends java.util.logging.Logger {
     /**
      * Protected method to construct a logger for a named subsystem.
      * <p>
@@ -23,7 +25,7 @@ public class TantalumLogger extends Logger {
      * @throws MissingResourceException if the resourceBundleName is non-null and
      *                                  no corresponding resource can be found.
      */
-    protected TantalumLogger(String name) {
+    protected Logger(String name) {
         super(name, null);
     }
 
@@ -86,16 +88,29 @@ public class TantalumLogger extends Logger {
         return super.isLoggable(level);
     }
 
+    public void constructor(String msg){
+        super.log(Level.CONSTRUCTOR, msg);
+    }
 
+    public void constructor(Supplier<String> msgSupplier){
+        super.log(Level.CONSTRUCTOR, msgSupplier);
+    }
 
     public void debug(String msg){
-        this.log(new LogRecord(Level.DEBUG, msg));
+        super.log(Level.DEBUG,msg);
     }
 
     public void debug(Supplier<String> msgSupplier){
-        this.log(Level.DEBUG, msgSupplier);
+        super.log(Level.DEBUG, msgSupplier);
     }
 
+    public void tracking(String msg){
+        super.log(Level.TRACKING,msg);
+    }
+
+    public void tracking(Supplier<String> msgSupplier){
+        super.log(Level.TRACKING, msgSupplier);
+    }
 
     public void entering(@NotNull Class src, String sourceMethod){
         super.entering(src.getName(), sourceMethod);
@@ -118,8 +133,15 @@ public class TantalumLogger extends Logger {
     }
 
     @Contract("!null -> new")
-    public static @NotNull TantalumLogger getLogger(String name) {
-        return new TantalumLogger(name);
+    public static @NotNull Logger getLogger(String name) {
+        return new Logger(name);
+    }
+
+    @Ignore
+    public static void demoLevels(){
+        //for (Level level : Level.AllLevels) {
+        //    Utils.getLogger().log(level, "This Is Logging Level: "+level.getName().toLowerCase(Locale.ROOT));
+        //}
     }
 
 }

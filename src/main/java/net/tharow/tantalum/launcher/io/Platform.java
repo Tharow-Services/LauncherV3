@@ -62,4 +62,8 @@ public class Platform implements IPlatformInfo {
         return version;
     }
 
+    @Override
+    public String toString(){
+        return name.replaceFirst(" API","");
+    }
 }

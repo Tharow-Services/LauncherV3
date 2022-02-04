@@ -1,16 +1,72 @@
 package net.tharow.tantalum.authlib.io;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
 import net.tharow.tantalum.authlib.IAuthlibServerInfo;
 import net.tharow.tantalum.rest.RestObject;
+import net.tharow.tantalum.utilslib.UUID5;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.UUID;
+
 @SuppressWarnings({"unused"})
 public class ServerInfo extends RestObject implements IAuthlibServerInfo {
 
     private ServerMetaInfo meta;
     private List<String> skinDomains;
-    private String signaturePublicKey;
+    @SerializedName("signaturePublickey") private String signaturePublicKey;
     private transient String serverUrl;
+    private transient String clientToken;
+
+    public ServerInfo(){
+
+    }
+
+    public ServerInfo(@NotNull ServerInfo serverInfo){
+        this.meta = serverInfo.meta;
+        this.skinDomains = serverInfo.skinDomains;
+        this.signaturePublicKey = serverInfo.signaturePublicKey;
+        this.serverUrl = serverInfo.serverUrl;
+    }
+
+    public ServerInfo(@NotNull ServerInfo serverInfo, final String address, final String clientToken){
+        this.meta = serverInfo.meta;
+        this.skinDomains = serverInfo.skinDomains;
+        this.signaturePublicKey = serverInfo.signaturePublicKey;
+        this.serverUrl = address;
+        this.clientToken = clientToken;
+    }
+
+    public void removePBK(){
+        this.signaturePublicKey = this.signaturePublicKey.substring(26);
+    }
+
+    public void set(@NotNull ServerInfo info){
+        this.meta = info.meta;
+        this.skinDomains = info.skinDomains;
+        //this.signaturePublicKey = info.signaturePublicKey;
+        this.serverUrl = info.serverUrl;
+        this.clientToken = info.clientToken;
+    }
+
+    public ServerInfo(final String name, final String implName, final String implVersion, final String homePage, final String registerPage,
+                      final boolean isEmailLogin, final boolean isLegacySkinApi, final boolean isMojangNamespace, final List<String> skinDomains, final String signaturePublicKey ){
+        this.meta = new ServerMetaInfo(name, implName, implVersion, homePage, registerPage, isEmailLogin, isLegacySkinApi, isMojangNamespace);
+        this.skinDomains = skinDomains;
+        this.signaturePublicKey = signaturePublicKey;
+    }
+
+    public UUID getUUID(){
+        return UUID5.fromUTF8(null, getServerName()+getImplName());
+    }
+
+    public String getSignature(){
+        return DigestUtils.md5Hex(this.signaturePublicKey == null ?"Fake Public Key":this.signaturePublicKey);
+        //return this.signaturePublicKey
+    }
 
     @Override
     public String getServerUrl() {
@@ -20,6 +76,18 @@ public class ServerInfo extends RestObject implements IAuthlibServerInfo {
     @Override
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
+    }
+
+    @Override
+    public IAuthlibServerInfo setApiLocation(String ALI) {
+        this.serverUrl = ALI;
+        return this;
+    }
+
+    public String getClientToken(){return this.clientToken;}
+
+    public void setClientToken(String clientToken) {
+        this.clientToken = clientToken;
     }
 
     @Override
@@ -73,36 +141,27 @@ public class ServerInfo extends RestObject implements IAuthlibServerInfo {
     }
 
     @Override
-    public String toString(){
-        return "Authlib{" +
-                "meta={" +
-                "serverName='" + this.meta.getServerName() + '\'' +
-                ", implementationName='" + this.meta.getImplName() + '\'' +
-                ", implementationVersion='" + this.meta.getImplName() + '\'' +", " +
-                "links={"+
-                "homepage='" + this.meta.getHomepage() + '\''+", "+
-                "register='" + this.meta.getRegister() + '\''+" }, "+
-                "feature.non_email_login=" + !this.meta.isEmailLogin() + '\''+ " ," +
-                "feature.legacy_skin_api=" + this.meta.isLegacySkinApi() + '\''+ " ," +
-                "feature.no_mojang_namespace=" + !this.meta.isMojangNamespace() + '\''+ " } " +
-                "skinDomains=[ " + this.skinDomains.toString() + " ], " +
-                "signaturePublicKey='" + this.signaturePublicKey + '\'' + "" +
+    public String toReadable() {
+        return null;
+    }
+
+
+    //@Override
+    //public String toString(){
+    //    return toJson().toString();
+    //}
+
+
+    @Override
+    public String toString() {
+        return "ServerInfo{" +
+                "meta=" + meta +
+                ", skinDomains=" + skinDomains +
+                ", signaturePublicKey='" + signaturePublicKey + '\'' +
                 '}';
     }
 
-    @Override
-    public String toReadable(){
-        return "Authlib: " + this.serverUrl +
-                "\nServer Name: " + this.meta.getServerName() +
-                "\nImplementation Name: " + this.meta.getImplName() +
-                "\nImplementation Version: " + this.meta.getImplName() +
-                "\nHome Page Url: " + this.meta.getHomepage() +
-                "\nRegister Page Url: '" + this.meta.getRegister() +
-                "\nUses Email Login: " + this.meta.isEmailLogin() +
-                "\nUses Legacy Skin Api: " + this.meta.isLegacySkinApi() +
-                "\nUses Mojang Name Space: " + this.meta.isMojangNamespace() +
-                "\nSkin Domains: " + this.skinDomains.toString() +
-                "\nContains Public Key: " + this.signaturePublicKey;
+    public ServerMetaInfo getMeta() {
+        return meta;
     }
-
 }

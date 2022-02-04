@@ -18,10 +18,12 @@
 
 package net.tharow.tantalum.launcher.ui.components.modpacks;
 
+import net.tharow.tantalum.launcher.io.Platform;
 import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.launcher.ui.controls.modpacks.FindMoreWidget;
 import net.tharow.tantalum.launcher.ui.controls.modpacks.ModpackWidget;
+import net.tharow.tantalum.launcher.ui.listitems.StreamItem;
 import net.tharow.tantalum.launchercore.auth.IAuthListener;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
@@ -40,7 +42,9 @@ import net.tharow.tantalum.solder.ISolderPackApi;
 import net.tharow.tantalum.ui.controls.TintablePanel;
 import net.tharow.tantalum.ui.controls.WatermarkTextField;
 import net.tharow.tantalum.ui.controls.borders.RoundBorder;
+import net.tharow.tantalum.ui.controls.list.SimpleButtonComboUI;
 import net.tharow.tantalum.ui.controls.list.SimpleScrollbarUI;
+import net.tharow.tantalum.ui.controls.list.popupformatters.RoundedBorderFormatter;
 import net.tharow.tantalum.ui.lang.IRelocalizableResource;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.utilslib.DesktopUtils;
@@ -49,11 +53,13 @@ import net.tharow.tantalum.utilslib.Utils;
 
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -74,11 +80,14 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
     private final IPlatformApi platformApi;
     private final ISolderApi solderApi;
 
+
+    private boolean hasShownStreamInfo = false;
     private JPanel widgetList;
     private ModpackInfoPanel modpackInfoPanel;
     private LauncherFrame launcherFrame;
     private JTextField filterContents;
-    private JComboBox<String> searchList;
+    private JComboBox<Platform> searchList;
+    private Platform selectedPlatform;
     private final FindMoreWidget findMoreWidget;
 
     private final DocumentFilter documentFilter = new DocumentFilter(){
@@ -162,6 +171,25 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         settings.save();
     }
 
+    protected void changeStream() {
+        assert searchList.getSelectedItem() != null;
+        this.selectedPlatform = (Platform) searchList.getSelectedItem();
+        //settings.setBuildStream(((StreamItem) searchList.getSelectedItem()).getStream());
+        //settings.save();
+    }
+
+    private void initControlValues(){
+        for (ActionListener listener : searchList.getActionListeners()) {
+            searchList.removeActionListener(listener);
+        }
+        searchList.removeAllItems();
+        platformApi.getMap().forEach((ignored, platform)->{
+            searchList.addItem(platform);
+        });
+        searchList.setSelectedIndex((settings.getBuildStream().equals("beta"))?1:0);
+        searchList.addActionListener(e -> changeStream());
+    }
+
     private void initComponents() {
         setLayout(new BorderLayout());
         setBackground(LauncherFrame.COLOR_SELECTOR_BACK);
@@ -177,15 +205,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         filterContents.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 14));
         filterContents.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
         filterContents.setForeground(LauncherFrame.COLOR_BLUE);
-
-        if(settings.isAcceptedWarnings()){
-            filterContents.setBackground(LauncherFrame.COLOR_REQUIREMENT_FAIL);
-        } else {
-            filterContents.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
-        }
-
-
-        //filterContents.setBackground(LauncherFrame.COLOR_REQUIREMENT_FAIL);
+        filterContents.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
         filterContents.setSelectedTextColor(Color.black);
         filterContents.setSelectionColor(LauncherFrame.COLOR_BUTTON_BLUE);
         filterContents.setCaretColor(LauncherFrame.COLOR_BUTTON_BLUE);
@@ -193,7 +213,26 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         ((AbstractDocument)filterContents.getDocument()).setDocumentFilter(documentFilter);
         filterContents.getDocument().addDocumentListener( new SimpleDocumentListener(this::detectFilterChanges));
 
-        header.add(filterContents, new GridBagConstraints(1,0,1,1,1,0,GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(3,0,3,0), 0, 12));
+        header.add(filterContents, new GridBagConstraints(1,0,1,1,1,0,GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5,0,3,0), 0, 12));
+
+        searchList = new JComboBox<>();
+        searchList.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
+        searchList.setEditable(false);
+        searchList.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 10));
+        searchList.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
+        searchList.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        searchList.setUI(new SimpleButtonComboUI(new RoundedBorderFormatter(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 0)), resources, LauncherFrame.COLOR_SCROLL_TRACK, LauncherFrame.COLOR_SCROLL_THUMB));
+        searchList.setFocusable(false);
+
+        Object child = searchList.getAccessibleContext().getAccessibleChild(0);
+        BasicComboPopup popup = (BasicComboPopup)child;
+        JList<?> list = popup.getList();
+        list.setSelectionForeground(LauncherFrame.COLOR_BUTTON_BLUE);
+        list.setSelectionBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
+        list.setBackground(LauncherFrame.COLOR_CENTRAL_BACK_OPAQUE);
+
+        header.add(searchList, new GridBagConstraints(1,1,1,1,1,0,GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5,0,5,0), 0, 12));
+
         widgetList = new JPanel();
         widgetList.setOpaque(false);
         widgetList.setLayout(new GridBagLayout());
@@ -203,12 +242,13 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getViewport().setOpaque(false);
         scrollPane.getVerticalScrollBar().setUI(new SimpleScrollbarUI(LauncherFrame.COLOR_SCROLL_TRACK, LauncherFrame.COLOR_SCROLL_THUMB));
-        scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(10, 10));
+        scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(10, 9));
         scrollPane.getVerticalScrollBar().setUnitIncrement(12);
         add(scrollPane, BorderLayout.CENTER);
 
         widgetList.add(Box.createHorizontalStrut(294), new GridBagConstraints(0, 0, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,0,0,0),0,0));
-        widgetList.add(Box.createGlue(), new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0,0));
+        widgetList.add(Box.createGlue(), new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0,0));
+        initControlValues();
     }
 
     @Override
@@ -503,39 +543,16 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
 
             String encodedSearch;
             ArrayList<IPackSource> sources = new ArrayList<>(2);
-            String tempPlatform = "https://tantalum-auth.azurewebsites.net/platform/";
-            boolean doNormal= true;
-            if(localSearchTag.charAt(0) == '`'){
-                if(!settings.isAcceptedWarnings()) {
-                    if (optionWarning()) {
-                        doNormal = false;
-                        changeWarning();
-                    } else {
-                        filterContents.setText("");
-                        return;
-                    }
-                } else {doNormal=false;}
-            }
-
-            if(doNormal)  {
-                Utils.getLogger().config("Using Normal Search");
-                sources.add(new NameFilterPackSource(defaultPacks, localSearchTag));
+            sources.add(new NameFilterPackSource(defaultPacks, localSearchTag));
                 encodedSearch  = filterContents.getText();
-            } else {
-                //findMoreWidget.setWidgetData("Warning Using The Technic Platform\n Search Mode WILL cause issues with modpacks");
-                localSearchTag = localSearchTag.substring(1);
-                Utils.getLogger().warning("Using Technic Platform For Search May Cause Issues");
-                tempPlatform = "https://api.technicpack.net/";
-                tempPlatform = "http://tantalum-auth.azurewebsites.net/platform/";
-                encodedSearch  = filterContents.getText().substring(1);
-            }
+
             try {
                 encodedSearch = URLEncoder.encode(encodedSearch, StandardCharsets.UTF_8.toString());
             } catch (UnsupportedEncodingException ignored) {}
-            findMoreUrl = "https://www.technicpack.net/modpacks?q="+encodedSearch;
+            findMoreUrl = selectedPlatform.getUrl()+"modpacks?q="+encodedSearch;
             findMoreWidget.setWidgetData(resources.getString("launcher.packselector.more"));
 
-            sources.add(new SearchResultPackSource(tempPlatform, localSearchTag));
+            sources.add(new SearchResultPackSource(selectedPlatform.getUrl(), localSearchTag));
             Utils.logDebug("Whats Currently in the source: ");
             sources.forEach(iPackSource -> Utils.logDebug(iPackSource.getSourceName()));
             //Debug.getConfig(this);

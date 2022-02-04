@@ -22,6 +22,7 @@ package net.tharow.tantalum.platform.cache;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonSyntaxException;
+import net.tharow.tantalum.launcher.io.Platform;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.platform.IPlatformApi;
 import net.tharow.tantalum.platform.http.HttpPlatformApi;
@@ -34,6 +35,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class ModpackCachePlatformApi implements IPlatformApi {
@@ -163,7 +165,6 @@ public class ModpackCachePlatformApi implements IPlatformApi {
         File cacheFile = new File(new File(new File(directories.getAssetsDirectory(), "packs"), info.getName()), "cache.json");
 
         String packCache = Utils.getGson().toJson(info);
-
         try {
             FileUtils.writeStringToFile(cacheFile, packCache, StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -173,6 +174,11 @@ public class ModpackCachePlatformApi implements IPlatformApi {
     @Override
     public String getPlatformUri(String packSlug) {
         return innerApi.getPlatformUri(packSlug);
+    }
+
+    @Override
+    public Map<String, Platform> getMap() {
+        return innerApi.getMap();
     }
 
     @Override
