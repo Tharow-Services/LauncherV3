@@ -80,8 +80,6 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
     private final IPlatformApi platformApi;
     private final ISolderApi solderApi;
 
-
-    private boolean hasShownStreamInfo = false;
     private JPanel widgetList;
     private ModpackInfoPanel modpackInfoPanel;
     private LauncherFrame launcherFrame;
@@ -186,7 +184,6 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         platformApi.getMap().forEach((ignored, platform)->{
             searchList.addItem(platform);
         });
-        searchList.setSelectedIndex((settings.getBuildStream().equals("beta"))?1:0);
         searchList.addActionListener(e -> changeStream());
     }
 
@@ -270,7 +267,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
     }
 
     protected void addModpackInternal(ModpackModel modpack) {
-        @SuppressWarnings("unchecked") final ModpackWidget widget = new ModpackWidget(resources, modpack, iconRepo.startImageJob(modpack));
+        final ModpackWidget widget = new ModpackWidget(resources, modpack, iconRepo.startImageJob(modpack));
 
         if (modpack.hasRecommendedUpdate()) {
             widget.setToolTipText(resources.getString("launcher.packselector.updatetip"));
@@ -379,7 +376,6 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
                             }
 
                             iconRepo.refreshRetry(refreshWidget.getModpack());
-                            //noinspection unchecked
                             refreshWidget.updateFromPack(iconRepo.startImageJob(refreshWidget.getModpack()));
 
                             EventQueue.invokeLater(() -> {
@@ -591,18 +587,5 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             invalidate();
             repaint();
         });
-    }
-
-
-    protected boolean optionWarning(){
-        int tempint = JOptionPane.showOptionDialog(this.launcherFrame,  "Warning Adding Technic Packs Using Search\nIs known to cause issues use at your own risk\nif Accepted This will not come up again", "Warning Technic Packs", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, UIManager.getIcon("OptionPane.warningIcon"), new String[]{"I Understand","Cancel"}, "Cancel");
-        switch (tempint){
-            case JOptionPane.OK_OPTION : Utils.getLogger().warning("Ok Option"); break;
-            case JOptionPane.NO_OPTION : Utils.getLogger().warning("No Option"); break;
-            case JOptionPane.CANCEL_OPTION : Utils.getLogger().warning("Cancel Option"); break;
-            case JOptionPane.CLOSED_OPTION : Utils.getLogger().warning("Closed option"); break;
-            default : throw new IllegalStateException("Unexpected value: " + tempint);
-        }
-        return tempint == JOptionPane.OK_OPTION;
     }
 }

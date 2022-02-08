@@ -40,6 +40,7 @@ public class TantalumLauncherDirectories implements LauncherDirectories {
     public File getRuntimesDirectory() {return getDirectoryBase("runtimes");}
     public File getWorldsDirectory() {return getDirectoryBase("worlds");}
     public File getLogsDirectory() {return  getDirectoryBase("logs");}
+    public File getPacksCache() {return getDirectoryBase(getAssetsDirectory(),"packs");}
     public File getLauncherAssetsDirectory() {return getDirectoryBase(getAssetsDirectory(),"launcher");}
 
 

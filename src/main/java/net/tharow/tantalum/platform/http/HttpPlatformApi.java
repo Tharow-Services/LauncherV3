@@ -1,77 +1,28 @@
-/*
- * This file is part of Technic Launcher Core.
- * Copyright ©2015 Syndicate, LLC
- *
- * Technic Launcher Core is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Technic Launcher Core is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License,
- * as well as a copy of the GNU Lesser General Public License,
- * along with Technic Launcher Core.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package net.tharow.tantalum.platform.http;
 
-import net.tharow.tantalum.github.io.RepoReleasesData;
-import net.tharow.tantalum.launcher.io.Platform;
-import net.tharow.tantalum.launcher.io.TantalumPlatformStore;
-import net.tharow.tantalum.launchercore.TantalumConstants;
-import net.tharow.tantalum.launchercore.logging.Level;
 import net.tharow.tantalum.launchercore.logging.Logger;
 import net.tharow.tantalum.platform.IPlatformApi;
-import net.tharow.tantalum.platform.IPlatformSearchApi;
-import net.tharow.tantalum.platform.io.INewsData;
+import net.tharow.tantalum.platform.IPlatformInfo;
 import net.tharow.tantalum.platform.io.NewsData;
 import net.tharow.tantalum.platform.io.PlatformPackInfo;
-import net.tharow.tantalum.platform.io.SearchResultsData;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.utilslib.Utils;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-
-public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
-    private static final Logger l = Logger.getLogger("Platform API");
+public class HttpPlatformApi implements IPlatformApi {
+    private final static Logger l = Logger.getLogger("HttpPlatformApi");
     static {
         l.setParent(Utils.getLogger());
+        l.setLevel(Utils.getLogger().getLevel());
     }
-    private static final String buildnumber = TantalumConstants.getBuildNumber().getBuildNumber();
-    private final TantalumPlatformStore store;
+    private final IPlatformInfo platform;
 
-
-    public HttpPlatformApi(TantalumPlatformStore store){
-        this.store = store;
-        l.log(Level.CONSTRUCTOR, "Tantalum Platform API Was Constructed");
+    public HttpPlatformApi(IPlatformInfo platform) {
+        this.platform = platform;
     }
 
-    public Map<String, Platform> getMap(){
-        return store.getMap();
-    }
-
-    @Deprecated
     public String getPlatformUri(String packSlug) {
-        return null;
-    }
-
-    public String getPlatformUri(String platform, String packSlug){
-        return getPlatformUri(platform,packSlug, Integer.parseInt(buildnumber));
-    }
-
-    @Contract(pure = true)
-    private @NotNull String getPlatformUri(String platform, String packSlug, int buildnumber){
-        String temp = platform.endsWith("/") ? "modpack/":"/modpack/";
-        return platform + temp + packSlug + "/?build="+ buildnumber;
+        return platform.get() + "modpack/" + packSlug + "?build="+platform.getBuild();
     }
 
     @Override
@@ -81,107 +32,30 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
 
     @Override
     public PlatformPackInfo getPlatformPackInfo(String packSlug) throws RestfulAPIException {
-        l.entering(this.getClass(), "getPlatformPackInfo(String packSlug)",packSlug);
-        //Utils.getLogger().warning("Using old get platform uri method please don't use this");
-        l.debug("Trying to find modpack with slug of: "+packSlug);
-        //Check Slug dict for the slug, so we can skip this//
-        if (this.store.getSlugHost(packSlug) != null) {
-            l.debug("The Slug of: "+packSlug+" was found in the slug dict");
-            PlatformPackInfo temp = RestObject.getRestObject(PlatformPackInfo.class,getPlatformUri(store.getSlugUrl(packSlug),packSlug));
-            l.exiting(this.getClass(), "getPlatformPackInfo(String packSlug)",temp);
-            return temp;
-        }
-        l.debug("The pack wasn't found in dict trying our known platforms");
-        //Time to Check our Platforms to see if any of them have this pack//
-        for (String hosts : this.store.getHosts()) {
-            Platform hostPlatform = store.getHostPlatform(hosts);// the last time we should need to access the store
-            PlatformPackInfo packInfo = getPlatformSlugPack(hostPlatform, packSlug);
-            if (packInfo != null) {
-                store.putSlug(packSlug, hosts); // if it was found add it to the dict
-                l.debug("Found the modpack adding to dict and Returning");
-                l.exiting(this.getClass(), "getPlatformPackInfo(String packSlug)", packInfo);
-                return packInfo;
-            }
-        }
-        // Utils.logDebug("Unable to find modpack");
-        l.exiting(this.getClass(), "getPlatformPackInfo(String packSlug)", new RestfulAPIException("Unable to find Modpack"));
-        throw new RestfulAPIException("Unable To Find Modpack");
-    }
-    protected PlatformPackInfo getPlatformSlugPack(@NotNull Platform platform,@NotNull String packSlug){
-        l.entering(this.getClass(),"getPlatformSlugPack(Platform,String)", new Object[]{platform,packSlug});
-        final String name = platform.getName();
-        final String platformUrl = getPlatformUri(platform.getUrl(), packSlug, platform.getBuild());
-        Utils.getLogger().info("Trying to get modpack with Slug: " + packSlug + " From: " + name);
-        l.debug("With Url: "+platformUrl);
-        PlatformPackInfo newPack = null;
-        try {
-            newPack = RestObject.getRestObject(PlatformPackInfo.class, platformUrl);
-        } catch (RestfulAPIException e) {
-            Utils.getLogger().warning("Platform: "+ name +" Gave us an Error: " + e.getMessage());
-            //e.printStackTrace();
-        }
-        if (newPack != null) {
-            if (!newPack.hasError()) {
-                Utils.getLogger().info("Got Modpack: " + newPack.getDisplayName() + " From Platform: "+name);
-                l.debug("With Url of "+platformUrl);
-            } else {
-                l.severe("The modpack from: "+name+" has an error: "+newPack.getError()+" Discarding Modpack");
-            }
-        } else {
-            l.debug("The Modpack from "+name+" was null ");
-        }
-        l.exiting(this.getClass(),"getPlatformSlugPack(Platform,String)", newPack);
-        return newPack;
+        String url = getPlatformUri(packSlug);
+        return RestObject.getRestObject(PlatformPackInfo.class, url);
     }
 
     @Override
     public void incrementPackRuns(String packSlug) {
-        l.entering(this.getClass(), "incrementPackRuns(String packSlug)",packSlug);
-        l.debug("Incrementing Pack Runs for slug: "+packSlug);
-        final String platformUrl = store.getSlugUrl(packSlug);
-        if (platformUrl == null) {
-            l.severe("While Trying to increment pack runs, we were unable to find the owner of the modpack slug: "+packSlug);
-            return;
-        }
-        String url = platformUrl + "modpack/" + packSlug + "/run?build=" + buildnumber;
+        String url = platform.get() + "modpack/" + packSlug + "/stat/run?build="+platform.getBuild();
         Utils.pingHttpURL(url);
     }
 
     @Override
     public void incrementPackInstalls(String packSlug) {
-        Utils.logDebug("Incrementing Pack Installs for Slug: "+packSlug);
-        final String platformUrl = store.getSlugUrl(packSlug);
-        if (platformUrl == null) {
-            l.severe("While Trying to increment pack installs, we were unable to find the owner of the modpack slug: "+packSlug);
-            return;
-        }
-        String url = platformUrl + "modpack/" + packSlug + "/install?build=" + buildnumber;
+        String url = platform.get() + "modpack/" + packSlug + "/stat/install?build="+platform.getBuild();
         Utils.pingHttpURL(url);
     }
 
-
-    public static @NotNull NewsData getTechnicNews() throws RestfulAPIException{
-        return RestObject.getRestObject(NewsData.class, "https://api.technicpack.net/news?build=" + buildnumber);
-    }
-
-    public static @NotNull INewsData getNews() throws RestfulAPIException{
-        return RepoReleasesData.getRestObject("https://api.github.com/repos/Tharow-Services/Tantalum-Launcher/releases");
+    @Override
+    public void incrementPackLikes(String packSlug) {
+        String url = platform.get() + "modpack/" + packSlug + "/stat/like?build="+platform.getBuild();
     }
 
     @Override
-    public SearchResultsData getSearchResults(String searchTerm) throws RestfulAPIException {
-        return getSearchResults(searchTerm, "https://tantalum-auth.azurewebsites.net/platform/", Integer.parseInt(buildnumber));
-    }
-
-    public static @NotNull SearchResultsData getFeaturedPacks(String platform) throws RestfulAPIException {
-        String url = platform + "search?featured&build=" + buildnumber;
-        return RestObject.getRestObject(SearchResultsData.class, url);
-    }
-
-    public static @NotNull SearchResultsData getSearchResults(@NotNull String searchTerm, String platform, int buildnumber) throws RestfulAPIException
-    {
-        String url = platform + "search?q=" + Utils.urlEncoder(searchTerm.trim()) + "&build=" + buildnumber;
-        l.logp(Level.CONFIG, HttpPlatformApi.class.getSimpleName(), "getSearchResults(@NotNull String, String, int)", url);
-        return RestObject.getRestObject(SearchResultsData.class, url);
+    public NewsData getNews() throws RestfulAPIException {
+        String url = platform.get() + "news?build="+platform.getBuild();
+        return RestObject.getRestObject(NewsData.class, url);
     }
 }

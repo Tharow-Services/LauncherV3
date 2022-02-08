@@ -139,9 +139,9 @@ public class Logger extends java.util.logging.Logger {
 
     @Ignore
     public static void demoLevels(){
-        //for (Level level : Level.AllLevels) {
-        //    Utils.getLogger().log(level, "This Is Logging Level: "+level.getName().toLowerCase(Locale.ROOT));
-        //}
+        for (Level level : Level.AllLevels) {
+            Utils.getLogger().log(level, "This Is Logging Level: "+level.getName().toLowerCase(Locale.ROOT));
+        }
     }
 
 }

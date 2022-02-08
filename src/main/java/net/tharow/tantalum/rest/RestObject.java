@@ -45,7 +45,6 @@ public class RestObject {
 
     public static <T extends RestObject> @NotNull T getRestObject(Class<T> restObject, String url) throws RestfulAPIException {
         try {
-
             URLConnection conn = new URL(url).openConnection();
             conn.setRequestProperty("User-Agent", TantalumConstants.getUserAgent());
             conn.setConnectTimeout(15000);

@@ -1,11 +1,21 @@
 package net.tharow.tantalum.platform;
 
-public interface IPlatformInfo {
+import java.util.function.Supplier;
+
+public interface IPlatformInfo extends Supplier<String> {
 
     String getName();
 
-    int getBuild();
+    String getAccessCode();
+
+    String getAccessVerb();
 
     String getVersion();
+
+    String get();
+
+    boolean isOffline();
+
+    void refresh();
 
 }

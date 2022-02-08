@@ -32,7 +32,7 @@ public class ImageRepository<T> {
         this.store = store;
     }
 
-    public ImageJob startImageJob(T key) {
+    public ImageJob<T> startImageJob(T key) {
         String jobKey = store.getJobKey(key);
 
         ImageJob<T> job = null;

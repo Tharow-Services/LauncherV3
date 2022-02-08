@@ -347,7 +347,7 @@ public class LauncherMain {
         Utils.getLogger().info("Identified as "+ OperatingSystem.getOperatingSystem().getName());
         Utils.getLogger().info("Java: " + System.getProperty("java.version") + " " + JavaUtils.getJavaBitness() + "-bit (" + System.getProperty("os.arch") + ")");
         Utils.getLogger().info("Launcher Build: " + TantalumConstants.getBuildNumber().getBuildNumber());
-        //Logger.demoLevels();
+        Logger.demoLevels();
         final String[] domains = {"tantalum.tharow.net","tantalum-auth.azurewebsites.net","minecraft.net", "session.minecraft.net", "textures.minecraft.net", "libraries.minecraft.net", "authserver.mojang.com", "account.mojang.com", "technicpack.net", "launcher.technicpack.net", "api.technicpack.net", "mirror.technicpack.net", "solder.technicpack.net", "files.minecraftforge.net"};
         for (String domain : domains) {
             try {
@@ -493,6 +493,7 @@ public class LauncherMain {
             startupParameters.getPlatformUrl().add(0,"https://tantalum-auth.azurewebsites.net/platform/");
             startupParameters.getPlatformUrl().add(1, "https://api.technicpack.net/");
         }
+        platforms.put(new Platform("Tantalum Platform","Demo","https://tantalum-auth.azurewebsites.net/platform/",800));
         HttpPlatformApi httpPlatform = new HttpPlatformApi(platforms);
         //Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
         IPlatformApi platform = new ModpackCachePlatformApi(httpPlatform, 60 * 60, directories);
