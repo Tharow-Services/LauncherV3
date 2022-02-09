@@ -47,7 +47,7 @@ public class Authlib {
     }
 
     protected void init() {
-        synchronized (authlibServer.getMap()) {
+        synchronized (authlibServer) {
             for (Map.Entry<UUID, AuthlibServer> entry : authlibServer.getMap().entrySet()) {
                 UUID uuid = entry.getKey();
                 AuthlibServer authlibServer1 = entry.getValue();

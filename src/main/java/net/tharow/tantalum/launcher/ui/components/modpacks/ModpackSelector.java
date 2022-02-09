@@ -183,6 +183,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         }
         searchList.removeAllItems();
         tantalum.getPlatforms().forEach((platform)->searchList.addItem(platform));
+        searchList.setSelectedIndex(0);
         searchList.addActionListener(e -> changeStream());
     }
 
@@ -494,57 +495,6 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         currentSearchTimer = new Timer(500, e -> {
             String localSearchTag = searchText.trim();
 
-            String localSearchUrl = searchText.trim();
-            if (!localSearchUrl.startsWith("http://") && !localSearchUrl.startsWith("https://"))
-                localSearchUrl = "https://" + localSearchTag;
-            /*
-            try {
-                URI uri = new URI(localSearchUrl);
-                if (true){
-                    //throw new DisabledUntilFutureVersion("This Feature has been disabled until a future version\n in which in will be reimplemented");
-                } else
-                {
-                String host = uri.getHost();
-                String scheme = uri.getScheme();
-                if (host != null && scheme != null && (scheme.equals("http") || scheme.equals("https"))) {
-                    String path = uri.getPath();
-                    if (path.startsWith("/"))
-                        path = path.substring(1);
-                    if (path.endsWith("/"))
-                        path = path.substring(0, path.length() - 1);
-                    String[] fragments = path.split("/");
-
-                    if ((fragments.length == 2 && fragments[0].equals("modpack")) || (fragments.length == 3 && fragments[1].equals("modpack"))) {
-                        String slug = fragments[fragments.length - 1];
-
-                        Matcher siteMatcher = siteRegex.matcher(slug);
-                        if (siteMatcher.find()) {
-                            slug = siteMatcher.group(1);
-                        }
-
-                        Matcher slugMatcher = slugRegex.matcher(slug);
-                        if (slugMatcher.find()) {
-                            Utils.getLogger().warning("Http Search Site: " + scheme + host + "/" + " Slug: " + slug + " Search text: " + searchText);
-                            findMoreUrl = localSearchUrl;
-                            findMoreWidget.setWidgetData(resources.getString("launcher.packselector.api"));
-                            ArrayList<IPackSource> source = new ArrayList<>(1);
-                            source.add(new SinglePlatformSource(new HttpPlatformApi(new Platform()), solderApi, slug));
-                            Utils.logDebug("Whats Currently in the source: ");
-                            source.forEach(iPackSource -> Utils.logDebug(iPackSource.getSourceName()));
-                            currentLoadJob = packLoader.createRepositoryLoadJob(ModpackSelector.this, source, null, false);
-                            return;
-                        }
-                    }
-                }
-                }
-            } catch (URISyntaxException ex) {
-                //It wasn't a valid URI which is actually fine.
-            } catch (DisabledUntilFutureVersion ex) {
-                //ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, ex.getMessage(), "Feature Disabled",JOptionPane.ERROR_MESSAGE);
-                filterContents.setText("");
-            }
-            */
             String encodedSearch;
             ArrayList<IPackSource> sources = new ArrayList<>(2);
             sources.add(new NameFilterPackSource(defaultPacks, localSearchTag));
@@ -555,8 +505,9 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             } catch (UnsupportedEncodingException ignored) {}
             //findMoreUrl = selectedPlatform.getUrl()+"modpacks?q="+encodedSearch;
             findMoreWidget.setWidgetData(resources.getString("launcher.packselector.more"));
-
-            sources.add(new SearchResultPackSource(tantalum.getPlatformApi(selectedPlatform.get()), localSearchTag));
+            final HttpPlatformApi api = tantalum.getPlatformApi()
+            final SearchResultPackSource source = new SearchResultPackSource(tantalum.getPlatformApi(selectedPlatform.get()), localSearchTag);
+            sources.add(source);
             Utils.logDebug("Whats Currently in the source: ");
             sources.forEach(iPackSource -> Utils.logDebug(iPackSource.getSourceName()));
             //Debug.getConfig(this);

@@ -27,6 +27,7 @@ import net.tharow.tantalum.platform.io.SearchResult;
 import net.tharow.tantalum.platform.io.SearchResultsData;
 import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.rest.io.PackInfo;
+import net.tharow.tantalum.utilslib.Utils;
 
 import java.util.*;
 
@@ -38,6 +39,7 @@ public class SearchResultPackSource implements IPackSource {
     public SearchResultPackSource(IPlatformSearchApi searchApi, String searchTerms) {
         this.platform = searchApi;
         this.searchTerms = searchTerms;
+        Utils.getLogger().constructor("Built "+getSourceName());
     }
 
     @Override
@@ -54,6 +56,7 @@ public class SearchResultPackSource implements IPackSource {
         try {
             results = platform.getSearchResults(searchTerms);
         } catch (RestfulAPIException ex) {
+            ex.printStackTrace();
             return Collections.emptySet();
         }
 

@@ -50,7 +50,7 @@ public final class StartupParameters {
     private String solder = null;
     @Parameter(names = {"-platform","-p"}, description = "Add A Platform To the list")
     private List<String> platform = new ArrayList<>();
-    @Parameter(names = {"-overrideRoots"}, description = "Force the override of root ca Certificates")
+    @Parameter(names = {"-overrideRoots","-orca"}, description = "Force the override of root ca Certificates")
     private boolean overrideRoots = false;
     @Parameter(names = {"-modpackFile","-mf"}, description = "Install a modpack from file", converter = FileConverter.class)
     private File modpackFile = null;

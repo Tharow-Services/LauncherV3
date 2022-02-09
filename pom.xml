@@ -30,7 +30,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>${project.groupId}.${project.artifactId}.LauncherMain</mainClass>
-        <buildNumber>220</buildNumber>
+        <buildNumber>230</buildNumber>
         <revision>5.1-${buildNumber}</revision>
     </properties>
 
@@ -100,17 +100,21 @@
     <!-- Project dependencies -->
     <dependencies>
         <!-- Included in final JAR -->
+        <!--
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.13</version>
+            <version>1.7.35</version>
         </dependency>
+        -->
 
+        <!--
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.33</version>
+            <version>1.7.35</version>
         </dependency>
+        -->
 
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -118,11 +122,6 @@
             <version>1.7.1</version>
         </dependency>
 
-        <!--<dependency>
-            <groupId>com.github.thaliproject.Tor_Onion_Proxy_Library</groupId>
-            <artifactId>java</artifactId>
-            <version>master-v0.0.0-g71dc2a1-111</version>
-        </dependency> -->
 
         <dependency>
             <groupId>joda-time</groupId>
@@ -133,7 +132,7 @@
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.81</version>
+            <version>1.82</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -184,33 +183,33 @@
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client</artifactId>
-            <version>1.32.1</version>
+            <version>1.33.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.32.1</version>
+            <version>1.33.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client</artifactId>
-            <version>1.40.1</version>
+            <version>1.41.2</version>
         </dependency>
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-gson</artifactId>
-            <version>1.40.1</version>
+            <version>1.41.2</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>commons-logging-jboss-logging</artifactId>
             <version>1.0.0.Final</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>

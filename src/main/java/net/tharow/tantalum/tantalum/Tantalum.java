@@ -110,6 +110,7 @@ public class Tantalum implements IAuthoritativePackSource, IPlatformApi {
 
     public void addPlatform(String url, String accessVerb, String accessCode) throws RestfulAPIException, RequiresAccessCode {
         final Platform platform = new Platform(url, accessVerb, accessCode);
+        logger.constructor("Added New Platform");
         this.platformApi.put(platform.get(), new HttpPlatformApi(platform));
         this.store.put(platform);
     }
@@ -119,6 +120,7 @@ public class Tantalum implements IAuthoritativePackSource, IPlatformApi {
     }
 
     public HttpPlatformApi getPlatformApi(UUID uuid){
+        if (!platformApi.containsKey(uuid)) 
         return platformApi.get(uuid);
     }
 

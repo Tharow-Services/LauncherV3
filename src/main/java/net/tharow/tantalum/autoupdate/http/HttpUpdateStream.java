@@ -27,11 +27,8 @@ import net.tharow.tantalum.rest.RestfulAPIException;
 import java.net.URL;
 
 public class HttpUpdateStream implements IUpdateStream {
-    private final URL baseUrl;
 
-    public HttpUpdateStream(URL baseUrl) {
-        this.baseUrl = baseUrl;
-    }
+    public HttpUpdateStream() {}
 
     @Override
     public StreamVersion getStreamVersion(String stream) throws RestfulAPIException {
@@ -40,6 +37,6 @@ public class HttpUpdateStream implements IUpdateStream {
 
     @Override
     public StreamVersion getStreamVersion() throws RestfulAPIException {
-        return RestObject.getRestObject(StreamVersion.class, baseUrl.toString());
+        return RestObject.getRestObject(StreamVersion.class, "https://raw.githubusercontent.com/Tharow-Services/Tantalum-Mirror/master/stable4.json");
     }
 }

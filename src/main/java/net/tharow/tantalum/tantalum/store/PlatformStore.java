@@ -27,7 +27,7 @@ public class PlatformStore implements IStore {
     private final Map<String, UUID> slugDictionary = new Hashtable<>();
     private final List<String> bySlug = new ArrayList<>();
 
-    private static Logger l = Logger.getLogger("Platform Store");
+    private static final Logger l = Logger.getLogger("Platform Store");
     static {
         l.setParent(Utils.getLogger());
         l.setLevel(Utils.getLogger().getLevel());
@@ -44,10 +44,13 @@ public class PlatformStore implements IStore {
         });
     }
 
-    public static @NotNull PlatformStore load(@NotNull File jsonFile) {
+    private static void loggerInit(){
         l.setParent(Utils.getLogger());
         l.setLevel(Utils.getLogger().getLevel());
+    }
 
+    public static @NotNull PlatformStore load(@NotNull File jsonFile) {
+        loggerInit();
         if (!jsonFile.exists()) {
             l.log(Level.WARNING, "Unable to load Platforms from " + jsonFile + " because it does not exist.");
             return new PlatformStore(jsonFile);

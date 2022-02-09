@@ -13,6 +13,7 @@ import net.tharow.tantalum.utilslib.Utils;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URLEncoder;
+import java.util.Objects;
 
 public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
     private final static Logger l = Logger.getLogger("Http Platform Api");
@@ -24,13 +25,14 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
     private final IPlatformInfo platform;
 
     public HttpPlatformApi(@NotNull IPlatformInfo platform) {
+        l.constructor("Building HttpPlatform Api From "+platform);
         this.platform = platform;
         this.access = ((platform.getAccessVerb() == null)?"":'?'+platform.getAccessVerb()+'='+platform.getAccessCode());
     }
 
     @Override
     public String getPlatformUri(String packSlug) {
-        return platform.getUrl() + "modpack/" + packSlug + access;
+        return platform.getUrl() + "modpack/" + packSlug + '/' + access;
     }
 
     @Override
@@ -46,31 +48,39 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
 
     @Override
     public void incrementPackRuns(String packSlug) {
-        String url = platform.get() + "modpack/" + packSlug + "/stat/run"+this.access;
+        String url = platform.getUrl() + "modpack/" + packSlug + "/stat/run"+this.access;
         Utils.pingHttpURL(url);
     }
 
     @Override
     public void incrementPackInstalls(String packSlug) {
-        String url = platform.get() + "modpack/" + packSlug + "/stat/install" + this.access;
+        String url = platform.getUrl() + "modpack/" + packSlug + "/stat/install" + this.access;
         Utils.pingHttpURL(url);
     }
 
     @Override
     public void incrementPackLikes(String packSlug) {
-        String url = platform.get() + "modpack/" + packSlug + "/stat/like" + this.access;
+        String url = platform.getUrl() + "modpack/" + packSlug + "/stat/like" + this.access;
         Utils.pingHttpURL(url);
     }
 
     @Override
     public NewsData getNews() throws RestfulAPIException {
-        String url = platform.get() + "news"+'?'+this.access;
+        String url = platform.getUrl() + "news"+'?'+this.access;
         return RestObject.getRestObject(NewsData.class, url);
     }
 
     @Override
     public SearchResultsData getSearchResults(String searchTerm) throws RestfulAPIException {
-        String url = platform.get() + "search?q=" + Utils.urlEncode(searchTerm) + this.access.replaceFirst("\\?","&");
+        String url = platform.getUrl() + "search?q=" + Utils.urlEncode(searchTerm) + this.access.replaceFirst("\\?","&");
         return RestObject.getRestObject(SearchResultsData.class, url);
+    }
+
+    @Override
+    public String toString() {
+        return "HttpPlatformApi{" +
+                "access='" + access + '\'' +
+                ", platform=" + platform +
+                '}';
     }
 }

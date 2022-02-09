@@ -26,18 +26,20 @@ import net.tharow.tantalum.utilslib.Utils;
 import java.net.URL;
 
 public class TantalumConstants {
-    public static final String technicURL = "https://mirror.technicpack.net/Technic/";
-    public static final String technicVersions = "https://tantalum.tharow.net/launcher/version/";
+    public static final String technicURL = "https://raw.githubusercontent.com/Tharow-Services/Technic/master/";
+    public static final String technicVersions = "https://raw.githubusercontent.com/Tharow-Services/Tantalum-Mirror/master/version/";
     public static final String technicFmlLibRepo = technicURL + "lib/fml/";
     public static final String technicForgeRepo = technicURL + "lib/";
     public static final String forgeMavenRepo = "https://files.minecraftforge.net/maven/";
-    public static final String JAVA_RUNTIMES = "https://download.mcbbs.net/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json";
-    public static final String MINECRAFT_ASSETS = "https://download.mcbbs.net/assets/";
+    public static final String JAVA_RUNTIMES = "https://raw.githubusercontent.com/Tharow-Services/Tantalum-Mirror/master/runtimes/all.json";
+    public static final String MINECRAFT_ASSETS = "https://raw.githubusercontent.com/Tharow-Services/Tantalum-Mirror/master/assets/objects/";
 
     public static final String[] FALLBACK_MIRROR = {
-            "https://libraries.minecraft.net/",
-            "https://files.minecraftforge.net/maven/",
-            "https://mirror.technicpack.net/Technic/lib/",
+            "https://libraries.minecraft.net/", // Default Minecraft Mirror
+            "https://files.minecraftforge.net/maven/", // Default Forge Mirror
+            "https://mirror.technicpack.net/Technic/lib/", // Technic Platform Mirror
+            "https://raw.githubusercontent.com/Tharow-Services/Technic/master/lib/", // Alt Technic Mirror
+            "https://raw.githubusercontent.com/Tharow-Services/Tantalum-Mirror/master/maven/", // Tantalum Mirror
             "https://download.mcbbs.net/maven/",
     };
 

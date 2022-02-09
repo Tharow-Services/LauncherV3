@@ -47,7 +47,8 @@ import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
 import net.tharow.tantalum.launchercore.image.face.MinotarFaceImageStore;
 import net.tharow.tantalum.launchercore.image.face.WebAvatarImageStore;
-import net.tharow.tantalum.launchercore.install.*;
+import net.tharow.tantalum.launchercore.install.LauncherDirectories;
+import net.tharow.tantalum.launchercore.install.ModpackInstaller;
 import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.launch.java.source.FileJavaSource;
 import net.tharow.tantalum.launchercore.launch.java.source.InstalledJavaSource;
@@ -81,9 +82,10 @@ import net.tharow.tantalum.ui.components.ConsoleHandler;
 import net.tharow.tantalum.ui.components.LoggerOutputStream;
 import net.tharow.tantalum.ui.controls.installation.SplashScreen;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
-import net.tharow.tantalum.utilslib.*;
+import net.tharow.tantalum.utilslib.JavaUtils;
+import net.tharow.tantalum.utilslib.OperatingSystem;
+import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.varia.NullAppender;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
@@ -94,7 +96,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -106,21 +109,10 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
 import java.util.stream.Collectors;
 
 public class LauncherMain {
-
-    public static URL UPDATE_URL;
-
-    static {
-        try {
-            UPDATE_URL = new URL("https://tantalum-auth.azurewebsites.net/");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static ConsoleFrame consoleFrame;
 
@@ -217,13 +209,13 @@ public class LauncherMain {
             Utils.getLogger().setLevel(Level.convert(params.getLogLevel()*100));
         }
 
-        setupDnsJava(directories);
+        //System.setProperty("dcm.config.filename","");
         //runProxySetup(settings);
         runStartupDebug(settings, params);
         //injectNewRootCerts();
         injectNewRootCerts(settings.getForceOverrideRootCerts() || params.isOverrideRoots() || ComputerInfo.isSchoolEnv());
         //startLauncher(settings, params, directories, resources);
-        Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream(UPDATE_URL), build, directories, resources, params);
+        Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream(), build, directories, resources, params);
         try {
             if (launcher.runAutoUpdater())
                 startLauncher(settings, params, directories, resources);
@@ -237,25 +229,6 @@ public class LauncherMain {
 
 
     }
-
-    public static void setupDnsJava(final @NotNull LauncherDirectories directories) {
-        //System.setProperty("dns.server","8.8.8.8, localhost:9150, dns.google");
-        //DnsCacheManipulator.loadDnsCacheConfig("dns.properties");
-
-        Properties properties = new Properties();
-        try {
-            properties.loadFromXML(new FileInputStream(new File(directories.getLauncherAssetsDirectory(), "dnsCache.xml")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //InputStream inputStream new FileInputStream(new File(directories.getLauncherAssetsDirectory(), "dnsCache.xml"));
-        DnsCacheManipulator.setDnsCache(properties);
-        DnsCacheManipulator.getWholeDnsCache().getCache().forEach((dnsCacheEntry -> {
-            Utils.getLogger().config(dnsCacheEntry.toString());
-        }));
-
-    }
-
 
     public static void runProxySetup(@NotNull TantalumSettings settings2) {
         if(settings2.getUseTorRelay()){
@@ -328,9 +301,9 @@ public class LauncherMain {
             System.setOut(new PrintStream(new LoggerOutputStream(console, Level.WARNING, logger), true));
             System.setErr(new PrintStream(new LoggerOutputStream(console, Level.SEVERE, logger), true));
         }
-        org.apache.log4j.LogManager.getRootLogger().addAppender(new NullAppender());
-        org.apache.log4j.LogManager.getRootLogger().setLevel(org.apache.log4j.Level.ALL);
-        org.apache.log4j.LogManager.getRootLogger().info("Apache Logger Has Initialised");
+        //org.apache.log4j.LogManager.getRootLogger().addAppender(new org.apache.log4j.varia.NullAppender());
+        //org.apache.log4j.LogManager.getRootLogger().setLevel(org.apache.log4j.Level.ALL);
+        //org.apache.log4j.LogManager.getRootLogger().info("Apache Logger Has Initialised");
         //org.apache.log4j.LogManager.shutdown();
         //logger.setParent(Logger.getGlobal());
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -437,6 +410,10 @@ public class LauncherMain {
         UIManager.put( "ComboBox.disabledForeground", LauncherFrame.COLOR_GREY_TEXT );
         System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
 
+        DnsCacheManipulator.clearDnsCache();
+
+        //DnsCacheManipulator.loadDnsCacheConfig("net.tharow.tantalum.resources.dns-cache.properties");
+
         //setupDnsJava(directories);
 
         // runProxySetup(settings, directories.getTorRelayDirectory()); //Check and run proxy and custom dns settings
@@ -489,8 +466,10 @@ public class LauncherMain {
 
         Tantalum tantalum = Tantalum.init(directories, solder, 60 * 60);
         try {
-            tantalum.addPlatform("https://api.technicpack.net/", "build", "707");
-        } catch (RestfulAPIException | RequiresAccessCode e) {
+            //tantalum.addPlatform("https://api.technicpack.net/", "build", "707");
+            //tantalum.addPlatform("http://localhost/", "build", "800");
+            tantalum.addPlatform("https://tantalum-auth.azurewebsites.net/platform/", null, null);
+        } catch (IOException e) {
             e.printStackTrace();
         }
         //platforms.put(new Platform("Tantalum Platform","Demo","https://tantalum-auth.azurewebsites.net/platform/",800));

@@ -17,7 +17,6 @@ import net.tharow.tantalum.utilslib.UUID5;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.log4j.lf5.util.DateFormatManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

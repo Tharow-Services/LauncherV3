@@ -50,15 +50,19 @@ public class Platform extends RestObject implements IPlatformInfo {
         this.accessVerb = null;
         test();
     }
+
     private void test() throws RestfulAPIException, RequiresAccessCode {
         test(this);
     }
 
     private static void test(Platform platform) throws RestfulAPIException, RequiresAccessCode {
         RestObject restObject;
+        Utils.getLogger().constructor("Testing Current Pack");
         if (platform.accessVerb == null){
+            Utils.getLogger().warning("Testing Public Pack");
             restObject = RestObject.getRestObject(RestObject.class, platform.url + "news");
         } else {
+            Utils.getLogger().warning("Testing Private Pack");
             restObject = RestObject.getRestObject(RestObject.class, platform.url + "news?"+platform.accessVerb+'='+platform.accessCode);
         }
         if (restObject.hasError()) throw new RequiresAccessCode("Accessing News Api For Platform: "+platform.name+ " With Error: "+ restObject.getError());

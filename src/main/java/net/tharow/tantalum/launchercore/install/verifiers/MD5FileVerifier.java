@@ -40,7 +40,7 @@ public class MD5FileVerifier implements IFileVerifier {
         boolean hashMatches = md5Hash.equalsIgnoreCase(resultMD5);
 
         if (!hashMatches)
-            Utils.getLogger().warning("MD5 verification for " + file + " failed. Expected " + md5Hash + ", got " + resultMD5);
+            System.out.println("MD5 verification for " + file + " failed. Expected " + md5Hash + ", got " + resultMD5);
 
         return hashMatches;
     }

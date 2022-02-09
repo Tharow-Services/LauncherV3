@@ -97,6 +97,7 @@ public class QueryUpdateStream implements IInstallTask {
 
             downloadTasks.addTask(new DownloadUpdate(updateUrl, relauncher, postDownloadTasks));
         } catch (RestfulAPIException ex) {
+            ex.printStackTrace();
         }
     }
 }

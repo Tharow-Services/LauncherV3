@@ -42,7 +42,7 @@ public enum OperatingSystem {
         String path = System.getProperty("java.home") + separator + "bin" + separator;
 
         if (getOperatingSystem() == WINDOWS) {
-            return path + "javaw.exe";
+            return path + "java.exe";
         }
 
         return path + "java";
