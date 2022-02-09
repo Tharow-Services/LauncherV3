@@ -1,53 +1,37 @@
-/*
- * This file is part of Technic Launcher Core.
- * Copyright ©2015 Syndicate, LLC
- *
- * Technic Launcher Core is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Technic Launcher Core is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License,
- * as well as a copy of the GNU Lesser General Public License,
- * along with Technic Launcher Core.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package net.tharow.tantalum.platform.cache;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonSyntaxException;
-import net.tharow.tantalum.launcher.io.Platform;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.platform.IPlatformApi;
+import net.tharow.tantalum.platform.IPlatformPackApi;
 import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.INewsData;
+import net.tharow.tantalum.platform.io.NewsData;
 import net.tharow.tantalum.platform.io.PlatformPackInfo;
 import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
-public class ModpackCachePlatformApi implements IPlatformApi {
+public class ModpackCachePlatformApi implements IPlatformPackApi {
 
-    private final IPlatformApi innerApi;
     private final Cache<String, PlatformPackInfo> cache;
     private final Cache<String, Boolean> deadPacks;
     private final Cache<String, PlatformPackInfo> foreverCache;
     private final LauncherDirectories directories;
 
-    public ModpackCachePlatformApi(IPlatformApi innerApi, int cacheInSeconds, LauncherDirectories directories) {
-        this.innerApi = innerApi;
+    public ModpackCachePlatformApi(int cacheInSeconds, LauncherDirectories directories) {
         this.directories = directories;
         cache = CacheBuilder.newBuilder()
                 .concurrencyLevel(4)
@@ -80,7 +64,7 @@ public class ModpackCachePlatformApi implements IPlatformApi {
             return null;
 
         if (info == null) {
-            info = pullAndCache(packSlug);
+            throw new RestfulAPIException("Not In Cache");
         }
 
         return info;
@@ -93,18 +77,11 @@ public class ModpackCachePlatformApi implements IPlatformApi {
         if (info == null && isDead(packSlug))
             return getDeadPackInfo(packSlug);
 
-        try {
-            if (info == null) {
-                info = pullAndCache(packSlug);
-            }
-        } catch (RestfulAPIException ex) {
-            ex.printStackTrace();
-
-            deadPacks.put(packSlug, true);
-            return getDeadPackInfo(packSlug);
-        }
-
         return info;
+    }
+
+    public void setDeadPack(String slug){
+        deadPacks.put(slug, true);
     }
 
     protected PlatformPackInfo getDeadPackInfo(String packSlug) {
@@ -125,24 +102,14 @@ public class ModpackCachePlatformApi implements IPlatformApi {
         return isDead != null && isDead;
     }
 
-    private PlatformPackInfo pullAndCache(String packSlug) throws RestfulAPIException {
-        PlatformPackInfo info = null;
-        try {
-            info = innerApi.getPlatformPackInfoForBulk(packSlug);
-
-            if (info != null) {
-                cache.put(packSlug, info);
-                foreverCache.put(packSlug, info);
-                saveForeverCache(info);
-            }
-        } finally {
-            deadPacks.put(packSlug, info == null);
-        }
-
-        return info;
+    public void put(@NotNull PlatformPackInfo packInfo){
+        cache.put(packInfo.getName(), packInfo);
+        foreverCache.put(packInfo.getName(), packInfo);
+        saveForeverCache(packInfo);
+        deadPacks.put(packInfo.getName(), false);
     }
 
-    private PlatformPackInfo loadForeverCache(String packSlug) {
+    private @Nullable PlatformPackInfo loadForeverCache(String packSlug) {
         File cacheFile = new File(new File(new File(directories.getAssetsDirectory(), "packs"), packSlug), "cache.json");
         if (!cacheFile.exists())
             return null;
@@ -161,37 +128,12 @@ public class ModpackCachePlatformApi implements IPlatformApi {
         }
     }
 
-    private void saveForeverCache(PlatformPackInfo info) {
+    private void saveForeverCache(@NotNull PlatformPackInfo info) {
         File cacheFile = new File(new File(new File(directories.getAssetsDirectory(), "packs"), info.getName()), "cache.json");
 
         String packCache = Utils.getGson().toJson(info);
         try {
             FileUtils.writeStringToFile(cacheFile, packCache, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-        }
-    }
-
-    @Override
-    public String getPlatformUri(String packSlug) {
-        return innerApi.getPlatformUri(packSlug);
-    }
-
-    @Override
-    public Map<String, Platform> getMap() {
-        return innerApi.getMap();
-    }
-
-    @Override
-    public void incrementPackRuns(String packSlug) {
-        innerApi.incrementPackRuns(packSlug);
-    }
-
-    @Override
-    public void incrementPackInstalls(String packSlug) {
-        innerApi.incrementPackInstalls(packSlug);
-    }
-
-    public INewsData getNews() throws RestfulAPIException {
-        return HttpPlatformApi.getNews();
+        } catch (IOException ignored) {}
     }
 }

@@ -18,12 +18,10 @@
 
 package net.tharow.tantalum.launcher.ui.components.modpacks;
 
-import net.tharow.tantalum.launcher.io.Platform;
 import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.launcher.ui.controls.modpacks.FindMoreWidget;
 import net.tharow.tantalum.launcher.ui.controls.modpacks.ModpackWidget;
-import net.tharow.tantalum.launcher.ui.listitems.StreamItem;
 import net.tharow.tantalum.launchercore.auth.IAuthListener;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
@@ -32,6 +30,7 @@ import net.tharow.tantalum.launchercore.modpacks.packinfo.CombinedPackInfo;
 import net.tharow.tantalum.launchercore.modpacks.sources.IPackSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.NameFilterPackSource;
 import net.tharow.tantalum.platform.IPlatformApi;
+import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.PlatformPackInfo;
 import net.tharow.tantalum.platform.packsources.SearchResultPackSource;
 import net.tharow.tantalum.platform.packsources.SinglePlatformSource;
@@ -39,6 +38,8 @@ import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.rest.io.PackInfo;
 import net.tharow.tantalum.solder.ISolderApi;
 import net.tharow.tantalum.solder.ISolderPackApi;
+import net.tharow.tantalum.tantalum.Tantalum;
+import net.tharow.tantalum.tantalum.io.Platform;
 import net.tharow.tantalum.ui.controls.TintablePanel;
 import net.tharow.tantalum.ui.controls.WatermarkTextField;
 import net.tharow.tantalum.ui.controls.borders.RoundBorder;
@@ -49,10 +50,10 @@ import net.tharow.tantalum.ui.lang.IRelocalizableResource;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.utilslib.DesktopUtils;
 import net.tharow.tantalum.ui.controls.SimpleDocumentListener;
+import net.tharow.tantalum.utilslib.DisabledUntilFutureVersion;
 import net.tharow.tantalum.utilslib.Utils;
 
 import javax.swing.*;
-import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -77,7 +78,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
     private final PackLoader packLoader;
     private final IPackSource defaultPackSource;
     private final ImageRepository<ModpackModel> iconRepo;
-    private final IPlatformApi platformApi;
+    private final Tantalum tantalum;
     private final ISolderApi solderApi;
 
     private JPanel widgetList;
@@ -131,12 +132,12 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
     private final TantalumSettings settings;
 
 
-    public ModpackSelector(ResourceLoader resources, PackLoader packLoader, IPackSource defaultPackSource, ISolderApi solderApi, IPlatformApi platformApi, ImageRepository<ModpackModel> iconRepo, TantalumSettings settings) {
+    public ModpackSelector(ResourceLoader resources, PackLoader packLoader, IPackSource defaultPackSource, ISolderApi solderApi, Tantalum tantalum, ImageRepository<ModpackModel> iconRepo, TantalumSettings settings) {
         this.resources = resources;
         this.packLoader = packLoader;
         this.iconRepo = iconRepo;
         this.defaultPackSource = defaultPackSource;
-        this.platformApi = platformApi;
+        this.tantalum = tantalum;
         this.solderApi = solderApi;
         this.settings = settings;
 
@@ -181,9 +182,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             searchList.removeActionListener(listener);
         }
         searchList.removeAllItems();
-        platformApi.getMap().forEach((ignored, platform)->{
-            searchList.addItem(platform);
-        });
+        tantalum.getPlatforms().forEach((platform)->searchList.addItem(platform));
         searchList.addActionListener(e -> changeStream());
     }
 
@@ -351,7 +350,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
                 @Override
                 public void run() {
                     try {
-                        PlatformPackInfo updatedInfo = platformApi.getPlatformPackInfo(refreshWidget.getModpack().getName());
+                        PlatformPackInfo updatedInfo = tantalum.getPlatformPackInfo(refreshWidget.getModpack().getName());
                         PackInfo infoToUse = updatedInfo;
 
                         if (updatedInfo != null && updatedInfo.hasSolder()) {
@@ -498,9 +497,13 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             String localSearchUrl = searchText.trim();
             if (!localSearchUrl.startsWith("http://") && !localSearchUrl.startsWith("https://"))
                 localSearchUrl = "https://" + localSearchTag;
-
+            /*
             try {
                 URI uri = new URI(localSearchUrl);
+                if (true){
+                    //throw new DisabledUntilFutureVersion("This Feature has been disabled until a future version\n in which in will be reimplemented");
+                } else
+                {
                 String host = uri.getHost();
                 String scheme = uri.getScheme();
                 if (host != null && scheme != null && (scheme.equals("http") || scheme.equals("https"))) {
@@ -508,11 +511,11 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
                     if (path.startsWith("/"))
                         path = path.substring(1);
                     if (path.endsWith("/"))
-                        path = path.substring(0, path.length()-1);
+                        path = path.substring(0, path.length() - 1);
                     String[] fragments = path.split("/");
 
                     if ((fragments.length == 2 && fragments[0].equals("modpack")) || (fragments.length == 3 && fragments[1].equals("modpack"))) {
-                        String slug = fragments[fragments.length-1];
+                        String slug = fragments[fragments.length - 1];
 
                         Matcher siteMatcher = siteRegex.matcher(slug);
                         if (siteMatcher.find()) {
@@ -521,11 +524,11 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
 
                         Matcher slugMatcher = slugRegex.matcher(slug);
                         if (slugMatcher.find()) {
-                            Utils.getLogger().warning("Http Search Site: " + scheme + host + "/" + " Slug: " +slug + " Search text: "+searchText);
+                            Utils.getLogger().warning("Http Search Site: " + scheme + host + "/" + " Slug: " + slug + " Search text: " + searchText);
                             findMoreUrl = localSearchUrl;
                             findMoreWidget.setWidgetData(resources.getString("launcher.packselector.api"));
                             ArrayList<IPackSource> source = new ArrayList<>(1);
-                            source.add(new SinglePlatformSource(platformApi, solderApi, slug));
+                            source.add(new SinglePlatformSource(new HttpPlatformApi(new Platform()), solderApi, slug));
                             Utils.logDebug("Whats Currently in the source: ");
                             source.forEach(iPackSource -> Utils.logDebug(iPackSource.getSourceName()));
                             currentLoadJob = packLoader.createRepositoryLoadJob(ModpackSelector.this, source, null, false);
@@ -533,10 +536,15 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
                         }
                     }
                 }
+                }
             } catch (URISyntaxException ex) {
                 //It wasn't a valid URI which is actually fine.
+            } catch (DisabledUntilFutureVersion ex) {
+                //ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Feature Disabled",JOptionPane.ERROR_MESSAGE);
+                filterContents.setText("");
             }
-
+            */
             String encodedSearch;
             ArrayList<IPackSource> sources = new ArrayList<>(2);
             sources.add(new NameFilterPackSource(defaultPacks, localSearchTag));
@@ -545,10 +553,10 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             try {
                 encodedSearch = URLEncoder.encode(encodedSearch, StandardCharsets.UTF_8.toString());
             } catch (UnsupportedEncodingException ignored) {}
-            findMoreUrl = selectedPlatform.getUrl()+"modpacks?q="+encodedSearch;
+            //findMoreUrl = selectedPlatform.getUrl()+"modpacks?q="+encodedSearch;
             findMoreWidget.setWidgetData(resources.getString("launcher.packselector.more"));
 
-            sources.add(new SearchResultPackSource(selectedPlatform.getUrl(), localSearchTag));
+            sources.add(new SearchResultPackSource(tantalum.getPlatformApi(selectedPlatform.get()), localSearchTag));
             Utils.logDebug("Whats Currently in the source: ");
             sources.forEach(iPackSource -> Utils.logDebug(iPackSource.getSourceName()));
             //Debug.getConfig(this);

@@ -19,6 +19,7 @@
 package net.tharow.tantalum.launcher.ui;
 
 import net.tharow.tantalum.autoupdate.IBuildNumber;
+import net.tharow.tantalum.github.io.RepoReleasesData;
 import net.tharow.tantalum.launcher.LauncherMain;
 import net.tharow.tantalum.launcher.settings.StartupParameters;
 import net.tharow.tantalum.launcher.ui.components.ModpackOptionsDialog;
@@ -200,7 +201,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         AtomicBoolean temp = new AtomicBoolean(false);
         Thread thread = new Thread(() -> {
             try {
-                HttpPlatformApi.getNews();
+                RepoReleasesData.getRestObject("https://api.github.com/repos/Tharow-Services/Tantalum-Launcher/releases");
                 temp.set(true);
             } catch (RestfulAPIException e) {
                 Utils.getLogger().log(Level.WARNING, "Unable to load news", e);

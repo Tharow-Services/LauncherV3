@@ -107,14 +107,10 @@ public class Utils {
         getLogger().log(Level.DEBUG,msg);
     }
 
-    /**
-     * If We Are Running in Debug mode this do this
-     * @param runnable what to run in debug
-     */
-    public static void doDebug(Runnable runnable){
-        if(TantalumConstants.isIsDebug()){
-            runnable.run();
-        }
+    public static String urlEncode(String string){
+        try {return URLEncoder.encode(string, "utf-8");}
+        catch (UnsupportedEncodingException ignored) {}
+        return URLEncoder.encode(string);
     }
 
     /**

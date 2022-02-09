@@ -28,16 +28,14 @@ import net.tharow.tantalum.platform.IPlatformApi;
 import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.NewsArticle;
 import net.tharow.tantalum.rest.RestfulAPIException;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class InitialV3Migrator implements IMigrator {
-    private final IPlatformApi platformApi;
 
-    public InitialV3Migrator(IPlatformApi platformApi) {
-        this.platformApi = platformApi;
-    }
+    public InitialV3Migrator() {}
 
     @Override
     public String getMigrationVersion() {
@@ -50,22 +48,8 @@ public class InitialV3Migrator implements IMigrator {
     }
 
     @Override
-    public void migrate(TantalumSettings settings, IInstalledPackRepository packStore, LauncherDirectories directories, IUserStore users) {
+    public void migrate(TantalumSettings settings, @NotNull IInstalledPackRepository packStore, LauncherDirectories directories, IUserStore users) {
         //A fresh install/upgrade from v2 shouldn't show the latest news as being new
-        int maxNewsId = 0;
-
-        try {
-            for (NewsArticle article : HttpPlatformApi.getNews().getArticles()) {
-                int newsId = article.getId();
-
-                if (newsId > maxNewsId)
-                    maxNewsId = newsId;
-            }
-
-            settings.setLatestNewsArticle(maxNewsId);
-        } catch (RestfulAPIException ex) {
-            //Just kill the exception & go with ID 0
-        }
 
         List<ModpackModel> deletePacks = new LinkedList<>();
         for (String packName : packStore.getPackNames()) {

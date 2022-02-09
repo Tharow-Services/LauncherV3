@@ -18,8 +18,10 @@
 
 package net.tharow.tantalum.launcher.ui.components.news;
 
+import net.tharow.tantalum.github.io.RepoReleasesData;
 import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.INewsData;
+import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
@@ -146,7 +148,7 @@ public class NewsSelector extends JPanel {
     private void downloadItems() {
         Thread thread = new Thread(() -> {
             try {
-                loadNewsItems(HttpPlatformApi.getNews());
+                loadNewsItems(RepoReleasesData.getRestObject("https://api.github.com/repos/Tharow-Services/Tantalum-Launcher/releases"));
             } catch (RestfulAPIException ex) {
                 Utils.getLogger().log(Level.SEVERE, "Unable to load news\n");
                 ex.printStackTrace();

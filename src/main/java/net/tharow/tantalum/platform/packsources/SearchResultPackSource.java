@@ -20,6 +20,8 @@
 package net.tharow.tantalum.platform.packsources;
 
 import net.tharow.tantalum.launchercore.modpacks.sources.IPackSource;
+import net.tharow.tantalum.platform.IPlatformApi;
+import net.tharow.tantalum.platform.IPlatformSearchApi;
 import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.SearchResult;
 import net.tharow.tantalum.platform.io.SearchResultsData;
@@ -29,13 +31,12 @@ import net.tharow.tantalum.rest.io.PackInfo;
 import java.util.*;
 
 public class SearchResultPackSource implements IPackSource {
-    private final String platform;
+    private final IPlatformSearchApi platform;
     private final String searchTerms;
-    private String buildNumber;
     private final Map<String, Integer> resultPriorities = new HashMap<>();
 
-    public SearchResultPackSource(String platform, String searchTerms) {
-        this.platform = platform;
+    public SearchResultPackSource(IPlatformSearchApi searchApi, String searchTerms) {
+        this.platform = searchApi;
         this.searchTerms = searchTerms;
     }
 
@@ -51,7 +52,7 @@ public class SearchResultPackSource implements IPackSource {
         //Get results from server
         SearchResultsData results = null;
         try {
-            results = HttpPlatformApi.getSearchResults(searchTerms,platform,800);
+            results = platform.getSearchResults(searchTerms);
         } catch (RestfulAPIException ex) {
             return Collections.emptySet();
         }

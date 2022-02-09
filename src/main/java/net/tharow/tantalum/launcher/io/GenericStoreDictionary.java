@@ -1,7 +1,6 @@
 package net.tharow.tantalum.launcher.io;
 
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.annotations.SerializedName;
 import net.tharow.tantalum.launchercore.logging.Logger;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
@@ -17,16 +16,18 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
-public class GenericStore<Value extends Supplier<Index>, Index> implements IStore {
+public class GenericStoreDictionary<Value, Index, Name> implements IStore {
 
     private transient File loadedFile;
 
-    private final Map<Index, Value> Objects = new HashMap<>();
-    private final List<Index> indices = new ArrayList<>();
+    private final Map<Index, Value> map = new HashMap<>();
+    private final List<Index> mapIndex = new ArrayList<>();
+    private final Map<Name, Index> dict = new HashMap<>();
+    private final List<Name> dictIndex = new ArrayList<>();
 
     private final Logger l;
-    
-    protected GenericStore(File jsonFile, String name){
+
+    protected GenericStoreDictionary(File jsonFile, String name){
         this.loadedFile = jsonFile;
         this.l = Logger.getLogger(name);
         this.l.setParent(Utils.getLogger());
@@ -34,28 +35,28 @@ public class GenericStore<Value extends Supplier<Index>, Index> implements IStor
     }
     
 
-    public static <T extends Supplier<F>, F> @NotNull GenericStore load(String name, @NotNull File jsonFile) {
+    public static <T, F, N> @NotNull GenericStoreDictionary load(String name, @NotNull File jsonFile) {
         Logger logger = Logger.getLogger(name);
         logger.setParent(Utils.getLogger());
         logger.setLevel(Utils.getLogger().getLevel());
 
         if (!jsonFile.exists()) {
             logger.log(Level.WARNING, "Unable to load "+name+" from " + jsonFile + " because it does not exist.");
-            return new GenericStore<T, F>(jsonFile, name);
+            return new GenericStoreDictionary<T, F, N>(jsonFile, name);
         }
 
         try {
             String json = FileUtils.readFileToString(jsonFile, StandardCharsets.UTF_8);
-            GenericStore<T, F> parsedList = Utils.getGson().fromJson(json, GenericStore.class);
+            GenericStoreDictionary<T, F, N> parsedList = Utils.getGson().fromJson(json, GenericStoreDictionary.class);
 
             if (parsedList != null) {
                 parsedList.setLoadedFile(jsonFile);
                 return parsedList;
             } else
-                return new GenericStore<T, F>(jsonFile, name);
+                return new GenericStoreDictionary<T, F, N>(jsonFile, name);
         } catch (JsonSyntaxException | IOException e) {
             logger.log(Level.WARNING, "Unable to load "+name+" from " + jsonFile);
-            return new GenericStore<T, F>(jsonFile, name);
+            return new GenericStoreDictionary<T, F, N>(jsonFile, name);
         }
     }
 
@@ -64,34 +65,37 @@ public class GenericStore<Value extends Supplier<Index>, Index> implements IStor
     }
     
     public Map<Index, Value> getMap() {
-        return Objects;
+        return map;
     }
+    public List<Index> getMapIndex() { return mapIndex;}
 
+    public Map<Name, Index> getDict() {return dict;}
+    public List<Name> getDictIndex() {return dictIndex;}
     
-    public List<Index> getNames() {
-        return indices;
-    }
-    
-    public Value put(Value object) {
-        Value obj = Objects.put(object.get(), object);
-        if (obj == null) {
-            indices.add(object.get());
+    public Value putDict(Index index, Value value) {
+        Value object = map.put(index, value);
+        if (object == null) {
+            mapIndex.add(index);
         }
         save();
-        return obj;
+        return object;
+    }
+
+    public Index putMap(Name index, Index value){
+        return value;
     }
     
     public Value remove(Index name) {
-        Value obj = Objects.remove(name);
+        Value obj = map.remove(name);
         if (obj != null) {
-            indices.remove(name);
+            mapIndex.remove(name);
         }
         save();
         return obj;
     }
 
     @Override
-    public void save() {
+    public synchronized void save() {
         String json = Utils.getGson().toJson(this);
 
         File tmpFile = new File(loadedFile.getAbsolutePath() + ".tmp");

@@ -1,8 +1,11 @@
 package net.tharow.tantalum.platform;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
-public interface IPlatformInfo extends Supplier<String> {
+public interface IPlatformInfo extends Supplier<UUID> {
+
+    String getUrl();
 
     String getName();
 
@@ -12,10 +15,8 @@ public interface IPlatformInfo extends Supplier<String> {
 
     String getVersion();
 
-    String get();
+    UUID get();
 
     boolean isOffline();
-
-    void refresh();
 
 }

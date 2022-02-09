@@ -21,7 +21,6 @@ package net.tharow.tantalum.launcher;
 import com.alibaba.dcm.DnsCacheManipulator;
 import com.beust.jcommander.JCommander;
 import net.tharow.tantalum.authlib.Authlib;
-import net.tharow.tantalum.authlib.AuthlibAuthenticator;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.autoupdate.Relauncher;
 import net.tharow.tantalum.autoupdate.http.HttpUpdateStream;
@@ -64,20 +63,18 @@ import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.Backgrou
 import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.IModpackResourceType;
 import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.IconResourceType;
 import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.LogoResourceType;
-import net.tharow.tantalum.launchercore.modpacks.sources.IAuthoritativePackSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.IInstalledPackRepository;
 import net.tharow.tantalum.minecraftcore.launch.MinecraftLauncher;
 import net.tharow.tantalum.minecraftcore.microsoft.auth.MicrosoftAuthenticator;
 import net.tharow.tantalum.minecraftcore.mojang.auth.MojangAuthenticator;
-import net.tharow.tantalum.platform.IPlatformApi;
-import net.tharow.tantalum.platform.PlatformPackInfoRepository;
-import net.tharow.tantalum.platform.cache.ModpackCachePlatformApi;
-import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
+import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.solder.ISolderApi;
 import net.tharow.tantalum.solder.SolderPackSource;
 import net.tharow.tantalum.solder.cache.CachedSolderApi;
 import net.tharow.tantalum.solder.http.HttpSolderApi;
+import net.tharow.tantalum.tantalum.RequiresAccessCode;
+import net.tharow.tantalum.tantalum.Tantalum;
 import net.tharow.tantalum.ui.components.Console;
 import net.tharow.tantalum.ui.components.ConsoleFrame;
 import net.tharow.tantalum.ui.components.ConsoleHandler;
@@ -109,6 +106,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.*;
 import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.StreamHandler;
 import java.util.stream.Collectors;
 
 public class LauncherMain {
@@ -312,7 +311,6 @@ public class LauncherMain {
         RotatingFileHandler fileHandler = new RotatingFileHandler(logs.getPath());
 
         fileHandler.setFormatter(new BuildLogFormatter(buildNumber.getBuildNumber()));
-
         fileHandler.setLevel(Level.ALL);
         for (Handler h : logger.getHandlers()) {
             logger.removeHandler(h);
@@ -324,16 +322,17 @@ public class LauncherMain {
         Console console = new Console(LauncherMain.consoleFrame, buildNumber.getBuildNumber());
 
         logger.addHandler(new ConsoleHandler(console));
-
-        final Logger systemOut = Logger.getLogger("SystemOut");
-        systemOut.setParent(logger);
-        System.setOut(new PrintStream(new LoggerOutputStream(console, Level.WARNING, logger), true));
-        System.setErr(new PrintStream(new LoggerOutputStream(console, Level.SEVERE, logger), true));
+        if (Boolean.getBoolean("tantalum.useSystemOut")){
+            logger.addHandler(new StreamHandler(System.out, new BuildLogFormatter(buildNumber.getBuildNumber())));
+        } else {
+            System.setOut(new PrintStream(new LoggerOutputStream(console, Level.WARNING, logger), true));
+            System.setErr(new PrintStream(new LoggerOutputStream(console, Level.SEVERE, logger), true));
+        }
         org.apache.log4j.LogManager.getRootLogger().addAppender(new NullAppender());
         org.apache.log4j.LogManager.getRootLogger().setLevel(org.apache.log4j.Level.ALL);
         org.apache.log4j.LogManager.getRootLogger().info("Apache Logger Has Initialised");
         //org.apache.log4j.LogManager.shutdown();
-        logger.setParent(Logger.getGlobal());
+        //logger.setParent(Logger.getGlobal());
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             e.printStackTrace();
             logger.log(Level.SEVERE, "Unhandled Exception in " + t, e);
@@ -488,46 +487,46 @@ public class LauncherMain {
         ISolderApi httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
 
-        TantalumPlatformStore platforms = TantalumPlatformStore.load(new File(directories.getLauncherDirectory(),"platforms.json"),false);
-        if (startupParameters.getPlatformUrl().isEmpty()){
-            startupParameters.getPlatformUrl().add(0,"https://tantalum-auth.azurewebsites.net/platform/");
-            startupParameters.getPlatformUrl().add(1, "https://api.technicpack.net/");
+        Tantalum tantalum = Tantalum.init(directories, solder, 60 * 60);
+        try {
+            tantalum.addPlatform("https://api.technicpack.net/", "build", "707");
+        } catch (RestfulAPIException | RequiresAccessCode e) {
+            e.printStackTrace();
         }
-        platforms.put(new Platform("Tantalum Platform","Demo","https://tantalum-auth.azurewebsites.net/platform/",800));
-        HttpPlatformApi httpPlatform = new HttpPlatformApi(platforms);
+        //platforms.put(new Platform("Tantalum Platform","Demo","https://tantalum-auth.azurewebsites.net/platform/",800));
         //Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
-        IPlatformApi platform = new ModpackCachePlatformApi(httpPlatform, 60 * 60, directories);
+        //IPlatformApi platform = new ModpackCachePlatformApi(60 * 60, directories);
 
         IInstalledPackRepository packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks.json"));
-        IAuthoritativePackSource packInfoRepository = new PlatformPackInfoRepository(platform, solder);
+        //IAuthoritativePackSource packInfoRepository = new PlatformPackInfoRepository(platform, solder);
         //Debug.getInstalledConfig(packInfoRepository, packStore);
         //var source = new SolderPackSource("http://solder.technicpack.net/api/",solder);
         //Debug.getPackSourceConfig(packInfoRepository, source);
 
         ArrayList<IMigrator> migrators = new ArrayList<>(1);
-        migrators.add(new InitialV3Migrator(platform));
+        migrators.add(new InitialV3Migrator());
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
-        PackLoader packList = new PackLoader(directories, packStore, packInfoRepository);
+        PackLoader packList = new PackLoader(directories, packStore, tantalum);
 
         String solderUrl;
         if(startupParameters.getSolderUrl() != null){solderUrl = startupParameters.getSolderUrl();}
         else{solderUrl = settings.getSolderURL();}
-        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(solderUrl, solder), solder, platform, iconRepo, settings);
+        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(solderUrl, solder), solder, tantalum, iconRepo, settings);
         //ModpackSelector selector = new ModpackSelector(resources, packList, new FeaturedPackSource("http://platform.test/"), solder, platform, iconRepo, settings);
         selector.setBorder(BorderFactory.createEmptyBorder());
         userModel.addAuthListener(selector);
 
         resources.registerResource(selector);
 
-        DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, settings.getDiscoverURL(), platform, directories, selector);
+        DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, settings.getDiscoverURL(), tantalum, directories, selector);
 
-        MinecraftLauncher launcher = new MinecraftLauncher(platform, directories, userModel, javaVersions, buildNumber);
+        MinecraftLauncher launcher = new MinecraftLauncher(tantalum, directories, userModel, javaVersions, buildNumber);
         //noinspection rawtypes
-        ModpackInstaller modpackInstaller = new ModpackInstaller(platform, settings.getClientId());
+        ModpackInstaller modpackInstaller = new ModpackInstaller(tantalum, settings.getClientId());
         Installer installer = new Installer(startupParameters, directories, modpackInstaller, launcher, settings, iconMapper);
 
-        final LauncherFrame frame = new LauncherFrame(resources, skinRepo, userModel, settings, selector, iconRepo, logoRepo, backgroundRepo, installer, avatarRepo, platform, directories, packStore, startupParameters, discoverInfoPanel, javaVersions, javaVersionFile, buildNumber);
+        final LauncherFrame frame = new LauncherFrame(resources, skinRepo, userModel, settings, selector, iconRepo, logoRepo, backgroundRepo, installer, avatarRepo, tantalum, directories, packStore, startupParameters, discoverInfoPanel, javaVersions, javaVersionFile, buildNumber);
 
         //final LauncherFrame frame2 = new LauncherFrame(resources, skinRepo, userModel, settings, selector, iconRepo, logoRepo, backgroundRepo, installer, avatarRepo, platform, directories, packStore, startupParameters, discoverInfoPanel, javaVersions, javaVersionFile, buildNumber);
 

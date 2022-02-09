@@ -25,16 +25,13 @@ import net.tharow.tantalum.rest.RestfulAPIException;
 
 import java.util.Map;
 
-public interface IPlatformApi {
-    PlatformPackInfo getPlatformPackInfoForBulk(String packSlug) throws RestfulAPIException;
+public interface IPlatformApi extends IPlatformPackApi{
 
-    PlatformPackInfo getPlatformPackInfo(String packSlug) throws RestfulAPIException;
+    String getPlatformUri(String slug);
 
     void incrementPackRuns(String packSlug);
 
     void incrementPackInstalls(String packSlug);
-
-    String getPlatformUri(String slug);
 
     void incrementPackLikes(String packSlug);
 
