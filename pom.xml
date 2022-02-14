@@ -382,7 +382,7 @@
                                         <preCp>anything</preCp>
                                     </classPath>
                                     <jre>
-                                        <path>./jre</path>
+                                        <path>./jre8</path>
                                         <opts>
                                             <opt>-Djava.net.preferIPv4Stack=true</opt>
                                             <opt>-Dawt.useSystemAAFontSettings=lcd</opt>
