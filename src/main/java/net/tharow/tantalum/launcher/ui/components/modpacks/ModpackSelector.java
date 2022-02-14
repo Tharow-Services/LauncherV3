@@ -85,7 +85,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
     private ModpackInfoPanel modpackInfoPanel;
     private LauncherFrame launcherFrame;
     private JTextField filterContents;
-    private JComboBox<Platform> searchList;
+    private JComboBox<HttpPlatformApi> searchList;
     private Platform selectedPlatform;
     private final FindMoreWidget findMoreWidget;
 
@@ -182,7 +182,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             searchList.removeActionListener(listener);
         }
         searchList.removeAllItems();
-        tantalum.getPlatforms().forEach((platform)->searchList.addItem(platform));
+        tantalum.getApis().forEach((platform)->searchList.addItem(platform));
         searchList.setSelectedIndex(0);
         searchList.addActionListener(e -> changeStream());
     }
@@ -505,8 +505,10 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             } catch (UnsupportedEncodingException ignored) {}
             //findMoreUrl = selectedPlatform.getUrl()+"modpacks?q="+encodedSearch;
             findMoreWidget.setWidgetData(resources.getString("launcher.packselector.more"));
-            final HttpPlatformApi api = tantalum.getPlatformApi()
-            final SearchResultPackSource source = new SearchResultPackSource(tantalum.getPlatformApi(selectedPlatform.get()), localSearchTag);
+            //final Platform platform = (Platform) searchList.getSelectedItem();
+            //Utils.getLogger().constructor("Platform "+selectedPlatform.getUrl());
+            //final HttpPlatformApi api = tantalum.getPlatformApi(platform);//tantalum.getPlatformApi(selectedPlatform.get());
+            final SearchResultPackSource source = new SearchResultPackSource(searchList.getItemAt(searchList.getSelectedIndex()), localSearchTag);
             sources.add(source);
             Utils.logDebug("Whats Currently in the source: ");
             sources.forEach(iPackSource -> Utils.logDebug(iPackSource.getSourceName()));

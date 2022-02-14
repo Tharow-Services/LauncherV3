@@ -79,7 +79,23 @@ public class Tantalum implements IAuthoritativePackSource, IPlatformApi {
         logger.fine("Trying to find slug of "+slug+" In Slug Dictionary");
         if (store.getBySlug().contains(slug)) {
             logger.config("A modpack with slug: "+slug+" was found in the dictionary");
-            return null;
+            PlatformPackInfo packInfo;
+            try {
+                logger.config("Trying Cache for info");
+                packInfo = platformCache.getPlatformPackInfoForBulk(slug);
+                if (packInfo == null) throw new RestfulAPIException();
+            } catch (RestfulAPIException ignored){
+                try {
+                    logger.config("Trying Platform For Slug");
+                    packInfo = getPlatformApi(store.getDictionary().get(slug)).getPlatformPackInfoForBulk(slug);
+                } catch (RestfulAPIException ex){
+                    logger.config("That Modpack Gave An Error Removing and trying again");
+                    store.remove(slug);
+                    return getPlatformPackInfo(slug);
+                }
+            }
+
+            return packInfo;
         }
         logger.fine("A Modpack with slug: "+slug+" wasn't found in the dictionary");
         logger.fine("Grabbing Active Server List And Running Slugs");
@@ -119,8 +135,10 @@ public class Tantalum implements IAuthoritativePackSource, IPlatformApi {
         return store.getPlatforms().values();
     }
 
+    public Collection<HttpPlatformApi> getApis() {return platformApi.values();}
+
     public HttpPlatformApi getPlatformApi(UUID uuid){
-        if (!platformApi.containsKey(uuid)) 
+        if (!platformApi.containsKey(uuid)) throw new IllegalArgumentException("That Platform Isn't Loaded");
         return platformApi.get(uuid);
     }
 

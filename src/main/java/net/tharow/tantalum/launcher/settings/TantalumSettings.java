@@ -73,11 +73,11 @@ public class TantalumSettings implements ILaunchOptions {
     private int HTTPProxyPort = 3652;
     private String HTTPProxyBypassDomains = "";
     private String authlibServerURL = ""; //Authlib-Injector Server Address
-    private String discoverURL = "https://api.technicpack.net/discover";
-    private String solderURL = "https://tantalum-solder.azurewebsites.net/api/";
+    private String discoverURL = "https://tantalum.tharow.net/launcher/discover.html";
+    private String solderURL = "https://srv2.azurewebsites.net/api/";
     private String platformURL = "https://tantalum-auth.azurewebsites.net/";
-    private Boolean forceOverrideRootCerts = false;
-    private Boolean advOptions = false;
+    private Boolean forceOverrideRootCerts = true;
+    private Boolean advOptions = true;
 
     public boolean getAdvOptions(){return this.advOptions;}
     public void setAdvOptions(boolean advOptions){this.advOptions = advOptions;}

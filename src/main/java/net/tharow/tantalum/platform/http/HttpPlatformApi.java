@@ -78,9 +78,6 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
 
     @Override
     public String toString() {
-        return "HttpPlatformApi{" +
-                "access='" + access + '\'' +
-                ", platform=" + platform +
-                '}';
+        return platform.getName() + ' '+ platform.getVersion();
     }
 }
