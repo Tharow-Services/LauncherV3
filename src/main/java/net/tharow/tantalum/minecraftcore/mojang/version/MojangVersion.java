@@ -78,4 +78,6 @@ public interface MojangVersion {
     void addLibrary(Library library);
 
     JavaVersion getJavaVersion();
+
+    void removeLibrary(String libraryName);
 }

@@ -34,6 +34,7 @@ import net.tharow.tantalum.launcher.settings.StartupParameters;
 import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.settings.migration.IMigrator;
 import net.tharow.tantalum.launcher.settings.migration.InitialV3Migrator;
+import net.tharow.tantalum.launcher.settings.migration.ResetJvmArgsIfDefaultString;
 import net.tharow.tantalum.launcher.ui.InstallerFrame;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.launcher.ui.LoginFrame;
@@ -480,6 +481,7 @@ public class LauncherMain {
 
         ArrayList<IMigrator> migrators = new ArrayList<>(1);
         migrators.add(new InitialV3Migrator());
+        migrators.add(new ResetJvmArgsIfDefaultString());
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
         PackLoader packList = new PackLoader(directories, packStore, tantalum);

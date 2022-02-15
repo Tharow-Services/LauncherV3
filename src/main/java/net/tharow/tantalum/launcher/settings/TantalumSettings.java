@@ -34,6 +34,8 @@ public class TantalumSettings implements ILaunchOptions {
     public static final String STABLE = "stable";
     public static final String BETA = "beta";
 
+    public static final String DEFAULT_JAVA_ARGS = "-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M";
+
     private transient File settingsFile;
     private transient File technicRoot;
     private int memory;
@@ -54,7 +56,7 @@ public class TantalumSettings implements ILaunchOptions {
      */
     private boolean javaBitness = true;
 
-    private String launcherSettingsVersion = "1";
+    private String launcherSettingsVersion = "2";
 
     private WindowType windowType = WindowType.DEFAULT;
     private int windowWidth = 0;
@@ -249,12 +251,18 @@ public class TantalumSettings implements ILaunchOptions {
 
     public String getJavaArgs() {
         if (javaArgs == null || javaArgs.isEmpty()) {
-            // These are the default JVM args in the vanilla launcher
-            javaArgs = "-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M";
+            return DEFAULT_JAVA_ARGS;
         }
         return javaArgs;
     }
-    public void setJavaArgs(String args) { javaArgs = args; }
+    public void setJavaArgs(String args) {
+        if (args != null && args.equalsIgnoreCase(DEFAULT_JAVA_ARGS)) {
+            javaArgs = null;
+        } else {
+            javaArgs = args;
+        }
+
+    }
 
     public String getWrapperCommand() {
         return wrapperCommand;

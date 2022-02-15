@@ -23,14 +23,17 @@
     </developers>
     <version>${revision}</version>
     <url>https://www.tantalum.tharow.net/</url>
-    <inceptionYear>2021</inceptionYear>
+    <inceptionYear>2020</inceptionYear>
     <description>Minecraft launcher for installing and updating Modpacks from the Tantalum Platform.</description>
 
     <!-- Build properties -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>${project.groupId}.${project.artifactId}.LauncherMain</mainClass>
-        <buildNumber>233</buildNumber>
+        <buildNumber>234</buildNumber>
+        <installer.encrypt>no</installer.encrypt>
+        <installer.password>tantalum</installer.password>
+        <installer.version>v5.1-230</installer.version>
         <revision>5.1-${buildNumber}</revision>
     </properties>
 
@@ -59,6 +62,18 @@
         <pluginRepository>
             <id>maven-snapshots</id>
             <url>https://repository.apache.org/content/repositories/snapshots/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>jboss-maven2-release-repository</id>
+            <url>https://repository.jboss.org/maven2/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>apache-plugin</id>
+            <url>https://repo.maven.apache.org/maven2/org/apache/maven/plugins/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
         </pluginRepository>
     </pluginRepositories>
 
@@ -333,7 +348,18 @@
     <!-- Build profiles -->
     <profiles>
         <profile>
-            <id>Dynamic Build Number</id>
+            <id>static_build_number</id>
+            <activation>
+                <property>
+                    <name>!env.BUILD_NUMBER</name>
+                </property>
+            </activation>
+            <properties>
+                <buildNumber>0</buildNumber>
+            </properties>
+        </profile>
+        <profile>
+            <id>dynamic_build_number</id>
             <activation>
                 <property>
                     <name>env.BUILD_NUMBER</name>
@@ -343,16 +369,10 @@
                 <buildNumber>${env.BUILD_NUMBER}</buildNumber>
             </properties>
         </profile>
-        <!-- Make Inno Setup -->
         <profile>
-            <id>Make Inno Setup</id>
-            <activation>
-                <property>
-                    <name>env.BUILD_NUMBER</name>
-                </property>
-            </activation>
+            <id>installer-encrypt</id>
             <properties>
-                <buildNumber>${env.BUILD_NUMBER}</buildNumber>
+                <installer.encrypt>yes</installer.encrypt>
             </properties>
         </profile>
         <!-- Package for Windows -->
@@ -375,7 +395,7 @@
                                     <headerType>gui</headerType>
                                     <stayAlive>false</stayAlive>
                                     <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
-                                    <outfile>${project.build.directory}/TantalumLauncher.exe</outfile>
+                                    <outfile>${project.build.directory}/${project.artifactId}-${project.version}.exe</outfile>
                                     <classPath>
                                         <mainClass>${mainClass}</mainClass>
                                         <addDependencies>false</addDependencies>
@@ -405,6 +425,84 @@
                                 <phase>package</phase>
                                 <goals>
                                     <goal>launch4j</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Make Inno Setup -->
+        <profile>
+            <id>Make Inno Setup</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>1.6.0</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>exec</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <executable>"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"</executable>
+                        <arguments>
+                            <argument>${project.basedir}\src\main\inno\Tantalum.iss</argument>
+                            <argument>/DProjectDirectory=${project.basedir}</argument>
+                            <argument>/DAppEncrypt=${installer.encrypt}</argument>
+                            <argument>/DAppPassword=${installer.password}</argument>
+                            <argument>/DLauncherFile=${project.build.directory}\${project.artifactId}-${project.version}.exe</argument>
+                            <argument>/DSettingsFile=${project.basedir}\src\main\inno\settings.json</argument>
+                            <argument>/O${project.build.directory}</argument>
+                            <argument>/Fsetup-${installer.version}</argument>
+                        </arguments>
+                    </configuration>
+                </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>sign</id>
+            <activation>
+                <property>
+                    <name>env.CERT_KEYSTORE</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jarsigner-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>sign</id>
+                                <configuration>
+                                    <storetype>pkcs12</storetype>
+                                    <keystore>${env.CERT_KEYSTORE}</keystore>
+                                    <alias>alias</alias>
+                                    <storepass>storePass</storepass>
+                                    <keypass>keyPass</keypass>
+                                    <verbose>true</verbose>
+                                </configuration>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>verify</id>
+                                <goals>
+                                    <goal>verify</goal>
                                 </goals>
                             </execution>
                         </executions>
