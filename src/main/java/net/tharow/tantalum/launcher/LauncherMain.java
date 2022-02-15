@@ -199,7 +199,6 @@ public class LauncherMain {
         } catch (NumberFormatException ex) {
             //This is probably a debug build or something, build number is invalid
         }
-        Utils.getLogger().info("Current Build Number is " + build);
         // These 2 need to happen *before* the launcher or the updater run, so we have valuable debug information, and so
         // we can properly use websites that use Let's Encrypt (and other current certs not supported by old Java versions)
         if(params.getLogLevel()==6){
@@ -210,6 +209,7 @@ public class LauncherMain {
             Utils.getLogger().setLevel(Level.convert(params.getLogLevel()*100));
         }
 
+        Utils.getLogger().info("The Current Build Number"+ buildNumber.getBuildNumber());
         //System.setProperty("dcm.config.filename","");
         //runProxySetup(settings);
         runStartupDebug(settings, params);

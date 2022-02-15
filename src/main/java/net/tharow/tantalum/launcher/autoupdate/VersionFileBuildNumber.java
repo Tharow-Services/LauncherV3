@@ -40,6 +40,6 @@ public class VersionFileBuildNumber implements IBuildNumber {
             e.printStackTrace();
         }
 
-        return build;
+        return build.substring(0,3);
     }
 }
