@@ -218,7 +218,7 @@ public class LauncherMain {
         //startLauncher(settings, params, directories, resources);
         Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream(), build, directories, resources, params);
         if (params.isChangeOverride()){
-            settings.setForceOverrideRootCerts(true);
+            settings.setAdvOptions(true);
             settings.save();
         }
         try {

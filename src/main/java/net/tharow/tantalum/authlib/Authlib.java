@@ -64,6 +64,17 @@ public class Authlib {
 
     }
 
+    public String getAuthlibServerUrl(UUID uuid) {
+        AuthlibServer authlibServer = null;
+        try {
+            authlibServer = getAuthlibServer(uuid);
+        } catch (RestfulAPIException e) {
+            e.printStackTrace();
+        }
+        assert authlibServer != null;
+        return authlibServer.getServerUrl();
+    }
+
     public AuthlibServer getAuthlibServer(UUID uuid) throws NoSuchElementException, RestfulAPIException {
         AuthlibServer server = loadServer(uuid);
         try {

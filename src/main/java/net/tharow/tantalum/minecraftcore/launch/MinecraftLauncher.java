@@ -271,7 +271,7 @@ public final class MinecraftLauncher {
         }
 
         if (Objects.equals(user.getUserType(), AuthlibUser.AUTHLIB_USER_TYPE))
-            commands.addRaw("-javaagent:" + directories.getAssetsDirectory().getAbsolutePath() + "\\launcher\\authlib-injector.jar=" + userModel.getAuthlib());
+            commands.addRaw("-javaagent:" + directories.getAssetsDirectory().getAbsolutePath() + "\\launcher\\authlib-injector.jar=" + userModel.getAuthlibURL());
 
         commands.addRaw("-Xms" + memory + "m");
         commands.addRaw("-Xmx" + memory + "m");

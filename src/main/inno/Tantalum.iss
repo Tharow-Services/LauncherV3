@@ -2,9 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Tantalum Launcher"
-#define MyAppVersion "5.1-200+"
+#define MyAppVersion "5.1-230+"
 #define MyAppPublisher "Tharow Services"
 #define MyAppURL "https://tantalum.tharow.net/"
+#define MyUserProfile "C:\Users\PowellA1.46-OTO-SL1421"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -20,14 +21,14 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={userappdata}\.tantalum
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile=C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\LICENSE.txt
+LicenseFile={#MyUserProfile}\IdeaProjects\Tantalum-Launcher\LICENSE.txt
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 ;PrivilegesRequiredOverridesAllowed=dialog
-OutputDir=C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\target
+OutputDir={#MyUserProfile}\IdeaProjects\Tantalum-Launcher\target
 OutputBaseFilename=tantalum-setup
-SetupIconFile=C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\src\main\resources\icon.ico
-UninstallIconFile=C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\src\main\resources\icon.ico
+SetupIconFile={#MyUserProfile}\IdeaProjects\Tantalum-Launcher\src\main\resources\icon.ico
+UninstallIconFile={#MyUserProfile}\IdeaProjects\Tantalum-Launcher\src\main\resources\icon.ico
 Password=tantalum
 Encryption=yes
 Compression=lzma
@@ -38,8 +39,8 @@ WizardStyle=modern
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\target\TantalumLauncher.exe";DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\TherayTharow\IdeaProjects\Tantalum-Launcher\src\main\inno\settings.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyUserProfile}\IdeaProjects\Tantalum-Launcher\target\TantalumLauncher.exe";DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyUserProfile}\IdeaProjects\Tantalum-Launcher\src\main\inno\settings.json"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 Source: "{tmp}\jre.zip"; DestDir: "{app}"; Flags: deleteafterinstall external
 [Icons]
@@ -49,7 +50,7 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{sys}\tar.exe"; Parameters: "-xf .\jre.zip"; WorkingDir: "{app}"; StatusMsg: "Installing Java Runtime"; Flags: runhidden
-Filename: "{sys}\cmd.exe"; Parameters: "/c move .\jdk17* jre"; WorkingDir: "{app}"; StatusMsg: "Seting up Java Runtime"; Flags: runhidden
+Filename: "{sys}\cmd.exe"; Parameters: "/c  setx PATH %PATH%;{app}"; WorkingDir: "{app}"; StatusMsg: "Seting up Tantalum Path"; Flags: runhidden
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
 
@@ -73,7 +74,7 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   if CurPageID = wpReady then begin
     DownloadPage.Clear;
-    DownloadPage.Add('https://corretto.aws/downloads/latest/amazon-corretto-17-x64-windows-jdk.zip', 'jre.zip', '');
+    DownloadPage.Add('https://corretto.aws/downloads/latest/amazon-corretto-8-x64-windows-jre.zip', 'jre.zip', '');
     DownloadPage.Show;
     try
       try

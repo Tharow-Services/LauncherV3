@@ -121,6 +121,10 @@ public class UserModel {
         return this.authlib;
     }
 
+    public String getAuthlibURL(){
+        return this.authlib.loadServer(mCurrentUser.getAuthServerUUID()).getServerUrl();
+    }
+
     public AuthlibAuthenticator getAuthlibAuthenticator(UUID uuid){
         return this.getAuthlib().loadServer(uuid).getAuthenticator();
     }
