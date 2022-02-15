@@ -50,20 +50,22 @@ public final class StartupParameters {
     private String solder = null;
     @Parameter(names = {"-platform","-p"}, description = "Add A Platform To the list")
     private List<String> platform = new ArrayList<>();
+    @Parameter(names = {"-discover","-d"}, description = "Change Discover Url")
+    private String discover = "https://tantalum.tharow.net/discover.html";
     @Parameter(names = {"-overrideRoots","-orca"}, description = "Force the override of root ca Certificates")
     private boolean overrideRoots = false;
-    @Parameter(names = {"-modpackFile","-mf"}, description = "Install a modpack from file", converter = FileConverter.class)
-    private File modpackFile = null;
-    @Parameter(names = {"-modpackUri","-mu"}, description = "Install a modpack from api link")
-    private String modpackUri = null;
+    @Parameter(names = {"-file","-f"}, description = "Install a modpack from file", converter = FileConverter.class)
+    private File inputFile = null;
+    @Parameter(names = {"-uri","-u"}, description = "Install a modpack from api link")
+    private String inputUri = null;
     @Parameter(names = {"-blockReboot"}, description = "Prevent rebooting the launcher due to bad java properties.")
     private boolean blockReboot = false;
     @Parameter(names = {"-buildNumber","-b"}, description = "Force build number to this value for debugging.")
     private String buildNumber = "";
     @Parameter(names = {"-offline"}, description = "Force offline mode")
     private boolean offline = false;
-    @Parameter(names = {"-technic","-t"}, description = "Start In Technic Launcher Mode")
-    private boolean isTechnic = false;
+    @Parameter(names = {"-corca"})
+    private boolean changeOverride = false;
 
     public StartupParameters(String[] args) {
         this.args = args;
@@ -96,10 +98,11 @@ public final class StartupParameters {
     public String getMoveTarget() { return moveTarget; }
 
     public String getSolderUrl() {
-        if(isTechnic){
-            return "https://solder.technicpack.net/api/";
-        }else
-            return solder;
+        return solder;
+    }
+
+    public String getDiscover(){
+        return discover;
     }
 
     public String getBuildNumber() { return buildNumber; }
@@ -110,11 +113,15 @@ public final class StartupParameters {
 
     public boolean isOverrideRoots() {return overrideRoots;}
 
-    public File getModpackFile() {return modpackFile;}
+    public File getInputFile() {return inputFile;}
 
-    public String getModpackUri() {return modpackUri;}
+    public String getInputUri() {return inputUri;}
 
     public int getLogLevel() {
         return logLevel;
+    }
+
+    public boolean isChangeOverride() {
+        return changeOverride;
     }
 }

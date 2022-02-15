@@ -411,11 +411,6 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         HTTPProxyPort.setEnabled(settings.getUseHTTPProxy());
         HTTPProxyPort.getDocument().addDocumentListener(HTTPProxyPortListener);
 
-
-        discoverURL.getDocument().removeDocumentListener(discoverURLListener);
-        discoverURL.setText(settings.getDiscoverURL());
-        discoverURL.getDocument().addDocumentListener(discoverURLListener);
-
         solderURL.getDocument().removeDocumentListener(defaultSolderListener);
         solderURL.setText(settings.getSolderURL());
         solderURL.getDocument().addDocumentListener(defaultSolderListener);
@@ -886,12 +881,12 @@ public class OptionsDialog extends LauncherDialog implements IRelocalizableResou
         discoverURLField.setForeground(LauncherFrame.COLOR_WHITE_TEXT);
         panel.add(discoverURLField, new GridBagConstraints(2, 5, 1, 1, 0, 0, 17, 0, new Insets(0, 10, 0, 0), 0, 0));
 
-        discoverURL = new JTextField("");
+        discoverURL = new JTextField("Set By Startup Prams");
         discoverURL.setFont(resources.getFont(ResourceLoader.FONT_OPENSANS, 16));
         discoverURL.setForeground(LauncherFrame.COLOR_BLUE);
         discoverURL.setBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
         discoverURL.setHighlighter(null);
-        discoverURL.setEditable(true);
+        discoverURL.setEditable(false);
         discoverURL.setCursor(null);
         discoverURL.setBorder(new RoundBorder(LauncherFrame.COLOR_BUTTON_BLUE, 1, 8));
         panel.add(discoverURL, new GridBagConstraints(3, 5, 2, 1, 2, 0, 17, 1, new Insets(8, 16, 8, 16), 0, 16));

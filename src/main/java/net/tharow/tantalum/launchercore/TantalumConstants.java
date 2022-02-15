@@ -33,6 +33,8 @@ public class TantalumConstants {
     public static final String forgeMavenRepo = "https://files.minecraftforge.net/maven/";
     public static final String JAVA_RUNTIMES = "https://raw.githubusercontent.com/Tharow-Services/Tantalum-Mirror/master/runtimes/all.json";
     public static final String MINECRAFT_ASSETS = "https://raw.githubusercontent.com/Tharow-Services/Tantalum-Mirror/master/assets/objects/";
+    public static final String TRACKING_URL = "https://tantalum-auth.azurewebsites.net/tracking";
+    public static final String NEWS_URL = "https://api.github.com/repos/Tharow-Services/Tantalum-Launcher/releases";
 
     public static final String[] FALLBACK_MIRROR = {
             "https://libraries.minecraft.net/", // Default Minecraft Mirror

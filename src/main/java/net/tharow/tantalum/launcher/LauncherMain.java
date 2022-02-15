@@ -97,6 +97,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -216,6 +217,10 @@ public class LauncherMain {
         injectNewRootCerts(settings.getForceOverrideRootCerts() || params.isOverrideRoots() || ComputerInfo.isSchoolEnv());
         //startLauncher(settings, params, directories, resources);
         Relauncher launcher = new TechnicRelauncher(new HttpUpdateStream(), build, directories, resources, params);
+        if (params.isChangeOverride()){
+            settings.setForceOverrideRootCerts(true);
+            settings.save();
+        }
         try {
             if (launcher.runAutoUpdater())
                 startLauncher(settings, params, directories, resources);
@@ -404,13 +409,12 @@ public class LauncherMain {
         }
     }
 
-
     private static void startLauncher(final @NotNull TantalumSettings settings, @NotNull StartupParameters startupParameters, final LauncherDirectories directories, @NotNull ResourceLoader resources) {
         UIManager.put( "ComboBox.disabledBackground", LauncherFrame.COLOR_FORMELEMENT_INTERNAL );
         UIManager.put( "ComboBox.disabledForeground", LauncherFrame.COLOR_GREY_TEXT );
         System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
 
-        DnsCacheManipulator.clearDnsCache();
+        //DnsCacheManipulator.clearDnsCache();
 
         //DnsCacheManipulator.loadDnsCacheConfig("net.tharow.tantalum.resources.dns-cache.properties");
 
@@ -465,22 +469,14 @@ public class LauncherMain {
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
 
         Tantalum tantalum = Tantalum.init(directories, solder, 60 * 60);
-        try {
-            //tantalum.addPlatform("https://api.technicpack.net/", "build", "707");
-            //tantalum.addPlatform("http://localhost/", "build", "800");
-            tantalum.addPlatform("https://tantalum-auth.azurewebsites.net/platform/", null, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //platforms.put(new Platform("Tantalum Platform","Demo","https://tantalum-auth.azurewebsites.net/platform/",800));
-        //Utils.getLogger().log(Level.INFO, buildNumber.getBuildNumber());
-        //IPlatformApi platform = new ModpackCachePlatformApi(60 * 60, directories);
+
+        // Add Platforms to the platform store //
+        startupParameters.getPlatformUrl().forEach(tantalum::initPlatform);
+        // Static Platform Addition//
+        tantalum.initPlatform("https://tantalum-auth.azurewebsites.net/platform/");
+        tantalum.initPlatform("https://api.technicpack.net/", "build", "707");
 
         IInstalledPackRepository packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks.json"));
-        //IAuthoritativePackSource packInfoRepository = new PlatformPackInfoRepository(platform, solder);
-        //Debug.getInstalledConfig(packInfoRepository, packStore);
-        //var source = new SolderPackSource("http://solder.technicpack.net/api/",solder);
-        //Debug.getPackSourceConfig(packInfoRepository, source);
 
         ArrayList<IMigrator> migrators = new ArrayList<>(1);
         migrators.add(new InitialV3Migrator());
@@ -488,20 +484,16 @@ public class LauncherMain {
 
         PackLoader packList = new PackLoader(directories, packStore, tantalum);
 
-        String solderUrl;
-        if(startupParameters.getSolderUrl() != null){solderUrl = startupParameters.getSolderUrl();}
-        else{solderUrl = settings.getSolderURL();}
-        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(solderUrl, solder), solder, tantalum, iconRepo, settings);
+        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource((startupParameters.getSolderUrl()!=null?startupParameters.getSolderUrl():settings.getSolderURL()), solder), solder, tantalum, iconRepo, settings);
         //ModpackSelector selector = new ModpackSelector(resources, packList, new FeaturedPackSource("http://platform.test/"), solder, platform, iconRepo, settings);
         selector.setBorder(BorderFactory.createEmptyBorder());
         userModel.addAuthListener(selector);
 
         resources.registerResource(selector);
 
-        DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, settings.getDiscoverURL(), tantalum, directories, selector);
+        DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, startupParameters.getDiscover(), tantalum, directories, selector);
 
         MinecraftLauncher launcher = new MinecraftLauncher(tantalum, directories, userModel, javaVersions, buildNumber);
-        //noinspection rawtypes
         ModpackInstaller modpackInstaller = new ModpackInstaller(tantalum, settings.getClientId());
         Installer installer = new Installer(startupParameters, directories, modpackInstaller, launcher, settings, iconMapper);
 

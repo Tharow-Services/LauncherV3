@@ -18,6 +18,7 @@
 
 package net.tharow.tantalum.utilslib;
 
+import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.tharow.tantalum.authlib.AuthlibAuthenticator;
@@ -29,6 +30,7 @@ import net.tharow.tantalum.launchercore.logging.Logger;
 import net.tharow.tantalum.launchercore.mirror.download.Download;
 import net.tharow.tantalum.launchercore.util.DownloadListener;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -37,6 +39,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -175,8 +178,16 @@ public class Utils {
     }
 
     public static boolean sendTracking(String category, String action, String label, String clientId) {
-        getLogger().log(Level.TRACKING,"Block Tracking Command. Category: "+category+" Action: "+action+" Label: "+label+" Client ID: "+clientId);
-        return false;
+        getLogger().log(Level.TRACKING,"Sending Tracking Command: Category: "+category+" Action: "+action+" Label: "+label+" Client ID: "+clientId);
+        final Tracking tracking = new Tracking(category, action, label, clientId);
+        final String data = gson.toJson(tracking);
+        try {
+            postJson(TantalumConstants.TRACKING_URL, data);
+            return true;
+        } catch (IOException e) {
+            getLogger().log(Level.TRACKING, "Unable to send tracking command");
+            return false;
+        }
     }
 
     /**
@@ -316,4 +327,73 @@ public class Utils {
         return downloadFile(url, name, output, null);
     }
 
+    public static String postJson(String url, String data) throws IOException {
+        byte[] rawData = data.getBytes(StandardCharsets.UTF_8);
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setUseCaches(false);
+        connection.setDoOutput(true);
+        connection.setDoInput(true);
+        connection.setConnectTimeout(15000);
+        connection.setReadTimeout(15000);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+        connection.setRequestProperty("Content-Length", Integer.toString(rawData.length));
+        connection.setRequestProperty("Content-Language", "en-US");
+
+        DataOutputStream writer = new DataOutputStream(connection.getOutputStream());
+        writer.write(rawData);
+        writer.flush();
+        writer.close();
+
+        InputStream stream = null;
+        String returnable = null;
+        try {
+            stream = connection.getInputStream();
+            returnable = IOUtils.toString(stream, Charsets.UTF_8);
+        } catch (IOException e) {
+            stream = connection.getErrorStream();
+
+            if (stream == null) {
+                throw e;
+            }
+        } finally {
+            try {
+                if (stream != null)
+                    stream.close();
+            } catch (IOException ignored) {
+            }
+        }
+
+        return returnable;
+    }
+
+    static class Tracking {
+        private final String category;
+        private final String action;
+        private final String label;
+        private final String clientId;
+
+        public Tracking(String category, String action, String label, String clientId){
+            this.category = category;
+            this.action = action;
+            this.label = label;
+            this.clientId = clientId;
+        }
+
+        public String getCategory() {
+            return category;
+        }
+
+        public String getAction() {
+            return action;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getClientId() {
+            return clientId;
+        }
+    }
 }

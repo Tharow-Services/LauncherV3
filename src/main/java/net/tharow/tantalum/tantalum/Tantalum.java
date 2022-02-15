@@ -54,10 +54,18 @@ public class Tantalum implements IAuthoritativePackSource, IPlatformApi {
 
     public static @NotNull Tantalum init(LauncherDirectories directories, ISolderApi solderApi, int cacheInSeconds){
         final ModpackCachePlatformApi platformCache = new ModpackCachePlatformApi(cacheInSeconds, directories);
-        final PlatformStore store = PlatformStore.load(new File(directories.getLauncherDirectory(), "platforms.json"));
+        final PlatformStore store = PlatformStore.load(new File(directories.getLauncherDirectory(), "tantalum-platforms.json"));
         return new Tantalum(store, solderApi, platformCache);
     }
 
+    public void initPlatform(String url) { initPlatform(url, null, null);}
+    public void initPlatform(String url, String verb, String code){
+        try {
+            this.addPlatform(url, verb, code);
+        } catch (RestfulAPIException | RequiresAccessCode e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public PackInfo getPackInfo(@NotNull InstalledPack pack) {
         return getPackInfo(pack.getName());

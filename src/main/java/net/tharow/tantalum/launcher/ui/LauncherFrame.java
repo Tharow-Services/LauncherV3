@@ -25,6 +25,7 @@ import net.tharow.tantalum.launcher.settings.StartupParameters;
 import net.tharow.tantalum.launcher.ui.components.ModpackOptionsDialog;
 import net.tharow.tantalum.launcher.ui.controls.HeaderTab;
 import net.tharow.tantalum.launcher.ui.controls.UserWidget;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.launch.java.source.FileJavaSource;
@@ -185,14 +186,6 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
 
     }
 
-    protected void installmodpack(){
-        if (params.getModpackUri() != null) {
-            //IPlatformApi platformApi = new HttpPlatformApi("https://api.technicpack.net/");
-            modpackSelector.setFilter(params.getModpackUri());
-            launchModpack();
-
-        }
-    }
     /////////////////////////////////////////////////
     // Action responses
     /////////////////////////////////////////////////
@@ -201,7 +194,7 @@ public class LauncherFrame extends DraggableFrame implements IRelocalizableResou
         AtomicBoolean temp = new AtomicBoolean(false);
         Thread thread = new Thread(() -> {
             try {
-                RepoReleasesData.getRestObject("https://api.github.com/repos/Tharow-Services/Tantalum-Launcher/releases");
+                RepoReleasesData.getRestObject(TantalumConstants.NEWS_URL);
                 temp.set(true);
             } catch (RestfulAPIException e) {
                 Utils.getLogger().log(Level.WARNING, "Unable to load news", e);
