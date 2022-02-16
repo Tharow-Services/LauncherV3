@@ -20,17 +20,13 @@
 package net.tharow.tantalum.launchercore;
 
 import net.tharow.tantalum.autoupdate.IBuildNumber;
-import net.tharow.tantalum.launchercore.exception.DownloadException;
-import net.tharow.tantalum.utilslib.Utils;
-
-import java.net.URL;
 
 public class TantalumConstants {
     public static final String MIRROR_URL = "https://raw.githubusercontent.com/Tharow-Services/Tantalum-Mirror/main/";
     public static final String VERSIONS_URL = MIRROR_URL+ "version/";
     public static final String MAVEN_URL = MIRROR_URL+ "maven/";
-    public static final String MC_REPO_URL = MAVEN_URL + "lib/";
-    public static final String FML_REPO_URL = MC_REPO_URL + "fml/";
+    public static final String FORGE_REPO_URL = MAVEN_URL + "lib/";
+    public static final String FML_REPO_URL = FORGE_REPO_URL + "fml/";
     public static final String USER_AVATAR_URL = MIRROR_URL+ "assets/avatars/";
     public static final String AVATAR_URL = USER_AVATAR_URL + "gravitar/";
     public static final String UPDATE_URL = MIRROR_URL+ "stable4.json";
@@ -39,11 +35,11 @@ public class TantalumConstants {
     public static final String TANTALUM_AUTH_PLATFORM_URL = TANTALUM_AUTH_URL + "platform/";
 
     public static final String technicURL = MIRROR_URL;
-    public static final String technicVersions = "version/";
-    public static final String technicFmlLibRepo = technicURL + "lib/fml/";
-    public static final String technicForgeRepo = technicURL + "lib/";
+    //public static final String technicVersions = "version/";
+    //public static final String technicFmlLibRepo = technicURL + "lib/fml/";
+    //public static final String technicForgeRepo = technicURL + "lib/";
 
-    public static final String forgeMavenRepo = "https://files.minecraftforge.net/maven/";
+    public static final String forgeMavenRepo = MAVEN_URL;//"https://files.minecraftforge.net/maven/";
     public static final String JAVA_RUNTIMES = MIRROR_URL+ "runtimes/all.json";
     public static final String MINECRAFT_ASSETS = MIRROR_URL + "assets/objects/";
     public static final String TRACKING_URL = "https://tantalum-auth.azurewebsites.net/tracking";

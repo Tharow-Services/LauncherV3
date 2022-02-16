@@ -87,7 +87,7 @@ public class HandleVersionFileTask implements IInstallTask {
         if (isLegacy) {
             Library legacyWrapper = new Library();
             legacyWrapper.setName("net.tharow.tantalum:legacywrapper:1.2.1");
-            legacyWrapper.setUrl(TantalumConstants.technicForgeRepo);
+            legacyWrapper.setUrl(TantalumConstants.FORGE_REPO_URL);
 
             version.addLibrary(legacyWrapper);
 
