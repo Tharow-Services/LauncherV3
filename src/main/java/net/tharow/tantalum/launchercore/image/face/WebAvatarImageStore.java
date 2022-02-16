@@ -19,12 +19,14 @@
 
 package net.tharow.tantalum.launchercore.image.face;
 
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.image.IImageStore;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
 import net.tharow.tantalum.utilslib.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.logging.Level;
 
 public class WebAvatarImageStore implements IImageStore<AuthorshipInfo> {
@@ -40,7 +42,9 @@ public class WebAvatarImageStore implements IImageStore<AuthorshipInfo> {
     @Override
     public void downloadImage(AuthorshipInfo key, File target) {
         try {
-            Utils.downloadFile(key.getAvatar(), key.getUser(), target.getAbsolutePath());
+            //final String user = (key.getUser()!=null?key.getUser():"System");
+            //final String url = (key.getAvatar()!=null?key.getAvatar():TantalumConstants.AVATAR_URL+user+".png");
+            Utils.downloadFile(key.getAvatar().toLowerCase(Locale.ROOT), key.getUser(), target.getAbsolutePath());
         } catch (InterruptedException ex) {
             //User cancel
         } catch (IOException e) {

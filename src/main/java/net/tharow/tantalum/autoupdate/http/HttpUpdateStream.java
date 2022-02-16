@@ -21,6 +21,7 @@ package net.tharow.tantalum.autoupdate.http;
 
 import net.tharow.tantalum.autoupdate.IUpdateStream;
 import net.tharow.tantalum.autoupdate.io.StreamVersion;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.RestfulAPIException;
 
@@ -37,6 +38,6 @@ public class HttpUpdateStream implements IUpdateStream {
 
     @Override
     public StreamVersion getStreamVersion() throws RestfulAPIException {
-        return RestObject.getRestObject(StreamVersion.class, "https://raw.githubusercontent.com/Tharow-Services/Tantalum-Mirror/master/stable4.json");
+        return RestObject.getRestObject(StreamVersion.class, TantalumConstants.UPDATE_URL);
     }
 }

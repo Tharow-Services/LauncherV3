@@ -18,7 +18,6 @@
 
 package net.tharow.tantalum.launcher;
 
-import com.alibaba.dcm.DnsCacheManipulator;
 import com.beust.jcommander.JCommander;
 import net.tharow.tantalum.authlib.Authlib;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
@@ -46,7 +45,7 @@ import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.auth.UserModel;
 import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
-import net.tharow.tantalum.launchercore.image.face.MinotarFaceImageStore;
+import net.tharow.tantalum.launchercore.image.face.UserFaceImageStore;
 import net.tharow.tantalum.launchercore.image.face.WebAvatarImageStore;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.launchercore.install.ModpackInstaller;
@@ -70,12 +69,10 @@ import net.tharow.tantalum.minecraftcore.launch.MinecraftLauncher;
 import net.tharow.tantalum.minecraftcore.microsoft.auth.MicrosoftAuthenticator;
 import net.tharow.tantalum.minecraftcore.mojang.auth.MojangAuthenticator;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
-import net.tharow.tantalum.rest.RestfulAPIException;
 import net.tharow.tantalum.solder.ISolderApi;
 import net.tharow.tantalum.solder.SolderPackSource;
 import net.tharow.tantalum.solder.cache.CachedSolderApi;
 import net.tharow.tantalum.solder.http.HttpSolderApi;
-import net.tharow.tantalum.tantalum.RequiresAccessCode;
 import net.tharow.tantalum.tantalum.Tantalum;
 import net.tharow.tantalum.ui.components.Console;
 import net.tharow.tantalum.ui.components.ConsoleFrame;
@@ -98,7 +95,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -197,7 +193,7 @@ public class LauncherMain {
 
         try {
             build = Integer.parseInt((new VersionFileBuildNumber(resources)).getBuildNumber());
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException | StringIndexOutOfBoundsException ex) {
             //This is probably a debug build or something, build number is invalid
         }
         // These 2 need to happen *before* the launcher or the updater run, so we have valuable debug information, and so
@@ -462,7 +458,7 @@ public class LauncherMain {
         ImageRepository<ModpackModel> logoRepo = new ImageRepository<>(new PackResourceMapper(directories, resources.getImage("modpack/ModImageFiller.png"), logoType), new PackImageStore(logoType));
         ImageRepository<ModpackModel> backgroundRepo = new ImageRepository<>(new PackResourceMapper(directories, null, backgroundType), new PackImageStore(backgroundType));
 
-        ImageRepository<IUserType> skinRepo = new ImageRepository<>(new TechnicFaceMapper(directories, resources), new MinotarFaceImageStore("https://tantalum-auth.azurewebsites.net/platform/"));
+        ImageRepository<IUserType> skinRepo = new ImageRepository<>(new TantalumFaceMapper(directories, resources), new UserFaceImageStore());
 
         ImageRepository<AuthorshipInfo> avatarRepo = new ImageRepository<>(new TantalumAvatarMapper(directories, resources), new WebAvatarImageStore());
 
@@ -474,7 +470,7 @@ public class LauncherMain {
         // Add Platforms to the platform store //
         startupParameters.getPlatformUrl().forEach(tantalum::initPlatform);
         // Static Platform Addition//
-        tantalum.initPlatform("https://tantalum-auth.azurewebsites.net/platform/");
+        tantalum.initPlatform(TantalumConstants.TANTALUM_AUTH_PLATFORM_URL);
         tantalum.initPlatform("https://api.technicpack.net/", "build", "707");
 
         IInstalledPackRepository packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks.json"));

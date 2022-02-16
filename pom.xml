@@ -30,7 +30,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>${project.groupId}.${project.artifactId}.LauncherMain</mainClass>
-        <buildNumber>234</buildNumber>
+        <buildNumber>235</buildNumber>
         <installer.encrypt>no</installer.encrypt>
         <installer.password>tantalum</installer.password>
         <installer.version>v5.1-230</installer.version>
@@ -348,18 +348,7 @@
     <!-- Build profiles -->
     <profiles>
         <profile>
-            <id>static_build_number</id>
-            <activation>
-                <property>
-                    <name>!env.BUILD_NUMBER</name>
-                </property>
-            </activation>
-            <properties>
-                <buildNumber>0</buildNumber>
-            </properties>
-        </profile>
-        <profile>
-            <id>dynamic_build_number</id>
+            <id>Environment Build Number</id>
             <activation>
                 <property>
                     <name>env.BUILD_NUMBER</name>
@@ -370,14 +359,14 @@
             </properties>
         </profile>
         <profile>
-            <id>installer-encrypt</id>
+            <id>Inno Setup Require Password</id>
             <properties>
                 <installer.encrypt>yes</installer.encrypt>
             </properties>
         </profile>
         <!-- Package for Windows -->
         <profile>
-            <id>package-win</id>
+            <id>Package Windows</id>
             <activation>
                 <os>
                     <family>windows</family>
@@ -434,11 +423,14 @@
         </profile>
         <!-- Make Inno Setup -->
         <profile>
-            <id>Make Inno Setup</id>
+            <id>Inno Setup</id>
             <activation>
                 <os>
                     <family>windows</family>
                 </os>
+                <property>
+                    <name>env.INNO_HOME</name>
+                </property>
             </activation>
             <build>
                 <plugins>
@@ -455,7 +447,7 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <executable>"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"</executable>
+                        <executable>${env.INNO_HOME}iscc.exe</executable>
                         <arguments>
                             <argument>${project.basedir}\src\main\inno\Tantalum.iss</argument>
                             <argument>/DProjectDirectory=${project.basedir}</argument>
@@ -472,7 +464,7 @@
             </build>
         </profile>
         <profile>
-            <id>sign</id>
+            <id>Sign Jar</id>
             <activation>
                 <property>
                     <name>env.CERT_KEYSTORE</name>

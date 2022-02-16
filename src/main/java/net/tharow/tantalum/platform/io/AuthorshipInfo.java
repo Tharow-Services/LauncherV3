@@ -19,6 +19,8 @@
 
 package net.tharow.tantalum.platform.io;
 
+import net.tharow.tantalum.launchercore.TantalumConstants;
+
 import java.util.Date;
 
 @SuppressWarnings({"unused"})
@@ -37,11 +39,11 @@ public class AuthorshipInfo {
     }
 
     public String getUser() {
-        return user;
+        return user!=null?user:TantalumConstants.SYSTEM_USERNAME;
     }
 
     public String getAvatar() {
-        return avatar;
+        return this.avatar!=null?this.avatar:TantalumConstants.AVATAR_URL+this.getUser()+".png";
     }
 
     public Date getDate() {

@@ -24,7 +24,7 @@ import java.util.Date;
 @SuppressWarnings({"unused"})
 public class NewsArticle implements INewsArticle{
     private int id;
-    private String username;
+    private String username = "System";
     private String avatar;
     private String title;
     private String content;

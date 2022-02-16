@@ -19,6 +19,7 @@
 
 package net.tharow.tantalum.launchercore.image.face;
 
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.image.IImageStore;
 import net.tharow.tantalum.utilslib.Utils;
@@ -27,12 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 
-public class MinotarFaceImageStore implements IImageStore<IUserType> {
-    private final String mBaseUrl;
-
-    public MinotarFaceImageStore(String baseUrl) {
-        mBaseUrl = baseUrl;
-    }
+public class UserFaceImageStore implements IImageStore<IUserType> {
 
     @Override
     public boolean canDownloadImage(IUserType user, File location) {
@@ -43,7 +39,7 @@ public class MinotarFaceImageStore implements IImageStore<IUserType> {
     public void downloadImage(IUserType user, File location) {
         //Utils.getLogger().log(Level.INFO, "User Face Image Isn't Currently Implemented");
         try {
-            Utils.downloadFile(mBaseUrl + "avatar.php?u=" + user.getUsername(), user.getDisplayName(), location.getAbsolutePath());
+            Utils.downloadFile(TantalumConstants.USER_AVATAR_URL + user.getDisplayName() + ".png", user.getDisplayName(), location.getAbsolutePath());
         } catch (InterruptedException ex) {
             //User cancelled
         } catch (IOException e) {

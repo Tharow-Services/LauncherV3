@@ -77,7 +77,7 @@ public class ModpackInfoPanel extends JPanel implements IImageJobListener<Modpac
         dataDisplay.setModpack(modpack);
         deleteButton.setVisible(modpack.getInstalledPack() != null);
 
-        @SuppressWarnings("unchecked") ImageJob<ModpackModel> job = backgroundRepo.startImageJob(modpack);
+        ImageJob<ModpackModel> job = backgroundRepo.startImageJob(modpack);
         job.addJobListener(this);
         background.setImage(job.getImage());
 
@@ -87,7 +87,7 @@ public class ModpackInfoPanel extends JPanel implements IImageJobListener<Modpac
 
         if (feed != null) {
             for (FeedItem item : feed) {
-                @SuppressWarnings("unchecked") FeedItemView itemView = new FeedItemView(resources, item, avatarRepo.startImageJob(item.getAuthorship()));
+                FeedItemView itemView = new FeedItemView(resources, item, avatarRepo.startImageJob(item.getAuthorship()));
                 itemView.addActionListener(e -> clickFeedItem((FeedItemView) e.getSource(), e.getActionCommand()));
                 feedGallery.add(itemView);
             }
@@ -110,7 +110,7 @@ public class ModpackInfoPanel extends JPanel implements IImageJobListener<Modpac
         feedGallery.selectNextComponent();
     }
 
-    protected void clickFeedItem(FeedItemView item, String command) {
+    protected void clickFeedItem(FeedItemView item, String ignored) {
         Rectangle r = item.getVisibleRect();
 
         if (r.getSize().equals(item.getSize()))

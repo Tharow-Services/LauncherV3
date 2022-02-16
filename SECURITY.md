@@ -2,14 +2,14 @@
 
 ## Supported Versions
 
-Currently There Are No Supported Versions
+Currently, Only The Latest Version Is Supported
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| Build | Supported          |
+|-------|--------------------|
+| 235   | :white_check_mark: |
+| 230   | :x:                |
+| 220   | :x:                |
+| 205   | :x:                |
 
 ## Reporting a Vulnerability
 

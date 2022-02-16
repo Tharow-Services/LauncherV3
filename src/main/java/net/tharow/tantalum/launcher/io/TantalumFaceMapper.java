@@ -26,11 +26,11 @@ import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public class TechnicFaceMapper implements IImageMapper<IUserType> {
+public class TantalumFaceMapper implements IImageMapper<IUserType> {
     private final LauncherDirectories directories;
     private final BufferedImage defaultImage;
 
-    public TechnicFaceMapper(LauncherDirectories directories, ResourceLoader resources) {
+    public TantalumFaceMapper(LauncherDirectories directories, ResourceLoader resources) {
         this.directories = directories;
         defaultImage = resources.getImage("news/authorHelm.png");
     }
