@@ -25,7 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class DiscoverResourceLoader extends ImageResourceLoader {
-    public static Logger XRLog = Utils.getLogger();
+    //public static Logger XRLog = Utils.getLogger();
     public static final RepaintListener NO_OP_REPAINT_LISTENER = doLayout -> XRLog.general(Level.FINE, "No-op repaint requested");
     private final Map _imageCache;
 
