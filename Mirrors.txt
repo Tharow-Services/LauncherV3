@@ -1,0 +1,24 @@
+Dependency Mirrors
+	1. Official Minecraft => 
+		Url: https://libraries.minecraft.net > 
+		Supports: All Minecraft
+	2. Official Forge => 
+		Url: https://files.minecraftforge.net/maven
+		Alias: https://maven.minecraftforge.net
+		Supports: All Forge
+	3. Technic Forge 
+		Url: https://mirror.technicpack.net/Technic/lib
+		Github-Alt: https://raw.githubusercontent.com/TechnicPack/Technic/master/lib 
+		Supports: Forge Dependencies
+	4. Tantalum Forge
+		Url: https://raw.githubusercontent.com/Tharow-Services/Technic/master/lib
+		Supports: Same As Technic Forge
+	5. Tantalum Minecraft 
+		Url: https://raw.githubusercontent.com/Tharow-Services/Tantalum-Mirror/main/maven
+		Supports: Partial Minecraft & Forge Dependencies
+	6. Official BMCLAPI 
+		Url: https://bmclapi.bangbang93.com/maven 
+		Supports: All Forge, Minecraft, Authlin-Injector, and Fabric
+	7. Alt BMCLAPI 
+		Url: https://download.mcbbs.net/maven 
+		Supports: Same As Official BMCLAPI
