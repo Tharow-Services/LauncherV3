@@ -30,7 +30,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>${project.groupId}.${project.artifactId}.LauncherMain</mainClass>
-        <buildNumber>236</buildNumber>
+        <buildNumber>237</buildNumber>
         <installer.encrypt>no</installer.encrypt>
         <installer.password>tantalum</installer.password>
         <installer.version>v5.1-230</installer.version>

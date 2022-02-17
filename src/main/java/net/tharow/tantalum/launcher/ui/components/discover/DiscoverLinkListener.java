@@ -49,12 +49,12 @@ public class DiscoverLinkListener extends LinkListener {
 
     @Override
     public void linkClicked(BasicPanel panel, String uri) {
-        if (uri.startsWith("platform://")) {
+        if (uri.startsWith("modpack://")) {
             if (uri.length() < 12)
                 return;
             String slug = uri.substring(11);
 
-            String platformUri = this.platform.getPlatformUri(slug);
+            String platformUri = this.modpackSelector.getSelectedPack().getDisplayName();
             try {
                 modpackSelector.setFilter(platformUri);
             } catch (Exception ex) {

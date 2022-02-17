@@ -19,10 +19,11 @@
 package net.tharow.tantalum.launcher.ui.components.discover;
 
 import net.tharow.tantalum.launcher.ui.components.modpacks.ModpackSelector;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
 import net.tharow.tantalum.platform.IPlatformApi;
-import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.ui.controls.TiledBackground;
+import net.tharow.tantalum.ui.lang.ResourceLoader;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -35,12 +36,12 @@ import org.xhtmlrenderer.swing.FSMouseListener;
 import org.xhtmlrenderer.swing.ImageResourceLoader;
 import org.xhtmlrenderer.swing.SwingReplacedElementFactory;
 
-import javax.net.ssl.SSLException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class DiscoverInfoPanel extends TiledBackground {
@@ -56,6 +57,8 @@ public class DiscoverInfoPanel extends TiledBackground {
         this.directories = directories;
         this.resources = loader;
 
+        if (discoverUrl == null)
+            discoverUrl = TantalumConstants.DISCOVER_URL;
 
         final String runnableAccessDiscover = discoverUrl;
 
@@ -117,15 +120,18 @@ public class DiscoverInfoPanel extends TiledBackground {
         panel.getSharedContext().setReplacedElementFactory(factory);
         panel.getSharedContext().setFontMapping("Raleway", resources.getFont(ResourceLoader.FONT_RALEWAY, 12));
 
-        EventQueue.invokeLater(() -> {
-            try {
-                File localCache = new File(directories.getCacheDirectory(), "discover.html");
-                panel.setDocument(getDiscoverDocument(runnableAccessDiscover, localCache), runnableAccessDiscover);
-            } catch (Exception ex) {
-                //Can't load document from internet- don't beef
-                ex.printStackTrace();
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    File localCache = new File(directories.getCacheDirectory(), "discover.html");
+                    panel.setDocument(getDiscoverDocument(runnableAccessDiscover, localCache), runnableAccessDiscover);
+                } catch (Exception ex) {
+                    //Can't load document from internet- don't beef
+                    ex.printStackTrace();
 
-                triggerLoadListener();
+                    triggerLoadListener();
+                }
             }
         });
 
@@ -175,9 +181,8 @@ public class DiscoverInfoPanel extends TiledBackground {
                 FileUtils.writeByteArrayToFile(localCache, data);
                 return doc;
             }
-        } catch (SSLException ex){
-            Utils.getLogger().warning("Discover Page Gave An SSL Error");
-            //ex.printStackTrace();
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

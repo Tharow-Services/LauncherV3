@@ -51,7 +51,7 @@ public final class StartupParameters {
     @Parameter(names = {"-platform","-p"}, description = "Add A Platform To the list")
     private List<String> platform = new ArrayList<>();
     @Parameter(names = {"-discover","-d"}, description = "Change Discover Url")
-    private String discover = "https://tantalum.tharow.net/discover.html";
+    private String discover = null;
     @Parameter(names = {"-overrideRoots","-orca"}, description = "Force the override of root ca Certificates")
     private boolean overrideRoots = false;
     @Parameter(names = {"-file","-f"}, description = "Install a modpack from file", converter = FileConverter.class)

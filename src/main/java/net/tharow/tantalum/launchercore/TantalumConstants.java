@@ -34,6 +34,8 @@ public class TantalumConstants {
     public static final String TANTALUM_AUTH_URL = "https://tantalum-auth.azurewebsites.net/";
     public static final String TANTALUM_AUTH_PLATFORM_URL = TANTALUM_AUTH_URL + "platform/";
 
+    public static final String DISCOVER_URL = "https://tantalum.tharow.net/discover.html";
+
     public static final String technicURL = MIRROR_URL;
     //public static final String technicVersions = "version/";
     //public static final String technicFmlLibRepo = technicURL + "lib/fml/";
