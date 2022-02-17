@@ -1,6 +1,9 @@
 package net.tharow.tantalum.launcher.ui.components.discover;
 
+import net.tharow.tantalum.launchercore.logging.Level;
+import net.tharow.tantalum.launchercore.logging.Logger;
 import net.tharow.tantalum.utilslib.ImageUtils;
+import net.tharow.tantalum.utilslib.Utils;
 import org.xhtmlrenderer.extend.FSImage;
 import org.xhtmlrenderer.resource.ImageResource;
 import org.xhtmlrenderer.swing.AWTFSImage;
@@ -20,11 +23,12 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 public class DiscoverResourceLoader extends ImageResourceLoader {
+    public static Logger XRLog = Utils.getLogger();
     public static final RepaintListener NO_OP_REPAINT_LISTENER = doLayout -> XRLog.general(Level.FINE, "No-op repaint requested");
     private final Map _imageCache;
+
 
     private final ImageLoadQueue _loadQueue;
 

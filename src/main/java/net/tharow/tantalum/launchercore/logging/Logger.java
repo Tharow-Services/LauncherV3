@@ -2,9 +2,11 @@ package net.tharow.tantalum.launchercore.logging;
 
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import net.tharow.tantalum.utilslib.Utils;
+import org.apache.commons.logging.Log;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.function.Supplier;
@@ -144,4 +146,36 @@ public class Logger extends java.util.logging.Logger {
         }
     }
 
+    public void exception(String s) {
+        LogRecord record = new LogRecord(Level.SEVERE, s);
+        record.setSourceClassName("XML Discover");
+        record.setSourceMethodName("Exception");
+        super.log(Level.SEVERE, s);
+    }
+
+    public void exception(String s, IOException e) {
+        LogRecord record = new LogRecord(Level.SEVERE, s);
+        record.setThrown(e);
+        record.setSourceClassName("XML Discover");
+        record.setSourceMethodName("Exception");
+        super.log(record);
+    }
+
+    public void load(Level fine, String s) {
+        LogRecord record = new LogRecord(fine, s);
+        record.setSourceClassName("XML Discover");
+        record.setSourceMethodName("Load");
+        super.log(record);
+    }
+
+    public void load(String s) {
+        this.load(Level.INFO, s);
+    }
+
+    public void general(Level fine, String s) {
+        LogRecord record = new LogRecord(fine, s);
+        record.setSourceClassName("XML Discover");
+        record.setSourceMethodName("General");
+        super.log(record);
+    }
 }
