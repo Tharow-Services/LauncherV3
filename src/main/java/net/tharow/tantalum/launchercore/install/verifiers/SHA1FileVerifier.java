@@ -41,7 +41,10 @@ public class SHA1FileVerifier implements IFileVerifier {
 
         if (!hashMatches)
             Utils.getLogger().warning("SHA1 verification for " + file + " failed. Expected " + sha1Hash + ", got " + resultSha1);
-
+        if (this.sha1Hash.equals("SHA-1 Hash Bypass")) {
+            Utils.getLogger().warning("SHA1 verification for " + file + " Bypassed Hash: "+resultSha1);
+            return true;
+        }
         return hashMatches;
     }
 }
