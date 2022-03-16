@@ -24,6 +24,7 @@ import net.tharow.tantalum.launchercore.install.ITasksQueue;
 import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
 import net.tharow.tantalum.launchercore.install.tasks.DownloadFileTask;
 import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
+import net.tharow.tantalum.launchercore.install.verifiers.BlankVerifier;
 import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
 import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
@@ -33,6 +34,7 @@ import net.tharow.tantalum.minecraftcore.mojang.java.JavaRuntimes;
 import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
 import net.tharow.tantalum.minecraftcore.mojang.version.io.Download;
 import net.tharow.tantalum.minecraftcore.mojang.version.io.JavaVersion;
+import net.tharow.tantalum.utilslib.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -132,7 +134,7 @@ public final class EnsureJavaRuntimeManifestTask implements IInstallTask {
 
         (new File(output.getParent())).mkdirs();
 
-        IFileVerifier fileVerifier = new SHA1FileVerifier(manifest.getSha1());
+        IFileVerifier fileVerifier = new SHA1FileVerifier(runtime.getManifest().getSha1());
 
         if (!output.exists() || !fileVerifier.isFileValid(output)) {
             examineJavaQueue.addTask(new DownloadFileTask(manifest.getUrl(), output, fileVerifier));

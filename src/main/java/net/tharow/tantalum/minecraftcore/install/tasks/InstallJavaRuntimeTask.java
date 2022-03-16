@@ -25,6 +25,7 @@ import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
 import net.tharow.tantalum.launchercore.install.tasks.EnsureFileTask;
 import net.tharow.tantalum.launchercore.install.tasks.EnsureLinkedFileTask;
 import net.tharow.tantalum.launchercore.install.tasks.IInstallTask;
+import net.tharow.tantalum.launchercore.install.verifiers.BlankVerifier;
 import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
 import net.tharow.tantalum.launchercore.install.verifiers.SHA1FileVerifier;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
@@ -160,7 +161,7 @@ public final class InstallJavaRuntimeTask implements IInstallTask {
 
                 IFileVerifier verifier = new SHA1FileVerifier(download.getSha1());
 
-                @SuppressWarnings("unchecked") EnsureFileTask ensureFileTask = new EnsureFileTask(target, verifier, null, download.getUrl(), downloadJavaQueue, null);
+                EnsureFileTask ensureFileTask = new EnsureFileTask<>(target, verifier, null, download.getUrl(), downloadJavaQueue, null);
                 ensureFileTask.setExecutable(runtimeFile.isExecutable());
 
                 examineJavaQueue.addTask(ensureFileTask);

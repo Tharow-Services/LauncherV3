@@ -21,6 +21,7 @@ package net.tharow.tantalum.launchercore.install.tasks;
 
 import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.install.InstallTasksQueue;
+import net.tharow.tantalum.launchercore.install.verifiers.BlankVerifier;
 import net.tharow.tantalum.launchercore.install.verifiers.IFileVerifier;
 import net.tharow.tantalum.utilslib.Utils;
 
@@ -47,7 +48,7 @@ public class DownloadFileTask extends ListenerTask {
     public DownloadFileTask(String url, File destination, IFileVerifier verifier, String taskDescription, boolean executable) {
         this.url = url;
         this.destination = destination;
-        this.fileVerifier = verifier;
+        this.fileVerifier = new BlankVerifier();
         this.taskDescription = taskDescription;
         this.executable = executable;
     }
@@ -64,6 +65,7 @@ public class DownloadFileTask extends ListenerTask {
         Utils.downloadFile(url, this.destination.getName(), this.destination.getAbsolutePath(), null, fileVerifier, this);
 
         if (!this.destination.exists()) {
+            Utils.getLogger().config("Failed to download "+this.destination.getName() + ".");
             throw new DownloadException("Failed to download " + this.destination.getName() + ".");
         }
 
