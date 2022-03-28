@@ -1,0 +1,191 @@
+<html>
+<head>
+<title>NewsInfoPanel.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #808080;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #cc7832;}
+.s3 { color: #6a8759;}
+.s4 { color: #6897bb;}
+.ln { color: #606366; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+NewsInfoPanel.java</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">/* 
+<a name="l2"><span class="ln">2    </span></a> * This file is part of The Technic Launcher Version 3. 
+<a name="l3"><span class="ln">3    </span></a> * Copyright ©2015 Syndicate, LLC 
+<a name="l4"><span class="ln">4    </span></a> * 
+<a name="l5"><span class="ln">5    </span></a> * The Technic Launcher is free software: you can redistribute it and/or modify 
+<a name="l6"><span class="ln">6    </span></a> * it under the terms of the GNU General Public License as published by 
+<a name="l7"><span class="ln">7    </span></a> * the Free Software Foundation, either version 3 of the License, or 
+<a name="l8"><span class="ln">8    </span></a> * (at your option) any later version. 
+<a name="l9"><span class="ln">9    </span></a> * 
+<a name="l10"><span class="ln">10   </span></a> * The Technic Launcher  is distributed in the hope that it will be useful, 
+<a name="l11"><span class="ln">11   </span></a> * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+<a name="l12"><span class="ln">12   </span></a> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+<a name="l13"><span class="ln">13   </span></a> * GNU General Public License for more details. 
+<a name="l14"><span class="ln">14   </span></a> * 
+<a name="l15"><span class="ln">15   </span></a> * You should have received a copy of the GNU General Public License 
+<a name="l16"><span class="ln">16   </span></a> * along with the Technic Launcher.  If not, see &lt;http://www.gnu.org/licenses/&gt;. 
+<a name="l17"><span class="ln">17   </span></a> */</span>
+<a name="l18"><span class="ln">18   </span></a>
+<a name="l19"><span class="ln">19   </span></a><span class="s2">package </span><span class="s1">net.tharow.tantalum.launcher.ui.components.news</span><span class="s2">;</span>
+<a name="l20"><span class="ln">20   </span></a>
+<a name="l21"><span class="ln">21   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/ui/controls/SimpleMouseListener.java.html">net.tharow.tantalum.ui.controls.SimpleMouseListener</a>;</span>
+<a name="l22"><span class="ln">22   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/ui/lang/ResourceLoader.java.html">net.tharow.tantalum.ui.lang.ResourceLoader</a>;</span>
+<a name="l23"><span class="ln">23   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/launcher/ui/LauncherFrame.java.html">net.tharow.tantalum.launcher.ui.LauncherFrame</a>;</span>
+<a name="l24"><span class="ln">24   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/ui/controls/RoundedButton.java.html">net.tharow.tantalum.ui.controls.RoundedButton</a>;</span>
+<a name="l25"><span class="ln">25   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/ui/controls/list/SimpleScrollbarUI.java.html">net.tharow.tantalum.ui.controls.list.SimpleScrollbarUI</a>;</span>
+<a name="l26"><span class="ln">26   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/launchercore/image/ImageRepository.java.html">net.tharow.tantalum.launchercore.image.ImageRepository</a>;</span>
+<a name="l27"><span class="ln">27   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/platform/io/AuthorshipInfo.java.html">net.tharow.tantalum.platform.io.AuthorshipInfo</a>;</span>
+<a name="l28"><span class="ln">28   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/platform/io/NewsArticle.java.html">net.tharow.tantalum.platform.io.NewsArticle</a>;</span>
+<a name="l29"><span class="ln">29   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/utilslib/DesktopUtils.java.html">net.tharow.tantalum.utilslib.DesktopUtils</a>;</span>
+<a name="l30"><span class="ln">30   </span></a>
+<a name="l31"><span class="ln">31   </span></a><span class="s2">import </span><span class="s1">javax.swing.*</span><span class="s2">;</span>
+<a name="l32"><span class="ln">32   </span></a><span class="s2">import </span><span class="s1">javax.swing.event.HyperlinkEvent</span><span class="s2">;</span>
+<a name="l33"><span class="ln">33   </span></a><span class="s2">import </span><span class="s1">java.awt.*</span><span class="s2">;</span>
+<a name="l34"><span class="ln">34   </span></a><span class="s2">import </span><span class="s1">java.awt.event.*</span><span class="s2">;</span>
+<a name="l35"><span class="ln">35   </span></a><span class="s2">import </span><span class="s1">java.beans.PropertyChangeEvent</span><span class="s2">;</span>
+<a name="l36"><span class="ln">36   </span></a><span class="s2">import </span><span class="s1">java.beans.PropertyChangeListener</span><span class="s2">;</span>
+<a name="l37"><span class="ln">37   </span></a>
+<a name="l38"><span class="ln">38   </span></a><span class="s2">public class </span><span class="s1">NewsInfoPanel </span><span class="s2">extends </span><span class="s1">JPanel </span><span class="s2">implements </span><span class="s1">PropertyChangeListener {</span>
+<a name="l39"><span class="ln">39   </span></a>    <span class="s2">private final <a href="../../../../../../../net/tharow/tantalum/ui/lang/ResourceLoader.java.html">ResourceLoader</a> </span><span class="s1">resources</span><span class="s2">;</span>
+<a name="l40"><span class="ln">40   </span></a>    <span class="s2">private final <a href="../../../../../../../net/tharow/tantalum/launchercore/image/ImageRepository.java.html">ImageRepository&lt;AuthorshipInfo&gt;</a> </span><span class="s1">avatarRepo</span><span class="s2">;</span>
+<a name="l41"><span class="ln">41   </span></a>
+<a name="l42"><span class="ln">42   </span></a>    <span class="s1">JTextPane newsText</span><span class="s2">;</span>
+<a name="l43"><span class="ln">43   </span></a>    <span class="s1">JScrollPane newsScroller</span><span class="s2">;</span>
+<a name="l44"><span class="ln">44   </span></a>    <a href="AuthorshipWidget.java.html">AuthorshipWidget</a> <span class="s1">authorshipInfo</span><span class="s2">;</span>
+<a name="l45"><span class="ln">45   </span></a>    <span class="s1">JLabel title</span><span class="s2">;</span>
+<a name="l46"><span class="ln">46   </span></a>
+<a name="l47"><span class="ln">47   </span></a>    <span class="s2">private </span><span class="s1">String url = </span><span class="s3">&quot;&quot;</span><span class="s2">;</span>
+<a name="l48"><span class="ln">48   </span></a>
+<a name="l49"><span class="ln">49   </span></a>    <span class="s2">public </span><span class="s1">NewsInfoPanel(<a href="../../../../../../../net/tharow/tantalum/ui/lang/ResourceLoader.java.html">ResourceLoader</a> resources</span><span class="s2">, <a href="../../../../../../../net/tharow/tantalum/launchercore/image/ImageRepository.java.html">ImageRepository&lt;AuthorshipInfo&gt;</a> </span><span class="s1">avatarRepo) {</span>
+<a name="l50"><span class="ln">50   </span></a>
+<a name="l51"><span class="ln">51   </span></a>        <span class="s2">this</span><span class="s1">.resources = resources</span><span class="s2">;</span>
+<a name="l52"><span class="ln">52   </span></a>        <span class="s2">this</span><span class="s1">.avatarRepo = avatarRepo</span><span class="s2">;</span>
+<a name="l53"><span class="ln">53   </span></a>
+<a name="l54"><span class="ln">54   </span></a>        <span class="s1">initComponents()</span><span class="s2">;</span>
+<a name="l55"><span class="ln">55   </span></a>    <span class="s1">}</span>
+<a name="l56"><span class="ln">56   </span></a>
+<a name="l57"><span class="ln">57   </span></a>    <span class="s2">public void </span><span class="s1">setArticle(<a href="../../../../../../../net/tharow/tantalum/platform/io/NewsArticle.java.html">NewsArticle</a> article) {</span>
+<a name="l58"><span class="ln">58   </span></a>        <span class="s2">if </span><span class="s1">(article == </span><span class="s2">null</span><span class="s1">) {</span>
+<a name="l59"><span class="ln">59   </span></a>            <span class="s1">newsText.setText(</span><span class="s3">&quot;&quot;</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l60"><span class="ln">60   </span></a>            <span class="s1">url = </span><span class="s3">&quot;&quot;</span><span class="s2">;</span>
+<a name="l61"><span class="ln">61   </span></a>            <span class="s2">return;</span>
+<a name="l62"><span class="ln">62   </span></a>        <span class="s1">}</span>
+<a name="l63"><span class="ln">63   </span></a>
+<a name="l64"><span class="ln">64   </span></a>        <span class="s1">title.setText(article.getTitle())</span><span class="s2">;</span>
+<a name="l65"><span class="ln">65   </span></a>        <span class="s1">url = article.getUrl()</span><span class="s2">;</span>
+<a name="l66"><span class="ln">66   </span></a>        <span class="s1">newsText.setText(</span><span class="s3">&quot;&lt;html&gt;&lt;head&gt;&lt;style type=</span><span class="s2">\&quot;</span><span class="s3">text/css</span><span class="s2">\&quot;</span><span class="s3">&gt;a{color:#309aeb}body{font-family:</span><span class="s2">\&quot;</span><span class="s3">&quot; </span><span class="s1">+ newsText.getFont().getFamily() + </span><span class="s3">&quot;</span><span class="s2">\&quot;</span><span class="s3">;color:#D0D0D0}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&quot;</span><span class="s1">+</span>
+<a name="l67"><span class="ln">67   </span></a>            <span class="s1">article.getContent() +</span>
+<a name="l68"><span class="ln">68   </span></a>            <span class="s3">&quot;&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l69"><span class="ln">69   </span></a>
+<a name="l70"><span class="ln">70   </span></a>        <span class="s0">//noinspection unchecked</span>
+<a name="l71"><span class="ln">71   </span></a>        <span class="s1">authorshipInfo.setAuthorshipInfo(article.getAuthorshipInfo()</span><span class="s2">, </span><span class="s1">avatarRepo.startImageJob(article.getAuthorshipInfo()))</span><span class="s2">;</span>
+<a name="l72"><span class="ln">72   </span></a>
+<a name="l73"><span class="ln">73   </span></a>        <span class="s1">EventQueue.invokeLater(() -&gt; newsText.scrollRectToVisible(</span><span class="s2">new </span><span class="s1">Rectangle(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">1</span><span class="s2">, </span><span class="s4">1</span><span class="s1">)))</span><span class="s2">;</span>
+<a name="l74"><span class="ln">74   </span></a>    <span class="s1">}</span>
+<a name="l75"><span class="ln">75   </span></a>
+<a name="l76"><span class="ln">76   </span></a>    <span class="s2">protected void </span><span class="s1">visitCurrentItem() {</span>
+<a name="l77"><span class="ln">77   </span></a>        <span class="s2">if </span><span class="s1">(url != </span><span class="s2">null </span><span class="s1">&amp;&amp; !url.equals(</span><span class="s3">&quot;&quot;</span><span class="s1">)) {</span>
+<a name="l78"><span class="ln">78   </span></a>            <a href="../../../../../../../net/tharow/tantalum/utilslib/DesktopUtils.java.html">DesktopUtils</a><span class="s1">.browseUrl(url)</span><span class="s2">;</span>
+<a name="l79"><span class="ln">79   </span></a>        <span class="s1">}</span>
+<a name="l80"><span class="ln">80   </span></a>    <span class="s1">}</span>
+<a name="l81"><span class="ln">81   </span></a>
+<a name="l82"><span class="ln">82   </span></a>    <span class="s2">private void </span><span class="s1">initComponents() {</span>
+<a name="l83"><span class="ln">83   </span></a>        <span class="s1">setLayout(</span><span class="s2">new </span><span class="s1">GridBagLayout())</span><span class="s2">;</span>
+<a name="l84"><span class="ln">84   </span></a>        <span class="s1">setBorder(BorderFactory.createEmptyBorder(</span><span class="s4">20</span><span class="s2">,</span><span class="s4">20</span><span class="s2">,</span><span class="s4">18</span><span class="s2">,</span><span class="s4">16</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l85"><span class="ln">85   </span></a>        <span class="s1">setBackground(<a href="../../../../../../../net/tharow/tantalum/launcher/ui/LauncherFrame.java.html">LauncherFrame</a>.COLOR_CENTRAL_BACK_OPAQUE)</span><span class="s2">;</span>
+<a name="l86"><span class="ln">86   </span></a>
+<a name="l87"><span class="ln">87   </span></a>        <span class="s1">title = </span><span class="s2">new </span><span class="s1">JLabel(</span><span class="s3">&quot;&quot;</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l88"><span class="ln">88   </span></a>        <span class="s1">title.setForeground(<a href="../../../../../../../net/tharow/tantalum/launcher/ui/LauncherFrame.java.html">LauncherFrame</a>.COLOR_WHITE_TEXT)</span><span class="s2">;</span>
+<a name="l89"><span class="ln">89   </span></a>        <span class="s1">title.setFont(resources.getFont(<a href="../../../../../../../net/tharow/tantalum/ui/lang/ResourceLoader.java.html">ResourceLoader</a>.FONT_RALEWAY</span><span class="s2">, </span><span class="s4">26</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l90"><span class="ln">90   </span></a>        <span class="s1">title.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))</span><span class="s2">;</span>
+<a name="l91"><span class="ln">91   </span></a>
+<a name="l92"><span class="ln">92   </span></a>        <span class="s1">title.addMouseListener(</span><span class="s2">new <a href="../../../../../../../net/tharow/tantalum/ui/controls/SimpleMouseListener.java.html">SimpleMouseListener</a></span><span class="s1">(</span><span class="s2">this</span><span class="s1">::visitCurrentItem))</span><span class="s2">;</span>
+<a name="l93"><span class="ln">93   </span></a>
+<a name="l94"><span class="ln">94   </span></a>        <span class="s1">add(title</span><span class="s2">, new </span><span class="s1">GridBagConstraints(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">2</span><span class="s2">, </span><span class="s4">1</span><span class="s2">, </span><span class="s4">1.0</span><span class="s2">, </span><span class="s4">0.0</span><span class="s2">, </span><span class="s1">GridBagConstraints.NORTHWEST</span><span class="s2">, </span><span class="s1">GridBagConstraints.HORIZONTAL</span><span class="s2">, new </span><span class="s1">Insets(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s1">)</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l95"><span class="ln">95   </span></a>
+<a name="l96"><span class="ln">96   </span></a>        <span class="s1">authorshipInfo = </span><span class="s2">new <a href="AuthorshipWidget.java.html">AuthorshipWidget</a></span><span class="s1">(resources)</span><span class="s2">;</span>
+<a name="l97"><span class="ln">97   </span></a>        <span class="s1">add(authorshipInfo</span><span class="s2">, new </span><span class="s1">GridBagConstraints(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">1</span><span class="s2">, </span><span class="s4">2</span><span class="s2">, </span><span class="s4">1</span><span class="s2">, </span><span class="s4">1.0</span><span class="s2">, </span><span class="s4">0.0</span><span class="s2">, </span><span class="s1">GridBagConstraints.NORTHWEST</span><span class="s2">, </span><span class="s1">GridBagConstraints.NONE</span><span class="s2">, new </span><span class="s1">Insets(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">8</span><span class="s2">, </span><span class="s4">0</span><span class="s1">)</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l98"><span class="ln">98   </span></a>
+<a name="l99"><span class="ln">99   </span></a>        <span class="s1">newsText = </span><span class="s2">new </span><span class="s1">JTextPane()</span><span class="s2">;</span>
+<a name="l100"><span class="ln">100  </span></a>        <span class="s1">newsText.setBorder(BorderFactory.createEmptyBorder(</span><span class="s4">5</span><span class="s2">, </span><span class="s4">5</span><span class="s2">, </span><span class="s4">5</span><span class="s2">, </span><span class="s4">5</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l101"><span class="ln">101  </span></a>        <span class="s1">newsText.setOpaque(</span><span class="s2">false</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l102"><span class="ln">102  </span></a>        <span class="s1">newsText.setForeground(<a href="../../../../../../../net/tharow/tantalum/launcher/ui/LauncherFrame.java.html">LauncherFrame</a>.COLOR_WHITE_TEXT)</span><span class="s2">;</span>
+<a name="l103"><span class="ln">103  </span></a>        <span class="s1">newsText.setFont(resources.getFont(<a href="../../../../../../../net/tharow/tantalum/ui/lang/ResourceLoader.java.html">ResourceLoader</a>.FONT_OPENSANS</span><span class="s2">, </span><span class="s4">16</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l104"><span class="ln">104  </span></a>        <span class="s1">newsText.setEditable(</span><span class="s2">false</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l105"><span class="ln">105  </span></a>        <span class="s1">newsText.setHighlighter(</span><span class="s2">null</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l106"><span class="ln">106  </span></a>        <span class="s1">newsText.setAlignmentX(LEFT_ALIGNMENT)</span><span class="s2">;</span>
+<a name="l107"><span class="ln">107  </span></a>        <span class="s1">newsText.setContentType(</span><span class="s3">&quot;text/html&quot;</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l108"><span class="ln">108  </span></a>        <span class="s1">newsText.addHyperlinkListener(e -&gt; {</span>
+<a name="l109"><span class="ln">109  </span></a>            <span class="s2">if </span><span class="s1">(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {</span>
+<a name="l110"><span class="ln">110  </span></a>                <span class="s2">if </span><span class="s1">(e.getURL() != </span><span class="s2">null</span><span class="s1">)</span>
+<a name="l111"><span class="ln">111  </span></a>                    <a href="../../../../../../../net/tharow/tantalum/utilslib/DesktopUtils.java.html">DesktopUtils</a><span class="s1">.browseUrl(e.getURL().toString())</span><span class="s2">;</span>
+<a name="l112"><span class="ln">112  </span></a>            <span class="s1">}</span>
+<a name="l113"><span class="ln">113  </span></a>        <span class="s1">})</span><span class="s2">;</span>
+<a name="l114"><span class="ln">114  </span></a>        <span class="s1">newsText.addComponentListener(</span><span class="s2">new </span><span class="s1">ComponentListener() {</span>
+<a name="l115"><span class="ln">115  </span></a>            <span class="s1">@Override</span>
+<a name="l116"><span class="ln">116  </span></a>            <span class="s2">public void </span><span class="s1">componentResized(ComponentEvent e) {</span>
+<a name="l117"><span class="ln">117  </span></a>                <span class="s1">NewsInfoPanel.</span><span class="s2">this</span><span class="s1">.revalidate()</span><span class="s2">;</span>
+<a name="l118"><span class="ln">118  </span></a>            <span class="s1">}</span>
+<a name="l119"><span class="ln">119  </span></a>
+<a name="l120"><span class="ln">120  </span></a>            <span class="s1">@Override</span>
+<a name="l121"><span class="ln">121  </span></a>            <span class="s2">public void </span><span class="s1">componentMoved(ComponentEvent e) {</span>
+<a name="l122"><span class="ln">122  </span></a>
+<a name="l123"><span class="ln">123  </span></a>            <span class="s1">}</span>
+<a name="l124"><span class="ln">124  </span></a>
+<a name="l125"><span class="ln">125  </span></a>            <span class="s1">@Override</span>
+<a name="l126"><span class="ln">126  </span></a>            <span class="s2">public void </span><span class="s1">componentShown(ComponentEvent e) {</span>
+<a name="l127"><span class="ln">127  </span></a>
+<a name="l128"><span class="ln">128  </span></a>            <span class="s1">}</span>
+<a name="l129"><span class="ln">129  </span></a>
+<a name="l130"><span class="ln">130  </span></a>            <span class="s1">@Override</span>
+<a name="l131"><span class="ln">131  </span></a>            <span class="s2">public void </span><span class="s1">componentHidden(ComponentEvent e) {</span>
+<a name="l132"><span class="ln">132  </span></a>
+<a name="l133"><span class="ln">133  </span></a>            <span class="s1">}</span>
+<a name="l134"><span class="ln">134  </span></a>        <span class="s1">})</span><span class="s2">;</span>
+<a name="l135"><span class="ln">135  </span></a>
+<a name="l136"><span class="ln">136  </span></a>        <span class="s1">newsScroller = </span><span class="s2">new </span><span class="s1">JScrollPane(newsText</span><span class="s2">, </span><span class="s1">JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED</span><span class="s2">, </span><span class="s1">JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)</span><span class="s2">;</span>
+<a name="l137"><span class="ln">137  </span></a>        <span class="s1">newsScroller.getVerticalScrollBar().setUI(</span><span class="s2">new <a href="../../../../../../../net/tharow/tantalum/ui/controls/list/SimpleScrollbarUI.java.html">SimpleScrollbarUI</a></span><span class="s1">(<a href="../../../../../../../net/tharow/tantalum/launcher/ui/LauncherFrame.java.html">LauncherFrame</a>.COLOR_SCROLL_TRACK</span><span class="s2">, <a href="../../../../../../../net/tharow/tantalum/launcher/ui/LauncherFrame.java.html">LauncherFrame</a></span><span class="s1">.COLOR_SCROLL_THUMB))</span><span class="s2">;</span>
+<a name="l138"><span class="ln">138  </span></a>        <span class="s1">newsScroller.getVerticalScrollBar().setPreferredSize(</span><span class="s2">new </span><span class="s1">Dimension(</span><span class="s4">10</span><span class="s2">, </span><span class="s4">10</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l139"><span class="ln">139  </span></a>        <span class="s1">newsScroller.setBorder(BorderFactory.createEmptyBorder())</span><span class="s2">;</span>
+<a name="l140"><span class="ln">140  </span></a>        <span class="s1">newsScroller.setMaximumSize(</span><span class="s2">new </span><span class="s1">Dimension(</span><span class="s4">32000</span><span class="s2">,</span><span class="s4">900</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l141"><span class="ln">141  </span></a>        <span class="s1">newsScroller.setOpaque(</span><span class="s2">false</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l142"><span class="ln">142  </span></a>        <span class="s1">newsScroller.getViewport().setOpaque(</span><span class="s2">false</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l143"><span class="ln">143  </span></a>
+<a name="l144"><span class="ln">144  </span></a>        <span class="s1">JPanel newsTextPanel = </span><span class="s2">new </span><span class="s1">JPanel()</span><span class="s2">;</span>
+<a name="l145"><span class="ln">145  </span></a>        <span class="s1">newsTextPanel.setLayout(</span><span class="s2">new </span><span class="s1">BoxLayout(newsTextPanel</span><span class="s2">, </span><span class="s1">BoxLayout.PAGE_AXIS))</span><span class="s2">;</span>
+<a name="l146"><span class="ln">146  </span></a>        <span class="s1">newsTextPanel.setOpaque(</span><span class="s2">false</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l147"><span class="ln">147  </span></a>        <span class="s1">newsTextPanel.add(newsScroller)</span><span class="s2">;</span>
+<a name="l148"><span class="ln">148  </span></a>        <span class="s1">newsTextPanel.add(Box.createVerticalGlue())</span><span class="s2">;</span>
+<a name="l149"><span class="ln">149  </span></a>
+<a name="l150"><span class="ln">150  </span></a>        <span class="s1">add(newsTextPanel</span><span class="s2">, new </span><span class="s1">GridBagConstraints(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">2</span><span class="s2">, </span><span class="s4">2</span><span class="s2">, </span><span class="s4">1</span><span class="s2">, </span><span class="s4">1.0</span><span class="s2">, </span><span class="s4">1.0</span><span class="s2">, </span><span class="s1">GridBagConstraints.NORTHWEST</span><span class="s2">, </span><span class="s1">GridBagConstraints.BOTH</span><span class="s2">, new </span><span class="s1">Insets(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">10</span><span class="s2">, </span><span class="s4">0</span><span class="s1">)</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l151"><span class="ln">151  </span></a>
+<a name="l152"><span class="ln">152  </span></a>        <span class="s1">add(Box.createGlue()</span><span class="s2">, new </span><span class="s1">GridBagConstraints(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">3</span><span class="s2">, </span><span class="s4">1</span><span class="s2">, </span><span class="s4">1</span><span class="s2">, </span><span class="s4">1.0</span><span class="s2">, </span><span class="s4">0.0</span><span class="s2">, </span><span class="s1">GridBagConstraints.NORTHWEST</span><span class="s2">, </span><span class="s1">GridBagConstraints.NONE</span><span class="s2">, new </span><span class="s1">Insets(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s1">)</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l153"><span class="ln">153  </span></a>
+<a name="l154"><span class="ln">154  </span></a>        <a href="../../../../../../../net/tharow/tantalum/ui/controls/RoundedButton.java.html">RoundedButton</a> <span class="s1">discussButton = </span><span class="s2">new <a href="../../../../../../../net/tharow/tantalum/ui/controls/RoundedButton.java.html">RoundedButton</a></span><span class="s1">(resources.getString(</span><span class="s3">&quot;launcher.news.discuss&quot;</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l155"><span class="ln">155  </span></a>        <span class="s1">discussButton.setFont(resources.getFont(<a href="../../../../../../../net/tharow/tantalum/ui/lang/ResourceLoader.java.html">ResourceLoader</a>.FONT_OPENSANS</span><span class="s2">, </span><span class="s4">16</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l156"><span class="ln">156  </span></a>        <span class="s1">discussButton.setBorder(BorderFactory.createEmptyBorder(</span><span class="s4">5</span><span class="s2">, </span><span class="s4">17</span><span class="s2">, </span><span class="s4">10</span><span class="s2">, </span><span class="s4">17</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l157"><span class="ln">157  </span></a>        <span class="s1">discussButton.setForeground(<a href="../../../../../../../net/tharow/tantalum/launcher/ui/LauncherFrame.java.html">LauncherFrame</a>.COLOR_BUTTON_BLUE)</span><span class="s2">;</span>
+<a name="l158"><span class="ln">158  </span></a>        <span class="s1">discussButton.setHoverForeground(<a href="../../../../../../../net/tharow/tantalum/launcher/ui/LauncherFrame.java.html">LauncherFrame</a>.COLOR_BLUE)</span><span class="s2">;</span>
+<a name="l159"><span class="ln">159  </span></a>        <span class="s1">discussButton.setAlignmentX(RIGHT_ALIGNMENT)</span><span class="s2">;</span>
+<a name="l160"><span class="ln">160  </span></a>        <span class="s1">discussButton.setContentAreaFilled(</span><span class="s2">false</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l161"><span class="ln">161  </span></a>        <span class="s1">discussButton.addActionListener(e -&gt; visitCurrentItem())</span><span class="s2">;</span>
+<a name="l162"><span class="ln">162  </span></a>        <span class="s1">add(discussButton</span><span class="s2">, new </span><span class="s1">GridBagConstraints(</span><span class="s4">1</span><span class="s2">, </span><span class="s4">3</span><span class="s2">, </span><span class="s4">1</span><span class="s2">, </span><span class="s4">1</span><span class="s2">, </span><span class="s4">0.0</span><span class="s2">, </span><span class="s4">0.0</span><span class="s2">, </span><span class="s1">GridBagConstraints.SOUTHEAST</span><span class="s2">, </span><span class="s1">GridBagConstraints.BOTH</span><span class="s2">, new </span><span class="s1">Insets(</span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s1">)</span><span class="s2">, </span><span class="s4">0</span><span class="s2">, </span><span class="s4">0</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l163"><span class="ln">163  </span></a>    <span class="s1">}</span>
+<a name="l164"><span class="ln">164  </span></a>
+<a name="l165"><span class="ln">165  </span></a>    <span class="s1">@Override</span>
+<a name="l166"><span class="ln">166  </span></a>    <span class="s2">public void </span><span class="s1">propertyChange(PropertyChangeEvent evt) {</span>
+<a name="l167"><span class="ln">167  </span></a>        <span class="s1">invalidate()</span><span class="s2">;</span>
+<a name="l168"><span class="ln">168  </span></a>    <span class="s1">}</span>
+<a name="l169"><span class="ln">169  </span></a><span class="s1">}</span>
+<a name="l170"><span class="ln">170  </span></a></pre>
+</body>
+</html>

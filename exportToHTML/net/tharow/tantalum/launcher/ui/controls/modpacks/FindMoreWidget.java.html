@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>FindMoreWidget.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #808080;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #cc7832;}
+.s3 { color: #6897bb;}
+.s4 { color: #6a8759;}
+.ln { color: #606366; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+FindMoreWidget.java</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">/* 
+<a name="l2"><span class="ln">2    </span></a> * This file is part of The Technic Launcher Version 3. 
+<a name="l3"><span class="ln">3    </span></a> * Copyright ©2015 Syndicate, LLC 
+<a name="l4"><span class="ln">4    </span></a> * 
+<a name="l5"><span class="ln">5    </span></a> * The Technic Launcher is free software: you can redistribute it and/or modify 
+<a name="l6"><span class="ln">6    </span></a> * it under the terms of the GNU General Public License as published by 
+<a name="l7"><span class="ln">7    </span></a> * the Free Software Foundation, either version 3 of the License, or 
+<a name="l8"><span class="ln">8    </span></a> * (at your option) any later version. 
+<a name="l9"><span class="ln">9    </span></a> * 
+<a name="l10"><span class="ln">10   </span></a> * The Technic Launcher  is distributed in the hope that it will be useful, 
+<a name="l11"><span class="ln">11   </span></a> * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+<a name="l12"><span class="ln">12   </span></a> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+<a name="l13"><span class="ln">13   </span></a> * GNU General Public License for more details. 
+<a name="l14"><span class="ln">14   </span></a> * 
+<a name="l15"><span class="ln">15   </span></a> * You should have received a copy of the GNU General Public License 
+<a name="l16"><span class="ln">16   </span></a> * along with the Technic Launcher.  If not, see &lt;http://www.gnu.org/licenses/&gt;. 
+<a name="l17"><span class="ln">17   </span></a> */</span>
+<a name="l18"><span class="ln">18   </span></a>
+<a name="l19"><span class="ln">19   </span></a><span class="s2">package </span><span class="s1">net.tharow.tantalum.launcher.ui.controls.modpacks</span><span class="s2">;</span>
+<a name="l20"><span class="ln">20   </span></a>
+<a name="l21"><span class="ln">21   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/launcher/ui/LauncherFrame.java.html">net.tharow.tantalum.launcher.ui.LauncherFrame</a>;</span>
+<a name="l22"><span class="ln">22   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/launcher/ui/controls/SelectorWidget.java.html">net.tharow.tantalum.launcher.ui.controls.SelectorWidget</a>;</span>
+<a name="l23"><span class="ln">23   </span></a><span class="s2">import <a href="../../../../../../../net/tharow/tantalum/ui/lang/ResourceLoader.java.html">net.tharow.tantalum.ui.lang.ResourceLoader</a>;</span>
+<a name="l24"><span class="ln">24   </span></a>
+<a name="l25"><span class="ln">25   </span></a><span class="s2">import </span><span class="s1">javax.swing.*</span><span class="s2">;</span>
+<a name="l26"><span class="ln">26   </span></a><span class="s2">import </span><span class="s1">javax.swing.border.EmptyBorder</span><span class="s2">;</span>
+<a name="l27"><span class="ln">27   </span></a><span class="s2">import </span><span class="s1">java.awt.*</span><span class="s2">;</span>
+<a name="l28"><span class="ln">28   </span></a>
+<a name="l29"><span class="ln">29   </span></a><span class="s2">public class </span><span class="s1">FindMoreWidget </span><span class="s2">extends <a href="../../../../../../../net/tharow/tantalum/launcher/ui/controls/SelectorWidget.java.html">SelectorWidget</a> </span><span class="s1">{</span>
+<a name="l30"><span class="ln">30   </span></a>    <span class="s2">private final </span><span class="s1">JLabel moreLabel</span><span class="s2">;</span>
+<a name="l31"><span class="ln">31   </span></a>
+<a name="l32"><span class="ln">32   </span></a>    <span class="s2">public </span><span class="s1">FindMoreWidget(<a href="../../../../../../../net/tharow/tantalum/ui/lang/ResourceLoader.java.html">ResourceLoader</a> resources) {</span>
+<a name="l33"><span class="ln">33   </span></a>        <span class="s2">super</span><span class="s1">(resources)</span><span class="s2">;</span>
+<a name="l34"><span class="ln">34   </span></a>
+<a name="l35"><span class="ln">35   </span></a>        <span class="s1">initComponents()</span><span class="s2">;</span>
+<a name="l36"><span class="ln">36   </span></a>        <span class="s1">setIsSelected(</span><span class="s2">true</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l37"><span class="ln">37   </span></a>
+<a name="l38"><span class="ln">38   </span></a>        <span class="s1">setLayout(</span><span class="s2">new </span><span class="s1">GridBagLayout())</span><span class="s2">;</span>
+<a name="l39"><span class="ln">39   </span></a>        <span class="s1">setBorder(</span><span class="s2">new </span><span class="s1">EmptyBorder(</span><span class="s3">5</span><span class="s2">,</span><span class="s3">0</span><span class="s2">,</span><span class="s3">5</span><span class="s2">,</span><span class="s3">0</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l40"><span class="ln">40   </span></a>        <span class="s1">moreLabel = </span><span class="s2">new </span><span class="s1">JLabel(resources.getString(</span><span class="s4">&quot;launcher.packselector.more&quot;</span><span class="s1">)</span><span class="s2">, </span><span class="s1">JLabel.CENTER)</span><span class="s2">;</span>
+<a name="l41"><span class="ln">41   </span></a>        <span class="s1">moreLabel.setFont(getResources().getFont(<a href="../../../../../../../net/tharow/tantalum/ui/lang/ResourceLoader.java.html">ResourceLoader</a>.FONT_OPENSANS</span><span class="s2">, </span><span class="s3">14</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l42"><span class="ln">42   </span></a>        <span class="s1">moreLabel.setForeground(<a href="../../../../../../../net/tharow/tantalum/launcher/ui/LauncherFrame.java.html">LauncherFrame</a>.COLOR_DIM_TEXT)</span><span class="s2">;</span>
+<a name="l43"><span class="ln">43   </span></a>        <span class="s1">moreLabel.setIcon(resources.getIcon(</span><span class="s4">&quot;arrow_right.png&quot;</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l44"><span class="ln">44   </span></a>        <span class="s1">moreLabel.setHorizontalTextPosition(SwingConstants.LEADING)</span><span class="s2">;</span>
+<a name="l45"><span class="ln">45   </span></a>        <span class="s1">moreLabel.setIconTextGap(</span><span class="s3">8</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l46"><span class="ln">46   </span></a>        <span class="s1">moreLabel.setOpaque(</span><span class="s2">false</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l47"><span class="ln">47   </span></a>        <span class="s1">add(moreLabel</span><span class="s2">, new </span><span class="s1">GridBagConstraints(</span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">1</span><span class="s2">, </span><span class="s3">1</span><span class="s2">, </span><span class="s3">1</span><span class="s2">, </span><span class="s3">1</span><span class="s2">, </span><span class="s1">GridBagConstraints.CENTER</span><span class="s2">, </span><span class="s1">GridBagConstraints.BOTH</span><span class="s2">, new </span><span class="s1">Insets(</span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s1">)</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s1">))</span><span class="s2">;</span>
+<a name="l48"><span class="ln">48   </span></a>    <span class="s1">}</span>
+<a name="l49"><span class="ln">49   </span></a>
+<a name="l50"><span class="ln">50   </span></a>    <span class="s2">public void </span><span class="s1">setWidgetData(String text) {</span>
+<a name="l51"><span class="ln">51   </span></a>        <span class="s1">moreLabel.setText(text)</span><span class="s2">;</span>
+<a name="l52"><span class="ln">52   </span></a>    <span class="s1">}</span>
+<a name="l53"><span class="ln">53   </span></a>
+<a name="l54"><span class="ln">54   </span></a>    <span class="s2">public </span><span class="s1">String getWidgetData() {</span>
+<a name="l55"><span class="ln">55   </span></a>        <span class="s2">return </span><span class="s1">moreLabel.getText()</span><span class="s2">;</span>
+<a name="l56"><span class="ln">56   </span></a>    <span class="s1">}</span>
+<a name="l57"><span class="ln">57   </span></a><span class="s1">}</span>
+<a name="l58"><span class="ln">58   </span></a></pre>
+</body>
+</html>

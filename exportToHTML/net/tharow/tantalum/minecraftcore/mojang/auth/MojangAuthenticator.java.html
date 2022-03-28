@@ -1,0 +1,166 @@
+<html>
+<head>
+<title>MojangAuthenticator.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #808080;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #cc7832;}
+.s3 { color: #6a8759;}
+.s4 { color: #6897bb;}
+.ln { color: #606366; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+MojangAuthenticator.java</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">/* 
+<a name="l2"><span class="ln">2    </span></a> * This file is part of Technic Minecraft Core. 
+<a name="l3"><span class="ln">3    </span></a> * Copyright ©2015 Syndicate, LLC 
+<a name="l4"><span class="ln">4    </span></a> * 
+<a name="l5"><span class="ln">5    </span></a> * Technic Minecraft Core is free software: you can redistribute it and/or modify 
+<a name="l6"><span class="ln">6    </span></a> * it under the terms of the GNU Lesser General Public License as published by 
+<a name="l7"><span class="ln">7    </span></a> * the Free Software Foundation, either version 3 of the License, or 
+<a name="l8"><span class="ln">8    </span></a> * (at your option) any later version. 
+<a name="l9"><span class="ln">9    </span></a> * 
+<a name="l10"><span class="ln">10   </span></a> * Technic Minecraft Core is distributed in the hope that it will be useful, 
+<a name="l11"><span class="ln">11   </span></a> * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+<a name="l12"><span class="ln">12   </span></a> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+<a name="l13"><span class="ln">13   </span></a> * GNU General Public License for more details. 
+<a name="l14"><span class="ln">14   </span></a> * 
+<a name="l15"><span class="ln">15   </span></a> * You should have received a copy of the GNU General Public License, 
+<a name="l16"><span class="ln">16   </span></a> * as well as a copy of the GNU Lesser General Public License, 
+<a name="l17"><span class="ln">17   </span></a> * along with Technic Minecraft Core.  If not, see &lt;http://www.gnu.org/licenses/&gt;. 
+<a name="l18"><span class="ln">18   </span></a> */</span>
+<a name="l19"><span class="ln">19   </span></a>
+<a name="l20"><span class="ln">20   </span></a><span class="s2">package </span><span class="s1">net.tharow.tantalum.minecraftcore.mojang.auth</span><span class="s2">;</span>
+<a name="l21"><span class="ln">21   </span></a>
+<a name="l22"><span class="ln">22   </span></a>
+<a name="l23"><span class="ln">23   </span></a><span class="s2">import <a href="../../../../../../net/tharow/tantalum/launchercore/exception/AuthenticationException.java.html">net.tharow.tantalum.launchercore.exception.AuthenticationException</a>;</span>
+<a name="l24"><span class="ln">24   </span></a><span class="s2">import <a href="../../../../../../net/tharow/tantalum/launchercore/exception/ResponseException.java.html">net.tharow.tantalum.launchercore.exception.ResponseException</a>;</span>
+<a name="l25"><span class="ln">25   </span></a><span class="s2">import <a href="../../../../../../net/tharow/tantalum/launchercore/exception/SessionException.java.html">net.tharow.tantalum.launchercore.exception.SessionException</a>;</span>
+<a name="l26"><span class="ln">26   </span></a><span class="s2">import <a href="../../../../../../net/tharow/tantalum/minecraftcore/MojangUtils.java.html">net.tharow.tantalum.minecraftcore.MojangUtils</a>;</span>
+<a name="l27"><span class="ln">27   </span></a><span class="s2">import <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/request/AuthRequest.java.html">net.tharow.tantalum.minecraftcore.mojang.auth.request.AuthRequest</a>;</span>
+<a name="l28"><span class="ln">28   </span></a><span class="s2">import <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/request/RefreshRequest.java.html">net.tharow.tantalum.minecraftcore.mojang.auth.request.RefreshRequest</a>;</span>
+<a name="l29"><span class="ln">29   </span></a><span class="s2">import <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/response/AuthResponse.java.html">net.tharow.tantalum.minecraftcore.mojang.auth.response.AuthResponse</a>;</span>
+<a name="l30"><span class="ln">30   </span></a><span class="s2">import </span><span class="s1">org.apache.commons.io.IOUtils</span><span class="s2">;</span>
+<a name="l31"><span class="ln">31   </span></a><span class="s2">import </span><span class="s1">org.jetbrains.annotations.Contract</span><span class="s2">;</span>
+<a name="l32"><span class="ln">32   </span></a><span class="s2">import </span><span class="s1">org.jetbrains.annotations.NotNull</span><span class="s2">;</span>
+<a name="l33"><span class="ln">33   </span></a>
+<a name="l34"><span class="ln">34   </span></a><span class="s2">import </span><span class="s1">java.io.DataOutputStream</span><span class="s2">;</span>
+<a name="l35"><span class="ln">35   </span></a><span class="s2">import </span><span class="s1">java.io.IOException</span><span class="s2">;</span>
+<a name="l36"><span class="ln">36   </span></a><span class="s2">import </span><span class="s1">java.io.InputStream</span><span class="s2">;</span>
+<a name="l37"><span class="ln">37   </span></a><span class="s2">import </span><span class="s1">java.net.HttpURLConnection</span><span class="s2">;</span>
+<a name="l38"><span class="ln">38   </span></a><span class="s2">import </span><span class="s1">java.net.URL</span><span class="s2">;</span>
+<a name="l39"><span class="ln">39   </span></a><span class="s2">import </span><span class="s1">java.nio.charset.StandardCharsets</span><span class="s2">;</span>
+<a name="l40"><span class="ln">40   </span></a>
+<a name="l41"><span class="ln">41   </span></a><span class="s2">public class </span><span class="s1">MojangAuthenticator {</span>
+<a name="l42"><span class="ln">42   </span></a>    <span class="s2">private final </span><span class="s1">String authServer</span><span class="s2">;</span>
+<a name="l43"><span class="ln">43   </span></a>    <span class="s2">private final </span><span class="s1">String clientToken</span><span class="s2">;</span>
+<a name="l44"><span class="ln">44   </span></a>
+<a name="l45"><span class="ln">45   </span></a>    <span class="s2">public </span><span class="s1">MojangAuthenticator(</span><span class="s2">final </span><span class="s1">String clientToken) {</span>
+<a name="l46"><span class="ln">46   </span></a>        <span class="s2">this</span><span class="s1">(clientToken</span><span class="s2">, </span><span class="s3">&quot;https://authserver.mojang.com/&quot;</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l47"><span class="ln">47   </span></a>    <span class="s1">}</span>
+<a name="l48"><span class="ln">48   </span></a>
+<a name="l49"><span class="ln">49   </span></a>    <span class="s2">public </span><span class="s1">MojangAuthenticator(</span><span class="s2">final </span><span class="s1">String clientToken</span><span class="s2">, final </span><span class="s1">String authServer){</span>
+<a name="l50"><span class="ln">50   </span></a>        <span class="s2">this</span><span class="s1">.clientToken = clientToken</span><span class="s2">;</span>
+<a name="l51"><span class="ln">51   </span></a>        <span class="s2">this</span><span class="s1">.authServer = authServer</span><span class="s2">;</span>
+<a name="l52"><span class="ln">52   </span></a>    <span class="s1">}</span>
+<a name="l53"><span class="ln">53   </span></a>
+<a name="l54"><span class="ln">54   </span></a>    <span class="s1">@Contract(value = </span><span class="s3">&quot;_, _ -&gt; new&quot;</span><span class="s1">)</span>
+<a name="l55"><span class="ln">55   </span></a>    <span class="s2">public </span><span class="s1">@NotNull <a href="MojangUser.java.html">MojangUser</a> loginNewUser(String username</span><span class="s2">, </span><span class="s1">String password) </span><span class="s2">throws <a href="../../../../../../net/tharow/tantalum/launchercore/exception/AuthenticationException.java.html">AuthenticationException</a> </span><span class="s1">{</span>
+<a name="l56"><span class="ln">56   </span></a>        <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/request/AuthRequest.java.html">AuthRequest</a> <span class="s1">request = </span><span class="s2">new <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/request/AuthRequest.java.html">AuthRequest</a></span><span class="s1">(username</span><span class="s2">, </span><span class="s1">password</span><span class="s2">, </span><span class="s1">clientToken)</span><span class="s2">;</span>
+<a name="l57"><span class="ln">57   </span></a>        <span class="s1">String data = <a href="../../../../../../net/tharow/tantalum/minecraftcore/MojangUtils.java.html">MojangUtils</a>.getGson().toJson(request)</span><span class="s2">;</span>
+<a name="l58"><span class="ln">58   </span></a>
+<a name="l59"><span class="ln">59   </span></a>        <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/response/AuthResponse.java.html">AuthResponse</a> <span class="s1">response</span><span class="s2">;</span>
+<a name="l60"><span class="ln">60   </span></a>        <span class="s2">try </span><span class="s1">{</span>
+<a name="l61"><span class="ln">61   </span></a>            <span class="s1">String returned = postJson(authServer + </span><span class="s3">&quot;authenticate&quot;</span><span class="s2">, </span><span class="s1">data)</span><span class="s2">;</span>
+<a name="l62"><span class="ln">62   </span></a>            <span class="s1">response = <a href="../../../../../../net/tharow/tantalum/minecraftcore/MojangUtils.java.html">MojangUtils</a>.getGson().fromJson(returned</span><span class="s2">, <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/response/AuthResponse.java.html">AuthResponse</a></span><span class="s1">.</span><span class="s2">class</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l63"><span class="ln">63   </span></a>            <span class="s2">if </span><span class="s1">(response == </span><span class="s2">null</span><span class="s1">) {</span>
+<a name="l64"><span class="ln">64   </span></a>                <span class="s2">throw new <a href="../../../../../../net/tharow/tantalum/launchercore/exception/ResponseException.java.html">ResponseException</a></span><span class="s1">(</span><span class="s3">&quot;Auth Error&quot;</span><span class="s2">, </span><span class="s3">&quot;Invalid credentials. Invalid username or password.&quot;</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l65"><span class="ln">65   </span></a>            <span class="s1">}</span>
+<a name="l66"><span class="ln">66   </span></a>            <span class="s2">if </span><span class="s1">(response.hasError()) {</span>
+<a name="l67"><span class="ln">67   </span></a>                <span class="s2">throw new <a href="../../../../../../net/tharow/tantalum/launchercore/exception/ResponseException.java.html">ResponseException</a></span><span class="s1">(response.getError()</span><span class="s2">, </span><span class="s1">response.getErrorMessage())</span><span class="s2">;</span>
+<a name="l68"><span class="ln">68   </span></a>            <span class="s1">}</span>
+<a name="l69"><span class="ln">69   </span></a>        <span class="s1">} </span><span class="s2">catch </span><span class="s1">(<a href="../../../../../../net/tharow/tantalum/launchercore/exception/ResponseException.java.html">ResponseException</a> e) {</span>
+<a name="l70"><span class="ln">70   </span></a>            <span class="s2">throw </span><span class="s1">e</span><span class="s2">;</span>
+<a name="l71"><span class="ln">71   </span></a>        <span class="s1">} </span><span class="s2">catch </span><span class="s1">(IOException e) {</span>
+<a name="l72"><span class="ln">72   </span></a>            <span class="s2">throw new <a href="../../../../../../net/tharow/tantalum/launchercore/exception/AuthenticationException.java.html">AuthenticationException</a></span><span class="s1">(</span>
+<a name="l73"><span class="ln">73   </span></a>                    <span class="s3">&quot;An error was raised while attempting to communicate with &quot; </span><span class="s1">+ authServer + </span><span class="s3">&quot;.&quot;</span><span class="s2">, </span><span class="s1">e)</span><span class="s2">;</span>
+<a name="l74"><span class="ln">74   </span></a>        <span class="s1">}</span>
+<a name="l75"><span class="ln">75   </span></a>
+<a name="l76"><span class="ln">76   </span></a>        <span class="s2">return new <a href="MojangUser.java.html">MojangUser</a></span><span class="s1">(username</span><span class="s2">, </span><span class="s1">response)</span><span class="s2">;</span>
+<a name="l77"><span class="ln">77   </span></a>    <span class="s1">}</span>
+<a name="l78"><span class="ln">78   </span></a>
+<a name="l79"><span class="ln">79   </span></a>    <span class="s2">public <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/response/AuthResponse.java.html">AuthResponse</a> </span><span class="s1">requestRefresh(@NotNull <a href="MojangUser.java.html">MojangUser</a> mojangUser) </span><span class="s2">throws <a href="../../../../../../net/tharow/tantalum/launchercore/exception/AuthenticationException.java.html">AuthenticationException</a> </span><span class="s1">{</span>
+<a name="l80"><span class="ln">80   </span></a>        <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/request/RefreshRequest.java.html">RefreshRequest</a> <span class="s1">refreshRequest = </span><span class="s2">new <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/request/RefreshRequest.java.html">RefreshRequest</a></span><span class="s1">(mojangUser.getAccessToken()</span><span class="s2">, </span><span class="s1">mojangUser.getClientToken())</span><span class="s2">;</span>
+<a name="l81"><span class="ln">81   </span></a>        <span class="s1">String data = <a href="../../../../../../net/tharow/tantalum/minecraftcore/MojangUtils.java.html">MojangUtils</a>.getGson().toJson(refreshRequest)</span><span class="s2">;</span>
+<a name="l82"><span class="ln">82   </span></a>
+<a name="l83"><span class="ln">83   </span></a>        <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/response/AuthResponse.java.html">AuthResponse</a> <span class="s1">response</span><span class="s2">;</span>
+<a name="l84"><span class="ln">84   </span></a>        <span class="s2">try </span><span class="s1">{</span>
+<a name="l85"><span class="ln">85   </span></a>            <span class="s1">String returned = postJson(authServer + </span><span class="s3">&quot;refresh&quot;</span><span class="s2">, </span><span class="s1">data)</span><span class="s2">;</span>
+<a name="l86"><span class="ln">86   </span></a>            <span class="s1">response = <a href="../../../../../../net/tharow/tantalum/minecraftcore/MojangUtils.java.html">MojangUtils</a>.getGson().fromJson(returned</span><span class="s2">, <a href="../../../../../../net/tharow/tantalum/minecraftcore/mojang/auth/response/AuthResponse.java.html">AuthResponse</a></span><span class="s1">.</span><span class="s2">class</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l87"><span class="ln">87   </span></a>            <span class="s2">if </span><span class="s1">(response == </span><span class="s2">null</span><span class="s1">) {</span>
+<a name="l88"><span class="ln">88   </span></a>                <span class="s2">throw new <a href="../../../../../../net/tharow/tantalum/launchercore/exception/SessionException.java.html">SessionException</a></span><span class="s1">(</span><span class="s3">&quot;Session Error. Try logging in again.&quot;</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l89"><span class="ln">89   </span></a>            <span class="s1">}</span>
+<a name="l90"><span class="ln">90   </span></a>            <span class="s2">if </span><span class="s1">(response.hasError()) {</span>
+<a name="l91"><span class="ln">91   </span></a>                <span class="s2">throw new <a href="../../../../../../net/tharow/tantalum/launchercore/exception/ResponseException.java.html">ResponseException</a></span><span class="s1">(response.getError()</span><span class="s2">, </span><span class="s1">response.getErrorMessage())</span><span class="s2">;</span>
+<a name="l92"><span class="ln">92   </span></a>            <span class="s1">}</span>
+<a name="l93"><span class="ln">93   </span></a>        <span class="s1">} </span><span class="s2">catch </span><span class="s1">(IOException e) {</span>
+<a name="l94"><span class="ln">94   </span></a>            <span class="s2">throw new <a href="../../../../../../net/tharow/tantalum/launchercore/exception/AuthenticationException.java.html">AuthenticationException</a></span><span class="s1">(</span>
+<a name="l95"><span class="ln">95   </span></a>                    <span class="s3">&quot;An error was raised while attempting to communicate with &quot; </span><span class="s1">+ authServer + </span><span class="s3">&quot;.&quot;</span><span class="s2">, </span><span class="s1">e)</span><span class="s2">;</span>
+<a name="l96"><span class="ln">96   </span></a>        <span class="s1">}</span>
+<a name="l97"><span class="ln">97   </span></a>
+<a name="l98"><span class="ln">98   </span></a>        <span class="s2">return </span><span class="s1">response</span><span class="s2">;</span>
+<a name="l99"><span class="ln">99   </span></a>    <span class="s1">}</span>
+<a name="l100"><span class="ln">100  </span></a>
+<a name="l101"><span class="ln">101  </span></a>    <span class="s2">private </span><span class="s1">String postJson(String url</span><span class="s2">, </span><span class="s1">@NotNull String data) </span><span class="s2">throws </span><span class="s1">IOException {</span>
+<a name="l102"><span class="ln">102  </span></a>        <span class="s2">byte</span><span class="s1">[] rawData = data.getBytes(StandardCharsets.UTF_8)</span><span class="s2">;</span>
+<a name="l103"><span class="ln">103  </span></a>        <span class="s1">HttpURLConnection connection = (HttpURLConnection) </span><span class="s2">new </span><span class="s1">URL(url).openConnection()</span><span class="s2">;</span>
+<a name="l104"><span class="ln">104  </span></a>        <span class="s1">connection.setUseCaches(</span><span class="s2">false</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l105"><span class="ln">105  </span></a>        <span class="s1">connection.setDoOutput(</span><span class="s2">true</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l106"><span class="ln">106  </span></a>        <span class="s1">connection.setDoInput(</span><span class="s2">true</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l107"><span class="ln">107  </span></a>        <span class="s1">connection.setConnectTimeout(</span><span class="s4">15000</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l108"><span class="ln">108  </span></a>        <span class="s1">connection.setReadTimeout(</span><span class="s4">15000</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l109"><span class="ln">109  </span></a>        <span class="s1">connection.setRequestMethod(</span><span class="s3">&quot;POST&quot;</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l110"><span class="ln">110  </span></a>        <span class="s1">connection.setRequestProperty(</span><span class="s3">&quot;Content-Type&quot;</span><span class="s2">, </span><span class="s3">&quot;application/json; charset=utf-8&quot;</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l111"><span class="ln">111  </span></a>        <span class="s1">connection.setRequestProperty(</span><span class="s3">&quot;Content-Length&quot;</span><span class="s2">, </span><span class="s1">Integer.toString(rawData.length))</span><span class="s2">;</span>
+<a name="l112"><span class="ln">112  </span></a>        <span class="s1">connection.setRequestProperty(</span><span class="s3">&quot;Content-Language&quot;</span><span class="s2">, </span><span class="s3">&quot;en-US&quot;</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l113"><span class="ln">113  </span></a>
+<a name="l114"><span class="ln">114  </span></a>        <span class="s1">DataOutputStream writer = </span><span class="s2">new </span><span class="s1">DataOutputStream(connection.getOutputStream())</span><span class="s2">;</span>
+<a name="l115"><span class="ln">115  </span></a>        <span class="s1">writer.write(rawData)</span><span class="s2">;</span>
+<a name="l116"><span class="ln">116  </span></a>        <span class="s1">writer.flush()</span><span class="s2">;</span>
+<a name="l117"><span class="ln">117  </span></a>        <span class="s1">writer.close()</span><span class="s2">;</span>
+<a name="l118"><span class="ln">118  </span></a>
+<a name="l119"><span class="ln">119  </span></a>        <span class="s1">InputStream stream = </span><span class="s2">null;</span>
+<a name="l120"><span class="ln">120  </span></a>        <span class="s1">String returnable = </span><span class="s2">null;</span>
+<a name="l121"><span class="ln">121  </span></a>        <span class="s2">try </span><span class="s1">{</span>
+<a name="l122"><span class="ln">122  </span></a>            <span class="s1">stream = connection.getInputStream()</span><span class="s2">;</span>
+<a name="l123"><span class="ln">123  </span></a>            <span class="s1">returnable = IOUtils.toString(stream</span><span class="s2">, </span><span class="s1">StandardCharsets.UTF_8)</span><span class="s2">;</span>
+<a name="l124"><span class="ln">124  </span></a>        <span class="s1">} </span><span class="s2">catch </span><span class="s1">(IOException e) {</span>
+<a name="l125"><span class="ln">125  </span></a>            <span class="s1">stream = connection.getErrorStream()</span><span class="s2">;</span>
+<a name="l126"><span class="ln">126  </span></a>
+<a name="l127"><span class="ln">127  </span></a>            <span class="s2">if </span><span class="s1">(stream == </span><span class="s2">null</span><span class="s1">) {</span>
+<a name="l128"><span class="ln">128  </span></a>                <span class="s2">throw </span><span class="s1">e</span><span class="s2">;</span>
+<a name="l129"><span class="ln">129  </span></a>            <span class="s1">}</span>
+<a name="l130"><span class="ln">130  </span></a>        <span class="s1">} </span><span class="s2">finally </span><span class="s1">{</span>
+<a name="l131"><span class="ln">131  </span></a>            <span class="s2">try </span><span class="s1">{</span>
+<a name="l132"><span class="ln">132  </span></a>                <span class="s2">if </span><span class="s1">(stream != </span><span class="s2">null</span><span class="s1">)</span>
+<a name="l133"><span class="ln">133  </span></a>                    <span class="s1">stream.close()</span><span class="s2">;</span>
+<a name="l134"><span class="ln">134  </span></a>            <span class="s1">} </span><span class="s2">catch </span><span class="s1">(IOException ignored) {</span>
+<a name="l135"><span class="ln">135  </span></a>            <span class="s1">}</span>
+<a name="l136"><span class="ln">136  </span></a>        <span class="s1">}</span>
+<a name="l137"><span class="ln">137  </span></a>
+<a name="l138"><span class="ln">138  </span></a>        <span class="s2">return </span><span class="s1">returnable</span><span class="s2">;</span>
+<a name="l139"><span class="ln">139  </span></a>    <span class="s1">}</span>
+<a name="l140"><span class="ln">140  </span></a>
+<a name="l141"><span class="ln">141  </span></a>    <span class="s2">public <a href="MojangUser.java.html">MojangUser</a> </span><span class="s1">createOfflineUser(String displayName) {</span>
+<a name="l142"><span class="ln">142  </span></a>        <span class="s2">return new <a href="MojangUser.java.html">MojangUser</a></span><span class="s1">(displayName)</span><span class="s2">;</span>
+<a name="l143"><span class="ln">143  </span></a>    <span class="s1">}</span>
+<a name="l144"><span class="ln">144  </span></a><span class="s1">}</span>
+<a name="l145"><span class="ln">145  </span></a></pre>
+</body>
+</html>

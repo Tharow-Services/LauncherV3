@@ -1,0 +1,147 @@
+<html>
+<head>
+<title>SimpleScrollbarUI.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #808080;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #cc7832;}
+.s3 { color: #6897bb;}
+.ln { color: #606366; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+SimpleScrollbarUI.java</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">/* 
+<a name="l2"><span class="ln">2    </span></a> * This file is part of Technic UI Core. 
+<a name="l3"><span class="ln">3    </span></a> * Copyright ©2015 Syndicate, LLC 
+<a name="l4"><span class="ln">4    </span></a> * 
+<a name="l5"><span class="ln">5    </span></a> * Technic UI Core is free software: you can redistribute it and/or modify 
+<a name="l6"><span class="ln">6    </span></a> * it under the terms of the GNU Lesser General Public License as published by 
+<a name="l7"><span class="ln">7    </span></a> * the Free Software Foundation, either version 3 of the License, or 
+<a name="l8"><span class="ln">8    </span></a> * (at your option) any later version. 
+<a name="l9"><span class="ln">9    </span></a> * 
+<a name="l10"><span class="ln">10   </span></a> * Technic UI Core is distributed in the hope that it will be useful, 
+<a name="l11"><span class="ln">11   </span></a> * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+<a name="l12"><span class="ln">12   </span></a> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+<a name="l13"><span class="ln">13   </span></a> * GNU General Public License for more details. 
+<a name="l14"><span class="ln">14   </span></a> * 
+<a name="l15"><span class="ln">15   </span></a> * You should have received a copy of the GNU General Public License, 
+<a name="l16"><span class="ln">16   </span></a> * as well as a copy of the GNU Lesser General Public License, 
+<a name="l17"><span class="ln">17   </span></a> * along with Technic UI Core.  If not, see &lt;http://www.gnu.org/licenses/&gt;. 
+<a name="l18"><span class="ln">18   </span></a> */</span>
+<a name="l19"><span class="ln">19   </span></a>
+<a name="l20"><span class="ln">20   </span></a><span class="s2">package </span><span class="s1">net.tharow.tantalum.ui.controls.list</span><span class="s2">;</span>
+<a name="l21"><span class="ln">21   </span></a>
+<a name="l22"><span class="ln">22   </span></a><span class="s2">import </span><span class="s1">javax.swing.*</span><span class="s2">;</span>
+<a name="l23"><span class="ln">23   </span></a><span class="s2">import </span><span class="s1">javax.swing.plaf.basic.BasicScrollBarUI</span><span class="s2">;</span>
+<a name="l24"><span class="ln">24   </span></a><span class="s2">import </span><span class="s1">java.awt.*</span><span class="s2">;</span>
+<a name="l25"><span class="ln">25   </span></a>
+<a name="l26"><span class="ln">26   </span></a><span class="s2">public class </span><span class="s1">SimpleScrollbarUI </span><span class="s2">extends </span><span class="s1">BasicScrollBarUI {</span>
+<a name="l27"><span class="ln">27   </span></a>
+<a name="l28"><span class="ln">28   </span></a>    <span class="s2">private final </span><span class="s1">Color trackColor</span><span class="s2">;</span>
+<a name="l29"><span class="ln">29   </span></a>    <span class="s2">private final </span><span class="s1">Color thumbColor</span><span class="s2">;</span>
+<a name="l30"><span class="ln">30   </span></a>
+<a name="l31"><span class="ln">31   </span></a>    <span class="s2">public </span><span class="s1">SimpleScrollbarUI(Color trackColor</span><span class="s2">, </span><span class="s1">Color thumbColor) {</span>
+<a name="l32"><span class="ln">32   </span></a>        <span class="s2">this</span><span class="s1">.trackColor = trackColor</span><span class="s2">;</span>
+<a name="l33"><span class="ln">33   </span></a>        <span class="s2">this</span><span class="s1">.thumbColor = thumbColor</span><span class="s2">;</span>
+<a name="l34"><span class="ln">34   </span></a>    <span class="s1">}</span>
+<a name="l35"><span class="ln">35   </span></a>
+<a name="l36"><span class="ln">36   </span></a>    <span class="s1">@Override</span>
+<a name="l37"><span class="ln">37   </span></a>    <span class="s2">protected void </span><span class="s1">paintTrack(Graphics g</span><span class="s2">, </span><span class="s1">JComponent c</span><span class="s2">, </span><span class="s1">Rectangle trackBounds) {</span>
+<a name="l38"><span class="ln">38   </span></a>        <span class="s1">g.setColor(trackColor)</span><span class="s2">;</span>
+<a name="l39"><span class="ln">39   </span></a>        <span class="s1">g.fillRect(trackBounds.x</span><span class="s2">, </span><span class="s1">trackBounds.y</span><span class="s2">, </span><span class="s1">trackBounds.width</span><span class="s2">, </span><span class="s1">trackBounds.height)</span><span class="s2">;</span>
+<a name="l40"><span class="ln">40   </span></a>    <span class="s1">}</span>
+<a name="l41"><span class="ln">41   </span></a>
+<a name="l42"><span class="ln">42   </span></a>    <span class="s1">@Override</span>
+<a name="l43"><span class="ln">43   </span></a>    <span class="s2">protected void </span><span class="s1">paintThumb(Graphics g</span><span class="s2">, </span><span class="s1">JComponent c</span><span class="s2">, </span><span class="s1">Rectangle thumbBounds) {</span>
+<a name="l44"><span class="ln">44   </span></a>        <span class="s1">g.setColor(thumbColor)</span><span class="s2">;</span>
+<a name="l45"><span class="ln">45   </span></a>
+<a name="l46"><span class="ln">46   </span></a>        <span class="s2">int </span><span class="s1">x = thumbBounds.x+</span><span class="s3">1</span><span class="s2">;</span>
+<a name="l47"><span class="ln">47   </span></a>        <span class="s2">int </span><span class="s1">y = thumbBounds.y+</span><span class="s3">1</span><span class="s2">;</span>
+<a name="l48"><span class="ln">48   </span></a>        <span class="s2">int </span><span class="s1">w = thumbBounds.width-</span><span class="s3">2</span><span class="s2">;</span>
+<a name="l49"><span class="ln">49   </span></a>        <span class="s2">int </span><span class="s1">h = thumbBounds.height-</span><span class="s3">2</span><span class="s2">;</span>
+<a name="l50"><span class="ln">50   </span></a>
+<a name="l51"><span class="ln">51   </span></a>        <span class="s1">g.fillRect(x</span><span class="s2">, </span><span class="s1">y</span><span class="s2">, </span><span class="s1">w</span><span class="s2">, </span><span class="s1">h)</span><span class="s2">;</span>
+<a name="l52"><span class="ln">52   </span></a>    <span class="s1">}</span>
+<a name="l53"><span class="ln">53   </span></a>
+<a name="l54"><span class="ln">54   </span></a>    <span class="s1">@Override</span>
+<a name="l55"><span class="ln">55   </span></a>    <span class="s2">protected void </span><span class="s1">installComponents(){</span>
+<a name="l56"><span class="ln">56   </span></a>        <span class="s2">super</span><span class="s1">.installComponents()</span><span class="s2">;</span>
+<a name="l57"><span class="ln">57   </span></a>        <span class="s1">scrollbar.remove(incrButton)</span><span class="s2">;</span>
+<a name="l58"><span class="ln">58   </span></a>        <span class="s1">scrollbar.remove(decrButton)</span><span class="s2">;</span>
+<a name="l59"><span class="ln">59   </span></a>    <span class="s1">}</span>
+<a name="l60"><span class="ln">60   </span></a>
+<a name="l61"><span class="ln">61   </span></a>    <span class="s1">@Override</span>
+<a name="l62"><span class="ln">62   </span></a>    <span class="s2">protected void </span><span class="s1">layoutVScrollbar(JScrollBar sb)</span>
+<a name="l63"><span class="ln">63   </span></a>    <span class="s1">{</span>
+<a name="l64"><span class="ln">64   </span></a>        <span class="s1">Dimension sbSize = sb.getSize()</span><span class="s2">;</span>
+<a name="l65"><span class="ln">65   </span></a>        <span class="s1">Insets sbInsets = sb.getInsets()</span><span class="s2">;</span>
+<a name="l66"><span class="ln">66   </span></a>
+<a name="l67"><span class="ln">67   </span></a>	<span class="s0">/* 
+<a name="l68"><span class="ln">68   </span></a>     * Width and left edge of the buttons and thumb. 
+<a name="l69"><span class="ln">69   </span></a>     */</span>
+<a name="l70"><span class="ln">70   </span></a>        <span class="s2">int </span><span class="s1">itemW = sbSize.width - (sbInsets.left + sbInsets.right)</span><span class="s2">;</span>
+<a name="l71"><span class="ln">71   </span></a>        <span class="s2">int </span><span class="s1">itemX = sbInsets.left</span><span class="s2">;</span>
+<a name="l72"><span class="ln">72   </span></a>        <span class="s2">int </span><span class="s1">endTrackY = sbSize.height - sbInsets.bottom</span><span class="s2">;</span>
+<a name="l73"><span class="ln">73   </span></a>
+<a name="l74"><span class="ln">74   </span></a>        <span class="s0">/* The thumb must fit within the height left over after we 
+<a name="l75"><span class="ln">75   </span></a>         * subtract the preferredSize of the buttons and the insets 
+<a name="l76"><span class="ln">76   </span></a>         * and the gaps 
+<a name="l77"><span class="ln">77   </span></a>         */</span>
+<a name="l78"><span class="ln">78   </span></a>        <span class="s2">int </span><span class="s1">sbInsetsH = sbInsets.top + sbInsets.bottom</span><span class="s2">;</span>
+<a name="l79"><span class="ln">79   </span></a>        <span class="s2">float </span><span class="s1">trackH = sbSize.height - sbInsetsH</span><span class="s2">;</span>
+<a name="l80"><span class="ln">80   </span></a>
+<a name="l81"><span class="ln">81   </span></a>        <span class="s0">/* Compute the height and origin of the thumb.   The case 
+<a name="l82"><span class="ln">82   </span></a>     * where the thumb is at the bottom edge is handled specially 
+<a name="l83"><span class="ln">83   </span></a>     * to avoid numerical problems in computing thumbY.  Enforce 
+<a name="l84"><span class="ln">84   </span></a>     * the thumbs min/max dimensions.  If the thumb doesn't 
+<a name="l85"><span class="ln">85   </span></a>     * fit in the track (trackH) we'll hide it later. 
+<a name="l86"><span class="ln">86   </span></a>     */</span>
+<a name="l87"><span class="ln">87   </span></a>        <span class="s2">float </span><span class="s1">min = sb.getMinimum()</span><span class="s2">;</span>
+<a name="l88"><span class="ln">88   </span></a>        <span class="s2">float </span><span class="s1">extent = sb.getVisibleAmount()</span><span class="s2">;</span>
+<a name="l89"><span class="ln">89   </span></a>        <span class="s2">float </span><span class="s1">range = sb.getMaximum() - min</span><span class="s2">;</span>
+<a name="l90"><span class="ln">90   </span></a>        <span class="s2">float </span><span class="s1">value = sb.getValue()</span><span class="s2">;</span>
+<a name="l91"><span class="ln">91   </span></a>
+<a name="l92"><span class="ln">92   </span></a>        <span class="s2">int </span><span class="s1">thumbH = (range &lt;= </span><span class="s3">0</span><span class="s1">)</span>
+<a name="l93"><span class="ln">93   </span></a>                <span class="s1">? getMaximumThumbSize().height : (</span><span class="s2">int</span><span class="s1">)(trackH * (extent / range))</span><span class="s2">;</span>
+<a name="l94"><span class="ln">94   </span></a>        <span class="s1">thumbH = Math.max(thumbH</span><span class="s2">, </span><span class="s1">getMinimumThumbSize().height)</span><span class="s2">;</span>
+<a name="l95"><span class="ln">95   </span></a>        <span class="s1">thumbH = Math.min(thumbH</span><span class="s2">, </span><span class="s1">getMaximumThumbSize().height)</span><span class="s2">;</span>
+<a name="l96"><span class="ln">96   </span></a>
+<a name="l97"><span class="ln">97   </span></a>        <span class="s2">int </span><span class="s1">thumbY = endTrackY - thumbH</span><span class="s2">;</span>
+<a name="l98"><span class="ln">98   </span></a>        <span class="s2">if </span><span class="s1">(value &lt; (sb.getMaximum() - sb.getVisibleAmount())) {</span>
+<a name="l99"><span class="ln">99   </span></a>            <span class="s2">float </span><span class="s1">thumbRange = trackH - thumbH</span><span class="s2">;</span>
+<a name="l100"><span class="ln">100  </span></a>            <span class="s1">thumbY = (</span><span class="s2">int</span><span class="s1">)(</span><span class="s3">0.5f </span><span class="s1">+ (thumbRange * ((value - min) / (range - extent))))</span><span class="s2">;</span>
+<a name="l101"><span class="ln">101  </span></a>        <span class="s1">}</span>
+<a name="l102"><span class="ln">102  </span></a>
+<a name="l103"><span class="ln">103  </span></a>	<span class="s0">/* Update the trackRect field. 
+<a name="l104"><span class="ln">104  </span></a>     */</span>
+<a name="l105"><span class="ln">105  </span></a>        <span class="s2">int </span><span class="s1">itrackY = </span><span class="s3">0</span><span class="s2">;</span>
+<a name="l106"><span class="ln">106  </span></a>        <span class="s2">int </span><span class="s1">itrackH = endTrackY - itrackY</span><span class="s2">;</span>
+<a name="l107"><span class="ln">107  </span></a>        <span class="s1">trackRect.setBounds(itemX</span><span class="s2">, </span><span class="s1">itrackY</span><span class="s2">, </span><span class="s1">itemW</span><span class="s2">, </span><span class="s1">itrackH)</span><span class="s2">;</span>
+<a name="l108"><span class="ln">108  </span></a>
+<a name="l109"><span class="ln">109  </span></a>	<span class="s0">/* If the thumb isn't going to fit, zero it's bounds.  Otherwise 
+<a name="l110"><span class="ln">110  </span></a>     * make sure it fits between the buttons.  Note that setting the 
+<a name="l111"><span class="ln">111  </span></a>     * thumbs bounds will cause a repaint. 
+<a name="l112"><span class="ln">112  </span></a>     */</span>
+<a name="l113"><span class="ln">113  </span></a>        <span class="s2">if</span><span class="s1">(thumbH &gt;= (</span><span class="s2">int</span><span class="s1">)trackH)	{</span>
+<a name="l114"><span class="ln">114  </span></a>            <span class="s1">setThumbBounds(</span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s2">, </span><span class="s3">0</span><span class="s1">)</span><span class="s2">;</span>
+<a name="l115"><span class="ln">115  </span></a>        <span class="s1">}</span>
+<a name="l116"><span class="ln">116  </span></a>        <span class="s2">else </span><span class="s1">{</span>
+<a name="l117"><span class="ln">117  </span></a>            <span class="s2">if </span><span class="s1">((thumbY + thumbH) &gt; endTrackY) {</span>
+<a name="l118"><span class="ln">118  </span></a>                <span class="s1">thumbY = endTrackY - thumbH</span><span class="s2">;</span>
+<a name="l119"><span class="ln">119  </span></a>            <span class="s1">}</span>
+<a name="l120"><span class="ln">120  </span></a>            <span class="s2">if </span><span class="s1">(thumbY  &lt; </span><span class="s3">0</span><span class="s1">) {</span>
+<a name="l121"><span class="ln">121  </span></a>                <span class="s1">thumbY = </span><span class="s3">1</span><span class="s2">;</span>
+<a name="l122"><span class="ln">122  </span></a>            <span class="s1">}</span>
+<a name="l123"><span class="ln">123  </span></a>            <span class="s1">setThumbBounds(itemX</span><span class="s2">, </span><span class="s1">thumbY</span><span class="s2">, </span><span class="s1">itemW</span><span class="s2">, </span><span class="s1">thumbH)</span><span class="s2">;</span>
+<a name="l124"><span class="ln">124  </span></a>        <span class="s1">}</span>
+<a name="l125"><span class="ln">125  </span></a>    <span class="s1">}</span>
+<a name="l126"><span class="ln">126  </span></a><span class="s1">}</span>
+<a name="l127"><span class="ln">127  </span></a></pre>
+</body>
+</html>
