@@ -21,6 +21,7 @@ package net.tharow.tantalum.minecraftcore.launch;
 
 import net.tharow.tantalum.authlib.AuthlibUser;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.auth.UserModel;
 import net.tharow.tantalum.launchercore.install.LauncherDirectories;
@@ -30,6 +31,7 @@ import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.modpacks.ModpackModel;
 import net.tharow.tantalum.launchercore.modpacks.RunData;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
+import net.tharow.tantalum.minecraftcore.mojang.auth.MojangUser;
 import net.tharow.tantalum.minecraftcore.mojang.version.MojangVersion;
 import net.tharow.tantalum.minecraftcore.mojang.version.io.CompleteVersion;
 import net.tharow.tantalum.minecraftcore.mojang.version.io.JavaVersion;
@@ -272,7 +274,9 @@ public final class MinecraftLauncher {
 
         if (Objects.equals(user.getUserType(), AuthlibUser.AUTHLIB_USER_TYPE))
             commands.addRaw("-javaagent:" + directories.getAssetsDirectory().getAbsolutePath() + "\\launcher\\authlib-injector.jar=" + userModel.getAuthlibURL());
-
+        if (Objects.equals(user.getUserType(), MojangUser.MOJANG_USER_TYPE) && !TantalumConstants.isUnlocked()){
+            commands.addRaw("-javaagent:" + directories.getAssetsDirectory().getAbsolutePath() + "\\launcher\\authlib-injector.jar=https://blessingskin.azurewebsites.net/api/yggdrasil/");
+        }
         commands.addRaw("-Xms" + memory + "m");
         commands.addRaw("-Xmx" + memory + "m");
 
