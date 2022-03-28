@@ -72,7 +72,7 @@ public class HttpSolderApi implements ISolderApi {
     @Override
     public Collection<SolderPackInfo> internalGetPublicSolderPacks(String solderRoot, ISolderApi packFactory) throws RestfulAPIException {
         LinkedList<SolderPackInfo> allPackApis = new LinkedList<>();
-        String allPacksUrl = solderRoot + "modpack?include=full&cid=" + clientId;
+        String allPacksUrl = solderRoot + "modpack/full.html?include=full&cid=" + clientId;
 
         FullModpacks technic = RestObject.getRestObject(FullModpacks.class, allPacksUrl);
         for (SolderPackInfo info : technic.getModpacks().values()) {

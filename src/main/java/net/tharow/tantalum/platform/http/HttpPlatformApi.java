@@ -34,7 +34,7 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
     }
     public HttpPlatformApi() {
         l.constructor("Building Static Platform Api");
-        this.platform = new Platform("Tantalum Static","2.3","https://static.tharow.net/platform/", false);
+        this.platform = new Platform("Tantalum Static","2.3","https://static.tantalum.tharow.net/platform/", false);
         this.access = "";
     }
 

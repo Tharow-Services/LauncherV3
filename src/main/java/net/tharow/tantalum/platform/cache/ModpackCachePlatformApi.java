@@ -114,7 +114,7 @@ public class ModpackCachePlatformApi implements IPlatformApi {
 
     private PlatformPackInfo pullAndCache(String packSlug) throws RestfulAPIException {
         PlatformPackInfo info = null;
-        if (innerApi!=null) {throw new RestfulAPIException("No Inner Api");}
+        if (innerApi==null) {throw new RestfulAPIException("No Inner Api");}
         try {
             info = innerApi.getPlatformPackInfoForBulk(packSlug);
 
