@@ -19,8 +19,13 @@
 
 package net.tharow.tantalum.platform.io;
 
-import java.util.Date;
+import sun.security.provider.MD5;
 
+import java.util.Date;
+import java.util.Locale;
+import java.util.Objects;
+
+import static net.tharow.tantalum.utilslib.MD5Utils.getMD5;
 @SuppressWarnings({"unused"})
 public class NewsArticle implements INewsArticle{
     private int id;
@@ -32,7 +37,6 @@ public class NewsArticle implements INewsArticle{
     private String url;
 
     public NewsArticle() {
-
     }
 
     public NewsArticle(int id, String username, String avatar, String title, String content, long date, String url) {
@@ -68,6 +72,10 @@ public class NewsArticle implements INewsArticle{
 
     @Override
     public String getAvatar() {
+        //if (this.avatar!=null || !Objects.requireNonNull(this.avatar).isEmpty()) {return this.avatar;}
+        if (this.avatar==null || this.avatar.isEmpty()){
+            return "https://www.gravatar.com/avatar/" + getMD5(this.username.toLowerCase(Locale.ROOT)) + "?d=identicon&s=2048";
+        }
         return this.avatar;
     }
 

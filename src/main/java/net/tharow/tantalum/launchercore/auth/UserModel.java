@@ -42,6 +42,14 @@ public class UserModel {
     private final MicrosoftAuthenticator microsoftAuthenticator;
     private final Authlib authlib;
 
+    public UserModel(IUserStore userStore, MojangAuthenticator mojangAuthenticator) {
+        this.mCurrentUser = null;
+        this.authlib = null;
+        this.mUserStore = userStore;
+        this.mojangAuthenticator = mojangAuthenticator;
+        this.microsoftAuthenticator = null;
+    }
+
     public UserModel(IUserStore userStore, MicrosoftAuthenticator microsoftAuthenticator, MojangAuthenticator mojangAuthenticator, Authlib authlib) {
         this.mCurrentUser = null;
         this.mUserStore = userStore;

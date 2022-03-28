@@ -21,6 +21,7 @@ package net.tharow.tantalum.launcher.settings;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.converters.FileConverter;
 import com.beust.jcommander.internal.Lists;
+import lombok.Getter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,8 +65,12 @@ public final class StartupParameters {
     private String buildNumber = "";
     @Parameter(names = {"-offline"}, description = "Force offline mode")
     private boolean offline = false;
+    @Parameter(names = {"-setting"})
+    @Getter private String setting;
     @Parameter(names = {"-corca"})
     private boolean changeOverride = false;
+    @Parameter(names = {"-unlock"}, hidden = true)
+    @Getter private boolean unlocked = false;
 
     public StartupParameters(String[] args) {
         this.args = args;
@@ -120,6 +125,7 @@ public final class StartupParameters {
     public int getLogLevel() {
         return logLevel;
     }
+
 
     public boolean isChangeOverride() {
         return changeOverride;

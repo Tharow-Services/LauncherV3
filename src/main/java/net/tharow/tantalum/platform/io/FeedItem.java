@@ -22,6 +22,9 @@ package net.tharow.tantalum.platform.io;
 import net.tharow.tantalum.launchercore.TantalumConstants;
 
 import java.util.Date;
+import java.util.Locale;
+
+import static net.tharow.tantalum.utilslib.MD5Utils.getMD5;
 
 @SuppressWarnings({"unused"})
 public class FeedItem {
@@ -47,7 +50,10 @@ public class FeedItem {
     }
 
     public String getAvatar() {
-        return this.avatar!=null?this.avatar:TantalumConstants.AVATAR_URL+this.getUser()+".png";
+        if (this.avatar==null || this.avatar.isEmpty()){
+            return "https://www.gravatar.com/avatar/" + getMD5(this.user.toLowerCase(Locale.ROOT)) + "?d=identicon&s=2048";
+        }
+        return this.avatar;
     }
 
     public String getUrl() {

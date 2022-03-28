@@ -19,6 +19,8 @@
 
 package net.tharow.tantalum.launchercore;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 
 public class TantalumConstants {
@@ -61,6 +63,8 @@ public class TantalumConstants {
     };
 
     private static IBuildNumber buildNumber;
+    @Getter @Setter
+    private static boolean unlocked = false;
     private static String userAgent;
     private static boolean isDebug;
 

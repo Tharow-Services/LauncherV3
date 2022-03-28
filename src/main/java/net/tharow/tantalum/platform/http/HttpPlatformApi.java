@@ -9,10 +9,13 @@ import net.tharow.tantalum.platform.io.PlatformPackInfo;
 import net.tharow.tantalum.platform.io.SearchResultsData;
 import net.tharow.tantalum.rest.RestObject;
 import net.tharow.tantalum.rest.RestfulAPIException;
+import net.tharow.tantalum.tantalum.io.Platform;
 import net.tharow.tantalum.utilslib.Utils;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 
 public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
@@ -28,6 +31,11 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
         l.constructor("Building HttpPlatform Api From "+platform);
         this.platform = platform;
         this.access = ((platform.getAccessVerb() == null)?"":'?'+platform.getAccessVerb()+'='+platform.getAccessCode());
+    }
+    public HttpPlatformApi() {
+        l.constructor("Building Static Platform Api");
+        this.platform = new Platform("Tantalum Static","2.3","https://static.tharow.net/platform/", false);
+        this.access = "";
     }
 
     @Override
@@ -68,6 +76,13 @@ public class HttpPlatformApi implements IPlatformApi, IPlatformSearchApi {
     public NewsData getNews() throws RestfulAPIException {
         String url = platform.getUrl() + "news"+'?'+this.access;
         return RestObject.getRestObject(NewsData.class, url);
+    }
+
+    @Override
+    public Collection<HttpPlatformApi> getApis() {
+        Collection<HttpPlatformApi> temp = new ArrayList<HttpPlatformApi>() {};
+        temp.add(this);
+        return temp;
     }
 
     @Override

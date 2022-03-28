@@ -27,7 +27,6 @@ import net.tharow.tantalum.minecraftcore.MojangUtils;
 import net.tharow.tantalum.minecraftcore.mojang.auth.request.AuthRequest;
 import net.tharow.tantalum.minecraftcore.mojang.auth.request.RefreshRequest;
 import net.tharow.tantalum.minecraftcore.mojang.auth.response.AuthResponse;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -40,10 +39,16 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MojangAuthenticator {
-    private static final String AUTH_SERVER = "https://authserver.mojang.com/";
+    private final String authServer;
     private final String clientToken;
-    public MojangAuthenticator(final String clientToken){
+
+    public MojangAuthenticator(final String clientToken) {
+        this(clientToken, "https://authserver.mojang.com/");
+    }
+
+    public MojangAuthenticator(final String clientToken, final String authServer){
         this.clientToken = clientToken;
+        this.authServer = authServer;
     }
 
     @Contract(value = "_, _ -> new")
@@ -53,7 +58,7 @@ public class MojangAuthenticator {
 
         AuthResponse response;
         try {
-            String returned = postJson(AUTH_SERVER + "authenticate", data);
+            String returned = postJson(authServer + "authenticate", data);
             response = MojangUtils.getGson().fromJson(returned, AuthResponse.class);
             if (response == null) {
                 throw new ResponseException("Auth Error", "Invalid credentials. Invalid username or password.");
@@ -65,7 +70,7 @@ public class MojangAuthenticator {
             throw e;
         } catch (IOException e) {
             throw new AuthenticationException(
-                    "An error was raised while attempting to communicate with " + AUTH_SERVER + ".", e);
+                    "An error was raised while attempting to communicate with " + authServer + ".", e);
         }
 
         return new MojangUser(username, response);
@@ -77,7 +82,7 @@ public class MojangAuthenticator {
 
         AuthResponse response;
         try {
-            String returned = postJson(AUTH_SERVER + "refresh", data);
+            String returned = postJson(authServer + "refresh", data);
             response = MojangUtils.getGson().fromJson(returned, AuthResponse.class);
             if (response == null) {
                 throw new SessionException("Session Error. Try logging in again.");
@@ -87,7 +92,7 @@ public class MojangAuthenticator {
             }
         } catch (IOException e) {
             throw new AuthenticationException(
-                    "An error was raised while attempting to communicate with " + AUTH_SERVER + ".", e);
+                    "An error was raised while attempting to communicate with " + authServer + ".", e);
         }
 
         return response;

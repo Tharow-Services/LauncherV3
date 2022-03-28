@@ -19,6 +19,7 @@
 package net.tharow.tantalum.launcher;
 
 import com.beust.jcommander.JCommander;
+import lombok.SneakyThrows;
 import net.tharow.tantalum.authlib.Authlib;
 import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.autoupdate.Relauncher;
@@ -43,6 +44,7 @@ import net.tharow.tantalum.launchercore.ComputerInfo;
 import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.auth.UserModel;
+import net.tharow.tantalum.launchercore.exception.AuthenticationException;
 import net.tharow.tantalum.launchercore.exception.DownloadException;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
 import net.tharow.tantalum.launchercore.image.face.UserFaceImageStore;
@@ -64,10 +66,15 @@ import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.Backgrou
 import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.IModpackResourceType;
 import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.IconResourceType;
 import net.tharow.tantalum.launchercore.modpacks.resources.resourcetype.LogoResourceType;
+import net.tharow.tantalum.launchercore.modpacks.sources.IAuthoritativePackSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.IInstalledPackRepository;
 import net.tharow.tantalum.minecraftcore.launch.MinecraftLauncher;
 import net.tharow.tantalum.minecraftcore.microsoft.auth.MicrosoftAuthenticator;
 import net.tharow.tantalum.minecraftcore.mojang.auth.MojangAuthenticator;
+import net.tharow.tantalum.platform.IPlatformApi;
+import net.tharow.tantalum.platform.PlatformPackInfoRepository;
+import net.tharow.tantalum.platform.cache.ModpackCachePlatformApi;
+import net.tharow.tantalum.platform.http.HttpPlatformApi;
 import net.tharow.tantalum.platform.io.AuthorshipInfo;
 import net.tharow.tantalum.solder.ISolderApi;
 import net.tharow.tantalum.solder.SolderPackSource;
@@ -91,6 +98,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import javax.swing.*;
+import javax.swing.plaf.IconUIResource;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -131,6 +139,15 @@ public class LauncherMain {
     };
 
     private static IBuildNumber buildNumber;
+
+    protected static void checkUnlockCode() throws AuthenticationException {
+        //JOptionPane.showMessageDialog(null, resources.getString("launcher.updateerror.download", "Tantalum Launcher", e.getMessage()), resources.getString("launcher.installerror.title"), JOptionPane.WARNING_MESSAGE);
+        String passCode = "3664Tantalum9986Unlock";
+        String rectCode = JOptionPane.showInputDialog(null, "Please Enter Launcher Unlock Code", "Unlock Launcher");
+        if (passCode.equals(rectCode)) {
+            throw new AuthenticationException("Passcode Incorrect");
+        }
+    }
 
     public static void main(String[] argv) {
         try {
@@ -181,7 +198,19 @@ public class LauncherMain {
         } else {
             buildNumber = new VersionFileBuildNumber(resources);
         }
-
+        File unlockedFile = new File(directories.getLauncherDirectory(), "Unlocked-Mode.lock");
+        if (params.isUnlocked() && unlockedFile.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            unlockedFile.delete();
+        }
+        if (params.isUnlocked() && !unlockedFile.exists()) {
+            try {
+                checkUnlockCode();
+                //noinspection ResultOfMethodCallIgnored
+                unlockedFile.createNewFile();
+            } catch (IOException | AuthenticationException ignored) {}
+        }
+        TantalumConstants.setUnlocked(unlockedFile.exists());
         TantalumConstants.setBuildNumber(buildNumber);
 
         setupLogging(directories, resources);
@@ -224,7 +253,7 @@ public class LauncherMain {
         } catch (InterruptedException e) {
             //Canceled by user
         } catch (DownloadException e) {
-            //JOptionPane.showMessageDialog(null, resources.getString("launcher.updateerror.download", pack.getDisplayName(), e.getMessage()), resources.getString("launcher.installerror.title"), JOptionPane.WARNING_MESSAGE);
+            //
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -442,13 +471,14 @@ public class LauncherMain {
         FileJavaSource javaVersionFile = FileJavaSource.load(new File(settings.getTechnicRoot(), "javaVersions.json"));
         javaVersionFile.enumerateVersions(javaVersions);
         javaVersions.selectVersion(settings.getJavaVersion(), settings.getJavaBitness());
-
-        TantalumUserStore users = TantalumUserStore.load(new File(directories.getLauncherDirectory(),"users.json"));
-        MojangAuthenticator mojangAuthenticator = new MojangAuthenticator(users.getClientToken());
-        Authlib authlib = new Authlib(new File(directories.getLauncherDirectory(),"authlib-servers.json"));
-        MicrosoftAuthenticator microsoftAuthenticator = new MicrosoftAuthenticator(new File(directories.getLauncherDirectory(), "oauth"));
-        UserModel userModel = new UserModel(users, microsoftAuthenticator, mojangAuthenticator, authlib);
-
+        TantalumUserStore users = TantalumUserStore.load(new File(directories.getLauncherDirectory(), "users.json"));
+        UserModel userModel = new UserModel(users, new MojangAuthenticator(users.getClientToken(), "https://blessingskin.azurewebsites.net/api/yggdrasil/authserver/"));
+        if (TantalumConstants.isUnlocked()) {
+            MojangAuthenticator mojangAuthenticator = new MojangAuthenticator(users.getClientToken());
+            Authlib authlib = new Authlib(new File(directories.getLauncherDirectory(), "authlib-servers.json"));
+            MicrosoftAuthenticator microsoftAuthenticator = new MicrosoftAuthenticator(new File(directories.getLauncherDirectory(), "oauth"));
+            userModel = new UserModel(users, microsoftAuthenticator, mojangAuthenticator, authlib);
+        }
         IModpackResourceType iconType = new IconResourceType();
         IModpackResourceType logoType = new LogoResourceType();
         IModpackResourceType backgroundType = new BackgroundResourceType();
@@ -464,14 +494,21 @@ public class LauncherMain {
 
         ISolderApi httpSolder = new HttpSolderApi(settings.getClientId());
         ISolderApi solder = new CachedSolderApi(directories, httpSolder, 60 * 60);
-
-        Tantalum tantalum = Tantalum.init(directories, solder, 60 * 60);
-
-        // Add Platforms to the platform store //
-        startupParameters.getPlatformUrl().forEach(tantalum::initPlatform);
-        // Static Platform Addition//
-        tantalum.initPlatform(TantalumConstants.TANTALUM_AUTH_PLATFORM_URL);
-        tantalum.initPlatform("https://api.technicpack.net/", "build", "707");
+        IAuthoritativePackSource packSource;
+        IPlatformApi platApi;
+        if (TantalumConstants.isUnlocked()) {
+            Tantalum tantalum = Tantalum.init(directories, solder, 60 * 60);
+            packSource = tantalum;
+            platApi = tantalum;
+            // Add Platforms to the platform store //
+            startupParameters.getPlatformUrl().forEach(tantalum::initPlatform);
+            // Static Platform Addition//
+            tantalum.initPlatform(TantalumConstants.TANTALUM_AUTH_PLATFORM_URL);
+            tantalum.initPlatform("https://api.technicpack.net/", "build", "707");
+        } else {
+            platApi = new ModpackCachePlatformApi(new HttpPlatformApi(),60 * 60, directories);
+            packSource = new PlatformPackInfoRepository(platApi, solder);
+        }
 
         IInstalledPackRepository packStore = TechnicInstalledPackStore.load(new File(directories.getLauncherDirectory(), "installedPacks.json"));
 
@@ -480,22 +517,25 @@ public class LauncherMain {
         migrators.add(new ResetJvmArgsIfDefaultString());
         SettingsFactory.migrateSettings(settings, packStore, directories, users, migrators);
 
-        PackLoader packList = new PackLoader(directories, packStore, tantalum);
-
-        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource((startupParameters.getSolderUrl()!=null?startupParameters.getSolderUrl():settings.getSolderURL()), solder), solder, tantalum, iconRepo, settings);
+        PackLoader packList = new PackLoader(directories, packStore, packSource);
+        if (startupParameters.getSolderUrl()!=null) {
+            settings.setSolderURL(startupParameters.getSolderUrl());
+            settings.save();
+        }
+        ModpackSelector selector = new ModpackSelector(resources, packList, new SolderPackSource(settings.getSolderURL(), solder), solder, platApi, iconRepo, settings);
         //ModpackSelector selector = new ModpackSelector(resources, packList, new FeaturedPackSource("http://platform.test/"), solder, platform, iconRepo, settings);
         selector.setBorder(BorderFactory.createEmptyBorder());
         userModel.addAuthListener(selector);
 
         resources.registerResource(selector);
 
-        DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, startupParameters.getDiscover(), tantalum, directories, selector);
+        DiscoverInfoPanel discoverInfoPanel = new DiscoverInfoPanel(resources, startupParameters.getDiscover(), platApi, directories, selector);
 
-        MinecraftLauncher launcher = new MinecraftLauncher(tantalum, directories, userModel, javaVersions, buildNumber);
-        ModpackInstaller modpackInstaller = new ModpackInstaller(tantalum, settings.getClientId());
+        MinecraftLauncher launcher = new MinecraftLauncher(platApi, directories, userModel, javaVersions, buildNumber);
+        ModpackInstaller modpackInstaller = new ModpackInstaller(platApi, settings.getClientId());
         Installer installer = new Installer(startupParameters, directories, modpackInstaller, launcher, settings, iconMapper);
 
-        final LauncherFrame frame = new LauncherFrame(resources, skinRepo, userModel, settings, selector, iconRepo, logoRepo, backgroundRepo, installer, avatarRepo, tantalum, directories, packStore, startupParameters, discoverInfoPanel, javaVersions, javaVersionFile, buildNumber);
+        final LauncherFrame frame = new LauncherFrame(resources, skinRepo, userModel, settings, selector, iconRepo, logoRepo, backgroundRepo, installer, avatarRepo, platApi, directories, packStore, startupParameters, discoverInfoPanel, javaVersions, javaVersionFile, buildNumber);
 
         //final LauncherFrame frame2 = new LauncherFrame(resources, skinRepo, userModel, settings, selector, iconRepo, logoRepo, backgroundRepo, installer, avatarRepo, platform, directories, packStore, startupParameters, discoverInfoPanel, javaVersions, javaVersionFile, buildNumber);
 

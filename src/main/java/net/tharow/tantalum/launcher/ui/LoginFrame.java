@@ -24,6 +24,7 @@ import net.tharow.tantalum.autoupdate.IBuildNumber;
 import net.tharow.tantalum.launcher.LauncherMain;
 import net.tharow.tantalum.launcher.settings.StartupParameters;
 import net.tharow.tantalum.launcher.ui.components.OptionsDialog;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.exception.*;
 import net.tharow.tantalum.launchercore.launch.java.JavaVersionRepository;
 import net.tharow.tantalum.launchercore.launch.java.source.FileJavaSource;
@@ -284,7 +285,9 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         addMojang.setHoverForeground(LauncherFrame.COLOR_BLUE);
         addMojang.addActionListener(e -> addMojangAccount());
         add(addMojang, new GridBagConstraints(0, 10, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
-
+        if (TantalumConstants.isUnlocked()) {
+            addMojang.setName("Add Tharow Services");
+        }
         // Microsoft login button
         addMicrosoft = new RoundedButton(resources.getString("login.addmicrosoft"));
         addMicrosoft.setBorder(BorderFactory.createEmptyBorder(5,17,10,17));
@@ -293,7 +296,10 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         addMicrosoft.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         addMicrosoft.setHoverForeground(LauncherFrame.COLOR_BLUE);
         addMicrosoft.addActionListener(e -> addMicrosoftAccount());
-        add(addMicrosoft, new GridBagConstraints(0, 11, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
+        if (TantalumConstants.isUnlocked()) {
+            add(addMicrosoft, new GridBagConstraints(0, 11, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(12,20,0,20),0,0));
+        }
+
 
 
 
@@ -305,7 +311,10 @@ public class LoginFrame extends DraggableFrame implements IRelocalizableResource
         addAuthlib.setForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         addAuthlib.setHoverForeground(LauncherFrame.COLOR_BLUE);
         addAuthlib.addActionListener(e -> addAuthlibAccount());
-        add(addAuthlib, new GridBagConstraints(0, 9, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(50,20,0,20),0,0));
+        if (TantalumConstants.isUnlocked()) {
+            add(addAuthlib, new GridBagConstraints(0, 9, GridBagConstraints.REMAINDER, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(50,20,0,20),0,0));
+        }
+
 
         //Authlib Auther Label
         authServerLabel = new JLabel(resources.getString("login.authserver"));

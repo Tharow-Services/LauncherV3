@@ -20,9 +20,11 @@ package net.tharow.tantalum.launcher.io;
 
 import com.google.gson.JsonSyntaxException;
 import net.tharow.tantalum.authlib.AuthlibUser;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.auth.IUserStore;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.minecraftcore.MojangUtils;
+import net.tharow.tantalum.minecraftcore.microsoft.auth.MicrosoftUser;
 import net.tharow.tantalum.minecraftcore.mojang.auth.MojangUser;
 import net.tharow.tantalum.utilslib.Utils;
 import org.apache.commons.io.FileUtils;
@@ -31,11 +33,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class TantalumUserStore implements IUserStore, IStore {
     private final String clientToken = UUID.randomUUID().toString();
@@ -112,11 +112,39 @@ public class TantalumUserStore implements IUserStore, IStore {
         return clientToken;
     }
 
+    public Collection<String> getMojangUsers() {
+        return getUsersOf(MojangUser.MOJANG_USER_TYPE).keySet();
+    }
+
+    public Collection<IUserType> getSavedMojangUsers() {
+        return getUsersOf(MojangUser.MOJANG_USER_TYPE).values();
+    }
+    public Collection<String> getMicrosoftUsers() {
+        return getUsersOf(MicrosoftUser.MC_MS_USER_TYPE).keySet();
+    }
+    public Collection<IUserType> getSavedMicrosoftUsers() {
+        return getUsersOf(MicrosoftUser.MC_MS_USER_TYPE).values();
+    }
+
+    protected Map<String, IUserType> getUsersOf(String userType) {
+        return savedUsers
+                .entrySet()
+                .stream()
+                .filter((entry) -> !entry.getValue().getMCUserType().equals(userType) )
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     public Collection<String> getUsers() {
+        if (!TantalumConstants.isUnlocked()) {
+            return getMojangUsers();
+        }
         return savedUsers.keySet();
     }
 
     public Collection<IUserType> getSavedUsers() {
+        if (!TantalumConstants.isUnlocked()) {
+            return getSavedMojangUsers();
+        }
         return savedUsers.values();
     }
 

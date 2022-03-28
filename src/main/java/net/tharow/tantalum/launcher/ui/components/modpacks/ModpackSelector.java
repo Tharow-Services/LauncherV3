@@ -22,11 +22,13 @@ import net.tharow.tantalum.launcher.settings.TantalumSettings;
 import net.tharow.tantalum.launcher.ui.LauncherFrame;
 import net.tharow.tantalum.launcher.ui.controls.modpacks.FindMoreWidget;
 import net.tharow.tantalum.launcher.ui.controls.modpacks.ModpackWidget;
+import net.tharow.tantalum.launchercore.TantalumConstants;
 import net.tharow.tantalum.launchercore.auth.IAuthListener;
 import net.tharow.tantalum.launchercore.auth.IUserType;
 import net.tharow.tantalum.launchercore.image.ImageRepository;
 import net.tharow.tantalum.launchercore.modpacks.*;
 import net.tharow.tantalum.launchercore.modpacks.packinfo.CombinedPackInfo;
+import net.tharow.tantalum.launchercore.modpacks.sources.IAuthoritativePackSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.IPackSource;
 import net.tharow.tantalum.launchercore.modpacks.sources.NameFilterPackSource;
 import net.tharow.tantalum.platform.IPlatformApi;
@@ -78,7 +80,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
     private final PackLoader packLoader;
     private final IPackSource defaultPackSource;
     private final ImageRepository<ModpackModel> iconRepo;
-    private final Tantalum tantalum;
+    private final IPlatformApi tantalum;
     private final ISolderApi solderApi;
 
     private JPanel widgetList;
@@ -132,7 +134,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
     private final TantalumSettings settings;
 
 
-    public ModpackSelector(ResourceLoader resources, PackLoader packLoader, IPackSource defaultPackSource, ISolderApi solderApi, Tantalum tantalum, ImageRepository<ModpackModel> iconRepo, TantalumSettings settings) {
+    public ModpackSelector(ResourceLoader resources, PackLoader packLoader, IPackSource defaultPackSource, ISolderApi solderApi, IPlatformApi tantalum, ImageRepository<ModpackModel> iconRepo, TantalumSettings settings) {
         this.resources = resources;
         this.packLoader = packLoader;
         this.iconRepo = iconRepo;
@@ -182,7 +184,7 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
             searchList.removeActionListener(listener);
         }
         searchList.removeAllItems();
-        tantalum.getApis().forEach((platform)->searchList.addItem(platform));
+        tantalum.getApis().forEach(searchList::addItem);
         searchList.setSelectedIndex(0);
         searchList.addActionListener(e -> changeStream());
     }
@@ -227,8 +229,10 @@ public class ModpackSelector extends TintablePanel implements IModpackContainer,
         list.setSelectionForeground(LauncherFrame.COLOR_BUTTON_BLUE);
         list.setSelectionBackground(LauncherFrame.COLOR_FORMELEMENT_INTERNAL);
         list.setBackground(LauncherFrame.COLOR_CENTRAL_BACK_OPAQUE);
+        if (TantalumConstants.isUnlocked()) {
+            header.add(searchList, new GridBagConstraints(1,1,1,1,1,0,GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5,0,5,0), 0, 12));
+        }
 
-        header.add(searchList, new GridBagConstraints(1,1,1,1,1,0,GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(5,0,5,0), 0, 12));
 
         widgetList = new JPanel();
         widgetList.setOpaque(false);

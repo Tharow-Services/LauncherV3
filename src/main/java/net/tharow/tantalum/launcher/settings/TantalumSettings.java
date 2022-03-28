@@ -76,7 +76,7 @@ public class TantalumSettings implements ILaunchOptions {
     private String HTTPProxyBypassDomains = "";
     private String authlibServerURL = ""; //Authlib-Injector Server Address
     private String discoverURL = "https://tantalum.tharow.net/launcher/discover.html";
-    private String solderURL = "https://srv2.azurewebsites.net/api/";
+    private String solderURL = "https://static.tantalum.tharow.net/solder/";
     private String platformURL = "https://tantalum-auth.azurewebsites.net/";
     private Boolean forceOverrideRootCerts = true;
     private Boolean advOptions = true;
